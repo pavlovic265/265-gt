@@ -1,19 +1,19 @@
 # Name of the executable
 BINARY_NAME=gt
 
-# Build options
+# Directory to store the build output
 BUILD_DIR=build
-SOURCES=$(shell find . -type f -name '*.go')
 
 .PHONY: all build clean run
 
 # Default target, builds the application
 all: build
 
-# Build the project
-build: $(SOURCES)
+# Build the project for the host platform
+build:
 	@echo "Building $(BINARY_NAME)..."
-	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME) .
+	mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
 	@echo "Build complete."
 
 # Run the built binary
@@ -24,5 +24,5 @@ run: build
 # Clean the build directory
 clean:
 	@echo "Cleaning up..."
-	rm  $(BUILD_DIR)/gt
+	rm -rf $(BUILD_DIR)
 	@echo "Cleanup complete."
