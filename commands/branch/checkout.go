@@ -11,14 +11,14 @@ import (
 )
 
 var checkoutCmd = &cobra.Command{
-	Use:   "checkout",
-	Short: "Interactively checkout a branch",
+	Use:     "checkout",
+	Aliases: []string{"co"},
+	Short:   "Interactively checkout a branch",
 }
 
 func Checkout() *cobra.Command {
 	checkoutCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		checkoutBranch()
-
 		return nil
 	}
 

@@ -10,6 +10,7 @@ import (
 
 var statusCmd = &cobra.Command{
 	Use:                "status",
+	Aliases:            []string{"st"},
 	Short:              "A simple CLI tool to show Git status",
 	DisableFlagParsing: true,
 }

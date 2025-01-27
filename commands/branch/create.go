@@ -10,6 +10,7 @@ import (
 
 var createCmd = &cobra.Command{
 	Use:                "create",
+	Aliases:            []string{"c"},
 	Short:              "create branch",
 	DisableFlagParsing: true,
 }
