@@ -11,7 +11,7 @@ import (
 var pushCmd = &cobra.Command{
 	Use:                "push",
 	Aliases:            []string{"pu"},
-	Short:              "push branch",
+	Short:              "push branch always froce",
 	DisableFlagParsing: true,
 }
 
@@ -21,7 +21,10 @@ func Push() *cobra.Command {
 		if err != nil {
 			return fmt.Errorf("failed to get current branch: %w", err)
 		}
-		exeArgs := append([]string{"push", "--force", "origin", string(currentBranch)}, args...)
+
+		currentBranchName := string(currentBranch[:len(currentBranch)-1])
+
+		exeArgs := append([]string{"push", "--force", "origin", currentBranchName}, args...)
 		exeCmd := exec.Command("git", exeArgs...)
 		exeCmd.Stdout = os.Stdout
 		exeCmd.Stderr = os.Stderr
