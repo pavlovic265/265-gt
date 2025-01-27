@@ -14,7 +14,7 @@ var contCmd = &cobra.Command{
 	DisableFlagParsing: true,
 }
 
-func cont() *cobra.Command {
+func Cont() *cobra.Command {
 	contCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		exeArgs := append([]string{"rebase", "--continue"}, args...)
 		exeCmd := exec.Command("git", exeArgs...)

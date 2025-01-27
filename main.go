@@ -19,6 +19,9 @@ func main() {
 	rootCmd.AddCommand(commands.Checkout())
 	rootCmd.AddCommand(commands.Swich())
 	rootCmd.AddCommand(commands.Move())
+	rootCmd.AddCommand(commands.Add())
+	rootCmd.AddCommand(commands.Cont())
+	rootCmd.AddCommand(commands.Push())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

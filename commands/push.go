@@ -15,7 +15,7 @@ var pushCmd = &cobra.Command{
 	DisableFlagParsing: true,
 }
 
-func push() *cobra.Command {
+func Push() *cobra.Command {
 	pushCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		currentBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 		if err != nil {
