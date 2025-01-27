@@ -18,8 +18,8 @@ build:
 
 # Run the built binary
 run: build
-	@echo "Running $(BINARY_NAME)..."
-	./$(BUILD_DIR)/$(BINARY_NAME)
+	@echo "Running $(BINARY_NAME) with arguments $(args)..."
+	./$(BUILD_DIR)/$(BINARY_NAME) $(args)
 
 # Clean the build directory
 clean:

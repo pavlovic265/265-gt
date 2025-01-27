@@ -19,6 +19,7 @@ func main() {
 
 	rootCmd.AddCommand(branch.Create())
 	rootCmd.AddCommand(branch.Checkout())
+	rootCmd.AddCommand(branch.Swich())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
