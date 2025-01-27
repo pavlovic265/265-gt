@@ -1,4 +1,4 @@
-module pavlovic265/265-gt
+module github.com/pavlovic265/265-gt
 
 go 1.20
 
