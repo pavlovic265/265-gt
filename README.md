@@ -14,4 +14,8 @@ to be done
 | add      | [x]    |                     |
 | move     | [ ]    |                     |
 | sync     | [ ]    |                     |
-| clean    | [ ]  |                     |
+| clean    | [ ]    |                     |
+| push    | [ ]    |                     |
+| pull    | [ ]    |                     |
+| pull    | [ ]    |                     |
+
