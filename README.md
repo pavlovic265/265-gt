@@ -3,11 +3,15 @@
 
 to be done
 
-
-Features
-
-create - 
-checkout -
-status - 
-swich
-
+| Features | Status | Improvement         |
+|----------|--------|---------------------|
+| create   | [x]    |                     |
+| checkout | [x]    | Needs Enhancement   |
+| bottom   | [ ]    |                     |
+| top      | [ ]    |                     |
+| status   | [x]    |                     |
+| switch   | [x]    |                     |
+| add      | [x]    |                     |
+| move     | [ ]    |                     |
+| sync     | [ ]    |                     |
+| clean    | [ ]  |                     |
