@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"pavlovic265/265-gt/commands"
+
+	"github.com/pavlovic265/265-gt/commands"
 
 	"github.com/spf13/cobra"
 )

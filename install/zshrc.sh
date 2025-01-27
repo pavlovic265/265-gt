@@ -16,7 +16,7 @@ GOBIN=$(go env GOPATH)/bin
 if [[ ":$PATH:" != *":$GOBIN:"* ]]; then
   echo "Adding $GOBIN to PATH..."
   export PATH=$PATH:$GOBIN
-  echo 'export PATH=$PATH:'"$GOBIN" >>~/.bashrc # Add to bashrc or use .zshrc for zsh
+  echo 'export PATH=$PATH:'"$GOBIN" >>~/.zahrc # Add to bashrc or use .zshrc for zsh
 fi
 
 # Verify installation
