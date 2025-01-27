@@ -11,7 +11,7 @@ import (
 var moveCmd = &cobra.Command{
 	Use:                "move",
 	Aliases:            []string{"mo"},
-	Short:              "A simple CLI tool to show Git move",
+	Short:              "rebase branch onto other branch",
 	DisableFlagParsing: true,
 }
 

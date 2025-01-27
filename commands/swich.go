@@ -11,7 +11,7 @@ import (
 var swichCmd = &cobra.Command{
 	Use:                "swich",
 	Aliases:            []string{"sw"},
-	Short:              "Swich back to previous branch",
+	Short:              "swich back to previous branch",
 	DisableFlagParsing: true,
 }
 

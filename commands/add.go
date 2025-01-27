@@ -11,7 +11,7 @@ import (
 var addCmd = &cobra.Command{
 	Use:                "add",
 	Aliases:            []string{"ad"},
-	Short:              "A simple CLI tool to show Git add",
+	Short:              "git add",
 	DisableFlagParsing: true,
 }
 
