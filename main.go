@@ -18,6 +18,7 @@ func main() {
 	rootCmd.AddCommand(commands.Create())
 	rootCmd.AddCommand(commands.Checkout())
 	rootCmd.AddCommand(commands.Swich())
+	rootCmd.AddCommand(commands.Move())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
