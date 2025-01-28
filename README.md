@@ -1,7 +1,6 @@
 # 265-gt
 
 
-to be done
 
 | Features | Alias   | Status | Improvement         |
 |----------|---------|--------|---------------------|
