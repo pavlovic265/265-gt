@@ -19,7 +19,8 @@ var checkoutCmd = &cobra.Command{
 func Checkout() *cobra.Command {
 	checkoutCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
-			err := exec.Command("git", "checkout", args[0]).Run()
+			exeArgs := append([]string{"checkout"}, args...)
+			err := exec.Command("git", exeArgs...).Run()
 			if err != nil {
 				return fmt.Errorf("error checking out branch: %w", err)
 			}
