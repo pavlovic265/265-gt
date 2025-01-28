@@ -1,7 +1,5 @@
 # 265-gt
 
-
-
 | Features | Alias   | Status | Improvement         |
 |----------|---------|--------|---------------------|
 | create   | c      | [x]    |                     |
