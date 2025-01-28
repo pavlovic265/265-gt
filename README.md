@@ -1,7 +1,7 @@
 # 265-gt
 
 | Features | Alias   | Status | Notes         | what needs to be done         |
-|----------|---------|--------|---------------------|
+|----------|---------|--------|---------------------|---------------------|
 | create   | c      | [x]    |                     ||
 | checkout | co      | [x]    | Maybe better ui, e.g. graph of branchs   |
 | bottom   | bt     | [ ]    |                     | move branch up |
