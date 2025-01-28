@@ -18,7 +18,7 @@ var moveCmd = &cobra.Command{
 func Move() *cobra.Command {
 	moveCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		branch := args[0]
-		err := rebaseOntoCurrent(branch)
+		err := rebaseOnto(branch)
 		if err != nil {
 			fmt.Printf("Error rebasing branch: %s\n", err)
 			os.Exit(1)
@@ -30,7 +30,7 @@ func Move() *cobra.Command {
 	return moveCmd
 }
 
-func rebaseOntoCurrent(branch string) error {
+func rebaseOnto(branch string) error {
 	// Get the current branch name
 	currentBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 	if err != nil {
@@ -49,11 +49,11 @@ func rebaseOntoCurrent(branch string) error {
 	}
 
 	// Rebase onto the current branch
-	rebaseCmd := exec.Command("git", "rebase", "--onto", currentBranchName, branch+"~1", branch)
+	rebaseCmd := exec.Command("git", "rebase", "--onto", branch, currentBranchName+"~1", currentBranchName)
 	rebaseCmd.Stdout = os.Stdout
 	rebaseCmd.Stderr = os.Stderr
 	if err := rebaseCmd.Run(); err != nil {
-		return fmt.Errorf("failed to rebase branch %s onto %s: %w", branch, currentBranchName, err)
+		return fmt.Errorf("failed to rebase branch %s onto %s: %w", currentBranchName, branch, err)
 	}
 
 	return nil
