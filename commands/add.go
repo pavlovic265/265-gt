@@ -10,7 +10,6 @@ import (
 
 var addCmd = &cobra.Command{
 	Use:                "add",
-	Aliases:            []string{"ad"},
 	Short:              "git add",
 	DisableFlagParsing: true,
 }
