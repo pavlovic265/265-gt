@@ -60,7 +60,7 @@ func loadGlobalConfig() (*Config, error) {
 		return nil, err
 	}
 
-	configPath := filepath.Join(homeDir, ".gt", "config.yaml")
+	configPath := filepath.Join(homeDir, ".gtconfig.yaml")
 
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -88,7 +88,7 @@ func loadLoaclConfig() (*Config, error) {
 	}
 	localConfig := strings.TrimSpace(out.String())
 
-	configPath := filepath.Join(localConfig, ".gt.yaml")
+	configPath := filepath.Join(localConfig, ".gtconfig.yaml")
 
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -101,8 +101,6 @@ func loadLoaclConfig() (*Config, error) {
 	if err := decoder.Decode(cfg); err != nil {
 		return nil, fmt.Errorf("failed to decode config file: %w", err)
 	}
-
-	fmt.Println(":>> ", cfg)
 
 	return cfg, nil
 }
