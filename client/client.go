@@ -8,6 +8,7 @@ import (
 )
 
 type CliClient interface {
+	AuthStatus() error
 	CreatePullRequest(args []string) error
 }
 

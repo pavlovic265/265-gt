@@ -6,6 +6,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
+	"github.com/pavlovic265/265-gt/commands/auth"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
 
@@ -32,7 +33,10 @@ func main() {
 	rootCmd.AddCommand(commands.Cont())
 	rootCmd.AddCommand(commands.Push())
 	rootCmd.AddCommand(commands.Pull())
+
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand())
+
+	rootCmd.AddCommand(auth.NewAuth())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

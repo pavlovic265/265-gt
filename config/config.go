@@ -12,8 +12,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Account struct {
+	User  string `yaml:"user"`
+	Token string `yaml:"token"`
+}
+
 type GitHub struct {
-	Assignee string `yaml:"assignee"`
+	Assignee string    `yaml:"assignee"`
+	Accounts []Account `yaml:"accounts"`
 }
 
 type Config struct {
