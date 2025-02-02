@@ -11,7 +11,8 @@ var authCmd = &cobra.Command{
 }
 
 func NewAuth() *cobra.Command {
-	authCmd.AddCommand(NewStatus())
+	authCmd.AddCommand(NewAuthStatus())
+	authCmd.AddCommand(NewAuthSwich())
 
 	return authCmd
 }
