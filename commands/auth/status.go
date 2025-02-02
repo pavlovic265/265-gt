@@ -15,7 +15,7 @@ func NewAuthStatus() *cobra.Command {
 		Short:              "see status of current auth user",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// git checkout -b
+			fmt.Println("Checking status...")
 			err := client.GlobalClient.AuthStatus()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error with auth: %v\n", err)
