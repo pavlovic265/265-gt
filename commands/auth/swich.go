@@ -10,29 +10,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var swichCmd = &cobra.Command{
-	Use:     "swich",
-	Aliases: []string{"sw"},
-	Short:   "swich accounts",
-}
-
-func NewAuthSwich() *cobra.Command {
-	swichCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if len(args) > 0 {
-			err := executeCommand(args[0])
-			if err != nil {
-				return fmt.Errorf("error swiching accounts %w", err)
+func NewAuthSwichAccountCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "swich",
+		Aliases: []string{"sw"},
+		Short:   "swich accounts",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 0 {
+				err := executeCommand(args[0])
+				if err != nil {
+					return fmt.Errorf("error swiching accounts %w", err)
+				}
+			} else {
+				err := startUserSwich()
+				if err != nil {
+					return fmt.Errorf("error swiching accounts %w", err)
+				}
 			}
-		} else {
-			err := startUserSwich()
-			if err != nil {
-				return fmt.Errorf("error swiching accounts %w", err)
-			}
-		}
-		return nil
+			return nil
+		},
 	}
-
-	return swichCmd
 }
 
 type model struct {

@@ -10,27 +10,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var checkoutCmd = &cobra.Command{
-	Use:     "checkout",
-	Aliases: []string{"co"},
-	Short:   "checkout branch",
-}
-
-func Checkout() *cobra.Command {
-	checkoutCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		if len(args) > 0 {
-			exeArgs := append([]string{"checkout"}, args...)
-			err := exec.Command("git", exeArgs...).Run()
-			if err != nil {
-				return fmt.Errorf("error checking out branch: %w", err)
+func NewCheckoutCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "checkout",
+		Aliases: []string{"co"},
+		Short:   "checkout branch",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 0 {
+				exeArgs := append([]string{"checkout"}, args...)
+				err := exec.Command("git", exeArgs...).Run()
+				if err != nil {
+					return fmt.Errorf("error checking out branch: %w", err)
+				}
+			} else {
+				checkoutBranch()
 			}
-		} else {
-			checkoutBranch()
-		}
-		return nil
+			return nil
+		},
 	}
-
-	return checkoutCmd
 }
 
 type model struct {

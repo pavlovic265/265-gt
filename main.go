@@ -24,15 +24,15 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	rootCmd.AddCommand(commands.Status())
-	rootCmd.AddCommand(commands.Create())
-	rootCmd.AddCommand(commands.Checkout())
-	rootCmd.AddCommand(commands.Swich())
-	rootCmd.AddCommand(commands.Move())
-	rootCmd.AddCommand(commands.Add())
-	rootCmd.AddCommand(commands.Cont())
-	rootCmd.AddCommand(commands.Push())
-	rootCmd.AddCommand(commands.Pull())
+	rootCmd.AddCommand(commands.NewStatusCommand())
+	rootCmd.AddCommand(commands.NewCreateCommand())
+	rootCmd.AddCommand(commands.NewCheckoutCommand())
+	rootCmd.AddCommand(commands.NewSwichCommand())
+	rootCmd.AddCommand(commands.NewMoveCommand())
+	rootCmd.AddCommand(commands.NewAddCommand())
+	rootCmd.AddCommand(commands.NewContCommand())
+	rootCmd.AddCommand(commands.NewPushCommand())
+	rootCmd.AddCommand(commands.NewPullCommand())
 
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand())
 

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewAuthStatus() *cobra.Command {
+func NewAuthStatusCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:                "status",
 		Aliases:            []string{"st"},

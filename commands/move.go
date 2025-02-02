@@ -8,26 +8,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var moveCmd = &cobra.Command{
-	Use:                "move",
-	Aliases:            []string{"mo"},
-	Short:              "rebase branch onto other branch",
-	DisableFlagParsing: true,
-}
+func NewMoveCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:                "move",
+		Aliases:            []string{"mo"},
+		Short:              "rebase branch onto other branch",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			branch := args[0]
+			err := rebaseOnto(branch)
+			if err != nil {
+				fmt.Printf("Error rebasing branch: %s\n", err)
+				os.Exit(1)
+			}
 
-func Move() *cobra.Command {
-	moveCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		branch := args[0]
-		err := rebaseOnto(branch)
-		if err != nil {
-			fmt.Printf("Error rebasing branch: %s\n", err)
-			os.Exit(1)
-		}
-
-		return nil
+			return nil
+		},
 	}
-
-	return moveCmd
 }
 
 func rebaseOnto(branch string) error {
