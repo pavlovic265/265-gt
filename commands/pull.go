@@ -1,35 +1,37 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
-func NewPullCommand() *cobra.Command {
+type pullCommand struct {
+	exe executor.Executor
+}
+
+func NewPullCommand(
+	exe executor.Executor,
+) pullCommand {
+	return pullCommand{
+		exe: exe,
+	}
+}
+
+func (svc *pullCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "pull",
-		Aliases:            []string{"pl"},
-		Short:              "pull branch",
-		DisableFlagParsing: true,
+		Use:     "pull",
+		Aliases: []string{"pl"},
+		Short:   "pull branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
 			if err != nil {
-				return fmt.Errorf("failed to get current branch: %w", err)
+				return err
 			}
 
-			currentBranchName := string(currentBranch[:len(currentBranch)-1])
-
-			exeArgs := append([]string{"pull", "origin", currentBranchName}, args...)
-			exeCmd := exec.Command("git", exeArgs...)
-			exeCmd.Stdout = os.Stdout
-			exeCmd.Stderr = os.Stderr
-
-			if err := exeCmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error executing git pull: %v\n", err)
-				os.Exit(1)
+			exeArgs := []string{"pull", "origin", *currentBranch}
+			if err := svc.exe.Execute("git", exeArgs...); err != nil {
+				return err
 			}
 
 			return nil

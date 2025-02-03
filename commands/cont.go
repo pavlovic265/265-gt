@@ -1,30 +1,30 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-func NewContCommand() *cobra.Command {
+type contCommand struct {
+	exe executor.Executor
+}
+
+func NewContCommand(
+	exe executor.Executor,
+) contCommand {
+	return contCommand{
+		exe: exe,
+	}
+}
+
+func (svc *contCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "cont",
-		Short:              "Used only finished resloving conflicnts",
-		DisableFlagParsing: true,
+		Use:   "cont",
+		Short: "short for rebase --contine",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"rebase", "--continue"}, args...)
-			exeCmd := exec.Command("git", exeArgs...)
-			exeCmd.Stdout = os.Stdout
-			exeCmd.Stderr = os.Stderr
+			exeArgs := []string{"rebase", "--continue"}
 
-			if err := exeCmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error executing git cont: %v\n", err)
-				os.Exit(1)
-			}
-
-			return nil
+			return svc.exe.Execute("git", exeArgs...)
 		},
 	}
 }

@@ -1,31 +1,31 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-func NewCreateCommand() *cobra.Command {
+type createCommand struct {
+	exe executor.Executor
+}
+
+func NewCreateCommand(
+	exe executor.Executor,
+) createCommand {
+	return createCommand{
+		exe: exe,
+	}
+}
+
+func (svc *createCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "create",
-		Aliases:            []string{"c"},
-		Short:              "create branch",
-		DisableFlagParsing: true,
+		Use:     "create",
+		Aliases: []string{"c"},
+		Short:   "create branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"checkout", "-b"}, args...)
-			exeCmd := exec.Command("git", exeArgs...)
-			exeCmd.Stdout = os.Stdout
-			exeCmd.Stderr = os.Stderr
+			exeArgs := []string{"checkout", "-b"}
 
-			if err := exeCmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error executing git status: %v\n", err)
-				os.Exit(1)
-			}
-
-			return nil
+			return svc.exe.Execute("git", exeArgs...)
 		},
 	}
 }

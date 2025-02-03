@@ -1,14 +1,23 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-func NewStatusCommand() *cobra.Command {
+type statusCommand struct {
+	exe executor.Executor
+}
+
+func NewStatusCommand(
+	exe executor.Executor,
+) statusCommand {
+	return statusCommand{
+		exe: exe,
+	}
+}
+
+func (svc *statusCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "status",
 		Aliases:            []string{"st"},
@@ -16,16 +25,8 @@ func NewStatusCommand() *cobra.Command {
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"status"}, args...)
-			exeCmd := exec.Command("git", exeArgs...)
-			exeCmd.Stdout = os.Stdout
-			exeCmd.Stderr = os.Stderr
 
-			if err := exeCmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error executing git status: %v\n", err)
-				os.Exit(1)
-			}
-
-			return nil
+			return svc.exe.Execute("git", exeArgs...)
 		},
 	}
 }

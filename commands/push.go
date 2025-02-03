@@ -1,35 +1,37 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
-func NewPushCommand() *cobra.Command {
+type pushCommand struct {
+	exe executor.Executor
+}
+
+func NewPushCommand(
+	exe executor.Executor,
+) pushCommand {
+	return pushCommand{
+		exe: exe,
+	}
+}
+
+func (svc *pushCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "push",
-		Aliases:            []string{"pu"},
-		Short:              "push branch always froce",
-		DisableFlagParsing: true,
+		Use:     "push",
+		Aliases: []string{"pu"},
+		Short:   "push branch always froce",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
 			if err != nil {
-				return fmt.Errorf("failed to get current branch: %w", err)
+				return err
 			}
 
-			currentBranchName := string(currentBranch[:len(currentBranch)-1])
-
-			exeArgs := append([]string{"push", "--force", "origin", currentBranchName}, args...)
-			exeCmd := exec.Command("git", exeArgs...)
-			exeCmd.Stdout = os.Stdout
-			exeCmd.Stderr = os.Stderr
-
-			if err := exeCmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error executing git push: %v\n", err)
-				os.Exit(1)
+			exeArgs := []string{"push", "--force", "origin", *currentBranch}
+			if err := svc.exe.Execute("git", exeArgs...); err != nil {
+				return err
 			}
 
 			return nil

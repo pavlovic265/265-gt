@@ -9,6 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/commands/auth"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/executor"
 
 	"github.com/spf13/cobra"
 )
@@ -24,15 +25,31 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	rootCmd.AddCommand(commands.NewStatusCommand())
-	rootCmd.AddCommand(commands.NewCreateCommand())
+	exe := executor.NewExe()
+
+	addCommand := commands.NewAddCommand(exe)
+	rootCmd.AddCommand(addCommand.Command())
+
+	statusCommand := commands.NewStatusCommand(exe)
+	rootCmd.AddCommand(statusCommand.Command())
+
+	swichCommand := commands.NewSwichCommand(exe)
+	rootCmd.AddCommand(swichCommand.Command())
+
+	pushCommand := commands.NewPushCommand(exe)
+	rootCmd.AddCommand(pushCommand.Command())
+
+	pullCommand := commands.NewPullCommand(exe)
+	rootCmd.AddCommand(pullCommand.Command())
+
+	createCommand := commands.NewCreateCommand(exe)
+	rootCmd.AddCommand(createCommand.Command())
+
+	contCommand := commands.NewContCommand(exe)
+	rootCmd.AddCommand(contCommand.Command())
+
 	rootCmd.AddCommand(commands.NewCheckoutCommand())
-	rootCmd.AddCommand(commands.NewSwichCommand())
 	rootCmd.AddCommand(commands.NewMoveCommand())
-	rootCmd.AddCommand(commands.NewAddCommand())
-	rootCmd.AddCommand(commands.NewContCommand())
-	rootCmd.AddCommand(commands.NewPushCommand())
-	rootCmd.AddCommand(commands.NewPullCommand())
 
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand())
 
