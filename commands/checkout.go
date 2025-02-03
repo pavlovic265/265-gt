@@ -2,128 +2,84 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/components"
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-func NewCheckoutCommand() *cobra.Command {
+type checkoutCommand struct {
+	exe executor.Executor
+}
+
+func NewCheckoutCommand(
+	exe executor.Executor,
+) pushCommand {
+	return pushCommand{
+		exe: exe,
+	}
+}
+
+func (svc *checkoutCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "checkout",
 		Aliases: []string{"co"},
 		Short:   "checkout branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				exeArgs := append([]string{"checkout"}, args...)
-				err := exec.Command("git", exeArgs...).Run()
-				if err != nil {
+				exeArgs := []string{"checkout"}
+				if err := svc.exe.Execute("git", exeArgs...); err != nil {
 					return fmt.Errorf("error checking out branch: %w", err)
 				}
 			} else {
-				checkoutBranch()
+				branches, err := svc.getBranches()
+				if err != nil {
+					return err
+				}
+				return svc.checkoutBranch(branches)
 			}
 			return nil
 		},
 	}
 }
 
-type model struct {
-	allChoices []string
-	choices    []string
-	cursor     int
-	query      string
-	selected   string
-}
+func (svc *checkoutCommand) checkoutBranch(
+	choices []string,
+) error {
+	initialModel := components.ListModel{
+		AllChoices: choices,
+		Choices:    choices,
+		Cursor:     0,
+		Query:      "",
+	}
 
-func (m model) Init() tea.Cmd {
+	program := tea.NewProgram(initialModel)
+
+	if finalModel, err := program.Run(); err == nil {
+		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+			fmt.Printf("Checking out branch '%s'...\n", m.Selected)
+			exeArgs := []string{"checkout", m.Selected}
+			if err := svc.exe.Execute("git", exeArgs...); err != nil {
+				return fmt.Errorf("error checking out branch: %w", err)
+			}
+
+		}
+	} else {
+		return fmt.Errorf("error running program: %w", err)
+	}
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down", "j":
-			if m.cursor < len(m.choices)-1 {
-				m.cursor++
-			}
-		case "enter":
-			m.selected = m.choices[m.cursor]
-			return m, tea.Quit
-		case "backspace":
-			if len(m.query) > 0 {
-				m.query = m.query[:len(m.query)-1]
-			}
-		default:
-			if msg.Type == tea.KeyRunes {
-				m.query += msg.String()
-			}
-		}
-
-		// Filter branches based on query
-		m.filterChoices()
-	}
-
-	return m, nil
-}
-
-func (m model) View() string {
-	s := fmt.Sprintf("Search: %s\n\n", m.query)
-
-	for i, choice := range m.choices {
-		cursor := " "
-		if m.cursor == i {
-			cursor = ">"
-		}
-
-		line := fmt.Sprintf("%s %s", cursor, choice)
-
-		if m.cursor == i {
-			line = fmt.Sprintf("\033[36m%s\033[0m", line)
-		}
-
-		s += line + "\n"
-	}
-
-	s += "\nPress q to quit.\n"
-
-	return s
-}
-
-func (m *model) filterChoices() {
-	if m.query == "" {
-		m.choices = m.allChoices
-		return
-	}
-
-	var filtered []string
-	for _, choice := range m.allChoices {
-		if strings.Contains(choice, m.query) {
-			filtered = append(filtered, choice)
-		}
-	}
-	m.choices = filtered
-	if m.cursor >= len(filtered) {
-		m.cursor = len(filtered) - 1
-	}
-}
-
-func getBranches() ([]string, error) {
-	out, err := exec.Command("git", "branch", "--list").Output()
+func (svc *checkoutCommand) getBranches() ([]string, error) {
+	exeArgs := []string{"branch", "--list"}
+	output, err := svc.exe.ExecuteWithOutput("git", exeArgs...)
 	if err != nil {
 		return nil, err
 	}
 
-	lines := strings.Split(string(out), "\n")
+	lines := strings.Split(string(output), "\n")
 	var branches []string
 	for _, line := range lines {
 		branch := strings.TrimSpace(line)
@@ -132,34 +88,4 @@ func getBranches() ([]string, error) {
 		}
 	}
 	return branches, nil
-}
-
-func checkoutBranch() {
-	branches, err := getBranches()
-	if err != nil {
-		fmt.Println("Error getting branches:", err)
-		return
-	}
-
-	initialModel := model{
-		allChoices: branches,
-		choices:    branches,
-		cursor:     0,
-		query:      "",
-	}
-
-	p := tea.NewProgram(initialModel)
-
-	if finalModel, err := p.Run(); err == nil {
-		if m, ok := finalModel.(model); ok && m.selected != "" {
-			fmt.Printf("Checking out branch '%s'...\n", m.selected)
-			err = exec.Command("git", "checkout", m.selected).Run()
-			if err != nil {
-				fmt.Println("Error checking out branch:", err)
-			}
-		}
-	} else {
-		fmt.Printf("Error running program: %v\n", err)
-		os.Exit(1)
-	}
 }
