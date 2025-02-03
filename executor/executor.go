@@ -31,11 +31,6 @@ func (exe exe) Execute(name string, args ...string) error {
 			err,
 		)
 		os.Exit(1)
-		//		return fmt.Errorf("error executing `%s %s` with err (%w)",
-		//			name,
-		//			strings.Join(args, " "),
-		//			err,
-		//		)
 	}
 
 	return nil
@@ -43,16 +38,15 @@ func (exe exe) Execute(name string, args ...string) error {
 
 func (exe exe) ExecuteWithOutput(name string, args ...string) ([]byte, error) {
 	cmd := exec.Command(name, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
 
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("error executing `%s %s` with err (%w)",
+		fmt.Printf("error executing `%s %s` with err (%w)",
 			name,
 			strings.Join(args, " "),
 			err,
 		)
+		os.Exit(1)
 	}
 
 	return output, nil

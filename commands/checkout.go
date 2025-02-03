@@ -16,8 +16,8 @@ type checkoutCommand struct {
 
 func NewCheckoutCommand(
 	exe executor.Executor,
-) pushCommand {
-	return pushCommand{
+) checkoutCommand {
+	return checkoutCommand{
 		exe: exe,
 	}
 }
@@ -29,7 +29,7 @@ func (svc *checkoutCommand) Command() *cobra.Command {
 		Short:   "checkout branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				exeArgs := []string{"checkout"}
+				exeArgs := []string{"checkout", args[0]}
 				if err := svc.exe.Execute("git", exeArgs...); err != nil {
 					return fmt.Errorf("error checking out branch: %w", err)
 				}
