@@ -25,7 +25,7 @@ func (exe exe) Execute(name string, args ...string) error {
 
 	if err := cmd.Run(); err != nil {
 
-		fmt.Printf("error executing `%s %s` with err (%w)",
+		fmt.Printf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),
 			err,
@@ -41,7 +41,7 @@ func (exe exe) ExecuteWithOutput(name string, args ...string) ([]byte, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Printf("error executing `%s %s` with err (%w)",
+		fmt.Printf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),
 			err,
