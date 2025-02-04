@@ -2,11 +2,11 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +34,7 @@ func (svc *checkoutCommand) Command() *cobra.Command {
 					return fmt.Errorf("error checking out branch: %w", err)
 				}
 			} else {
-				branches, err := svc.getBranches()
+				branches, err := utils.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}
@@ -70,22 +70,4 @@ func (svc *checkoutCommand) checkoutBranch(
 		return fmt.Errorf("error running program: %w", err)
 	}
 	return nil
-}
-
-func (svc *checkoutCommand) getBranches() ([]string, error) {
-	exeArgs := []string{"branch", "--list"}
-	output, err := svc.exe.ExecuteWithOutput("git", exeArgs...)
-	if err != nil {
-		return nil, err
-	}
-
-	lines := strings.Split(string(output), "\n")
-	var branches []string
-	for _, line := range lines {
-		branch := strings.TrimSpace(line)
-		if branch != "" {
-			branches = append(branches, strings.TrimPrefix(branch, "* "))
-		}
-	}
-	return branches, nil
 }

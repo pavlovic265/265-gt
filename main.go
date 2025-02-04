@@ -51,7 +51,8 @@ func main() {
 	checkoutCommand := commands.NewCheckoutCommand(exe)
 	rootCmd.AddCommand(checkoutCommand.Command())
 
-	rootCmd.AddCommand(commands.NewMoveCommand())
+	moveCommand := commands.NewMoveCommand(exe)
+	rootCmd.AddCommand(moveCommand.Command())
 
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand())
 

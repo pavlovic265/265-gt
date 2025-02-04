@@ -2,24 +2,50 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/components"
+	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
-func NewMoveCommand() *cobra.Command {
+type moveCommand struct {
+	exe executor.Executor
+}
+
+func NewMoveCommand(
+	exe executor.Executor,
+) moveCommand {
+	return moveCommand{
+		exe: exe,
+	}
+}
+
+func (svc *moveCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "move",
-		Aliases:            []string{"mo"},
-		Short:              "rebase branch onto other branch",
-		DisableFlagParsing: true,
+		Use:     "move",
+		Aliases: []string{"mo"},
+		Short:   "rebase branch onto other branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch := args[0]
-			err := rebaseOnto(branch)
+			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
 			if err != nil {
-				fmt.Printf("Error rebasing branch: %s\n", err)
-				os.Exit(1)
+				return err
+			}
+
+			if len(args) > 0 {
+				parentBranch := args[0]
+				if err := svc.rebaseBranchOnto(parentBranch, *currentBranch); err != nil {
+					return err
+				}
+			} else {
+				branchs, err := utils.GetBranches(svc.exe)
+				if err != nil {
+					return err
+				}
+				if err := svc.rebaseBranch(*currentBranch, branchs); err != nil {
+					return err
+				}
 			}
 
 			return nil
@@ -27,31 +53,41 @@ func NewMoveCommand() *cobra.Command {
 	}
 }
 
-func rebaseOnto(branch string) error {
-	// Get the current branch name
-	currentBranch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
-	if err != nil {
-		return fmt.Errorf("failed to get current branch: %w", err)
+func (svc *moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) error {
+	exeArgs := []string{"checkout", parentBranch}
+	if err := svc.exe.Execute("git", exeArgs...); err != nil {
+		return err
 	}
 
-	// Trim newline from command output
-	currentBranchName := string(currentBranch[:len(currentBranch)-1])
-
-	// Checkout the branch that needs to be rebased
-	checkoutCmd := exec.Command("git", "checkout", branch)
-	checkoutCmd.Stdout = os.Stdout
-	checkoutCmd.Stderr = os.Stderr
-	if err := checkoutCmd.Run(); err != nil {
-		return fmt.Errorf("failed to checkout branch %s: %w", branch, err)
+	exeArgs = []string{"rebase", "--onto", parentBranch, currentBranch + "~1", currentBranch}
+	if err := svc.exe.Execute("git", exeArgs...); err != nil {
+		return err
 	}
 
-	// Rebase onto the current branch
-	rebaseCmd := exec.Command("git", "rebase", "--onto", branch, currentBranchName+"~1", currentBranchName)
-	rebaseCmd.Stdout = os.Stdout
-	rebaseCmd.Stderr = os.Stderr
-	if err := rebaseCmd.Run(); err != nil {
-		return fmt.Errorf("failed to rebase branch %s onto %s: %w", currentBranchName, branch, err)
+	return nil
+}
+
+func (svc *moveCommand) rebaseBranch(
+	currentBranch string,
+	choices []string,
+) error {
+	initialModel := components.ListModel{
+		AllChoices: choices,
+		Choices:    choices,
+		Cursor:     0,
+		Query:      "",
 	}
 
+	program := tea.NewProgram(initialModel)
+
+	if finalModel, err := program.Run(); err == nil {
+		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+			if err := svc.rebaseBranchOnto(m.Selected, currentBranch); err != nil {
+				return fmt.Errorf("error checking out branch: %w", err)
+			}
+		}
+	} else {
+		return fmt.Errorf("error running program: %w", err)
+	}
 	return nil
 }
