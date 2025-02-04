@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
@@ -15,14 +13,10 @@ import (
 var exe = executor.NewExe()
 
 var rootCmd = &cobra.Command{
-	Use:          "gt",
-	Short:        "",
-	SilenceUsage: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("here 2")
+	Use: "gt",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		config.InitConfig()
 		client.InitCliClient(exe)
-		return nil
 	},
 }
 
