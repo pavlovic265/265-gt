@@ -24,10 +24,6 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 **Customizable commands:** Add your own shortcuts or workflows as needed.
 
 ## Usage/Examples
-## Usage/Examples
-
-
-## Usage/Examples
 
 - <line color="green">✓</line> **`create` (`c`)**  
   Create a new branch.
