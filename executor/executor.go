@@ -9,6 +9,7 @@ import (
 
 type Executor interface {
 	Execute(name string, args ...string) error
+	ExecuteWithStdin(name, input string, args ...string) error
 	ExecuteWithOutput(name string, args ...string) ([]byte, error)
 }
 
@@ -20,11 +21,29 @@ func NewExe() Executor {
 
 func (exe exe) Execute(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	//	cmd.Stdout = os.Stdout
+	//	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
+		fmt.Printf("error executing `%s %s` with err (%v)",
+			name,
+			strings.Join(args, " "),
+			err,
+		)
+		os.Exit(1)
+	}
 
+	return nil
+}
+
+func (exe exe) ExecuteWithStdin(name, input string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	//	cmd.Stdout = os.Stdout
+	//	cmd.Stderr = os.Stderr
+
+	cmd.Stdin = strings.NewReader(input)
+
+	if err := cmd.Run(); err != nil {
 		fmt.Printf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),

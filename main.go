@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
-	"github.com/pavlovic265/265-gt/commands/auth"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -17,9 +15,11 @@ import (
 var exe = executor.NewExe()
 
 var rootCmd = &cobra.Command{
-	Use:   "gt",
-	Short: "",
+	Use:          "gt",
+	Short:        "",
+	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		fmt.Println("here 2")
 		config.InitConfig()
 		client.InitCliClient(exe)
 		return nil
@@ -27,40 +27,16 @@ var rootCmd = &cobra.Command{
 }
 
 func main() {
-	addCommand := commands.NewAddCommand(exe)
-	rootCmd.AddCommand(addCommand.Command())
+	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewSwichCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewPushCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewPullCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewCreateCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewContCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewCheckoutCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewMoveCommand(exe).Command())
+	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
 
-	statusCommand := commands.NewStatusCommand(exe)
-	rootCmd.AddCommand(statusCommand.Command())
-
-	swichCommand := commands.NewSwichCommand(exe)
-	rootCmd.AddCommand(swichCommand.Command())
-
-	pushCommand := commands.NewPushCommand(exe)
-	rootCmd.AddCommand(pushCommand.Command())
-
-	pullCommand := commands.NewPullCommand(exe)
-	rootCmd.AddCommand(pullCommand.Command())
-
-	createCommand := commands.NewCreateCommand(exe)
-	rootCmd.AddCommand(createCommand.Command())
-
-	contCommand := commands.NewContCommand(exe)
-	rootCmd.AddCommand(contCommand.Command())
-
-	checkoutCommand := commands.NewCheckoutCommand(exe)
-	rootCmd.AddCommand(checkoutCommand.Command())
-
-	moveCommand := commands.NewMoveCommand(exe)
-	rootCmd.AddCommand(moveCommand.Command())
-
-	pullRequestCommand := pullrequests.NewPullRequestCommand(exe)
-	rootCmd.AddCommand(pullRequestCommand.Command())
-
-	rootCmd.AddCommand(auth.NewAuth())
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+	rootCmd.Execute()
 }

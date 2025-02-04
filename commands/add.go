@@ -17,7 +17,7 @@ func NewAddCommand(
 	}
 }
 
-func (svc *addCommand) Command() *cobra.Command {
+func (svc addCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "add",
 		Short:              "git add",

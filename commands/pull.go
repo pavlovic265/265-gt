@@ -18,7 +18,7 @@ func NewPullCommand(
 	}
 }
 
-func (svc *pullCommand) Command() *cobra.Command {
+func (svc pullCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "pull",
 		Aliases: []string{"pl"},

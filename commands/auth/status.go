@@ -2,13 +2,25 @@ package auth
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/pavlovic265/265-gt/client"
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-func NewAuthStatusCommand() *cobra.Command {
+type statusCommand struct {
+	exe executor.Executor
+}
+
+func NewStatusCommand(
+	exe executor.Executor,
+) statusCommand {
+	return statusCommand{
+		exe: exe,
+	}
+}
+
+func (svc statusCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "status",
 		Aliases:            []string{"st"},
@@ -16,13 +28,8 @@ func NewAuthStatusCommand() *cobra.Command {
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Checking status...")
-			err := client.GlobalClient.AuthStatus()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error with auth: %v\n", err)
-				os.Exit(1)
-			}
 
-			return nil
+			return client.GlobalClient.AuthStatus()
 		},
 	}
 }

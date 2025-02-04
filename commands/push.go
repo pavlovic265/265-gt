@@ -18,7 +18,7 @@ func NewPushCommand(
 	}
 }
 
-func (svc *pushCommand) Command() *cobra.Command {
+func (svc pushCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "push",
 		Aliases: []string{"pu"},

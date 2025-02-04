@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
@@ -22,7 +20,7 @@ func NewMoveCommand(
 	}
 }
 
-func (svc *moveCommand) Command() *cobra.Command {
+func (svc moveCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "move",
 		Aliases: []string{"mo"},
@@ -53,7 +51,7 @@ func (svc *moveCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc *moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) error {
+func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) error {
 	exeArgs := []string{"checkout", parentBranch}
 	if err := svc.exe.Execute("git", exeArgs...); err != nil {
 		return err
@@ -67,7 +65,7 @@ func (svc *moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) err
 	return nil
 }
 
-func (svc *moveCommand) rebaseBranch(
+func (svc moveCommand) rebaseBranch(
 	currentBranch string,
 	choices []string,
 ) error {
@@ -83,11 +81,11 @@ func (svc *moveCommand) rebaseBranch(
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
 			if err := svc.rebaseBranchOnto(m.Selected, currentBranch); err != nil {
-				return fmt.Errorf("error checking out branch: %w", err)
+				return err
 			}
 		}
 	} else {
-		return fmt.Errorf("error running program: %w", err)
+		return err
 	}
 	return nil
 }

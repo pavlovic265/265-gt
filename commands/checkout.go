@@ -22,7 +22,7 @@ func NewCheckoutCommand(
 	}
 }
 
-func (svc *checkoutCommand) Command() *cobra.Command {
+func (svc checkoutCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "checkout",
 		Aliases: []string{"co"},
@@ -31,7 +31,7 @@ func (svc *checkoutCommand) Command() *cobra.Command {
 			if len(args) > 0 {
 				exeArgs := []string{"checkout", args[0]}
 				if err := svc.exe.Execute("git", exeArgs...); err != nil {
-					return fmt.Errorf("error checking out branch: %w", err)
+					return err
 				}
 			} else {
 				branches, err := utils.GetBranches(svc.exe)
@@ -45,7 +45,7 @@ func (svc *checkoutCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc *checkoutCommand) checkoutBranch(
+func (svc checkoutCommand) checkoutBranch(
 	choices []string,
 ) error {
 	initialModel := components.ListModel{
@@ -62,12 +62,12 @@ func (svc *checkoutCommand) checkoutBranch(
 			fmt.Printf("Checking out branch '%s'...\n", m.Selected)
 			exeArgs := []string{"checkout", m.Selected}
 			if err := svc.exe.Execute("git", exeArgs...); err != nil {
-				return fmt.Errorf("error checking out branch: %w", err)
+				return err
 			}
 
 		}
 	} else {
-		return fmt.Errorf("error running program: %w", err)
+		return err
 	}
 	return nil
 }

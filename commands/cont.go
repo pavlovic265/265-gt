@@ -17,7 +17,7 @@ func NewContCommand(
 	}
 }
 
-func (svc *contCommand) Command() *cobra.Command {
+func (svc contCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "cont",
 		Short: "short for rebase --contine",

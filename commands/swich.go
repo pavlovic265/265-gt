@@ -17,7 +17,7 @@ func NewSwichCommand(
 	}
 }
 
-func (svc *swichCommand) Command() *cobra.Command {
+func (svc swichCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "swich",
 		Aliases: []string{"sw"},

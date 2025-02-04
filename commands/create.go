@@ -17,7 +17,7 @@ func NewCreateCommand(
 	}
 }
 
-func (svc *createCommand) Command() *cobra.Command {
+func (svc createCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "create",
 		Aliases: []string{"c"},

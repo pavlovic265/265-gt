@@ -17,16 +17,17 @@ func NewStatusCommand(
 	}
 }
 
-func (svc *statusCommand) Command() *cobra.Command {
+func (svc statusCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "status",
 		Aliases:            []string{"st"},
 		Short:              "git status",
 		DisableFlagParsing: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		SilenceUsage:       true,
+		Run: func(cmd *cobra.Command, args []string) {
 			exeArgs := append([]string{"status"}, args...)
 
-			return svc.exe.Execute("git", exeArgs...)
+			svc.exe.Execute("git", exeArgs...)
 		},
 	}
 }

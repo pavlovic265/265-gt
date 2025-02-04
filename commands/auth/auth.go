@@ -1,18 +1,29 @@
 package auth
 
 import (
+	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
-var authCmd = &cobra.Command{
-	Use:                "auth",
-	Short:              "auth user",
-	DisableFlagParsing: true,
+type authCommand struct {
+	exe executor.Executor
 }
 
-func NewAuth() *cobra.Command {
-	authCmd.AddCommand(NewAuthStatusCommand())
-	authCmd.AddCommand(NewAuthSwichAccountCommand())
+func NewAuthCommand(
+	exe executor.Executor,
+) authCommand {
+	return authCommand{
+		exe: exe,
+	}
+}
+
+func (svc authCommand) Command() *cobra.Command {
+	authCmd := &cobra.Command{
+		Use:   "auth",
+		Short: "auth user",
+	}
+	authCmd.AddCommand(NewStatusCommand(svc.exe).Command())
+	authCmd.AddCommand(NewSwichCommand(svc.exe).Command())
 
 	return authCmd
 }

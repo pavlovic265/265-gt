@@ -17,16 +17,14 @@ func NewPullRequestCommand(
 	}
 }
 
-func (svc *pullRequestCommand) Command() *cobra.Command {
+func (svc pullRequestCommand) Command() *cobra.Command {
 	pullRequestCmd := &cobra.Command{
-		Use:                "pull_request",
-		Aliases:            []string{"pr"},
-		Short:              "pull branch",
-		DisableFlagParsing: true,
+		Use:     "pull_request",
+		Aliases: []string{"pr"},
+		Short:   "pull branch",
 	}
 
-	createCommand := NewCreateCommand(svc.exe)
-	pullRequestCmd.AddCommand(createCommand.Command())
+	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe).Command())
 
 	return pullRequestCmd
 }
