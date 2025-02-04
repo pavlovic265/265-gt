@@ -24,6 +24,10 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 **Customizable commands:** Add your own shortcuts or workflows as needed.
 
 ## Usage/Examples
+## Usage/Examples
+
+
+## Usage/Examples
 
 - <line color="green">✓</line> **`create` (`c`)**  
   Create a new branch.
@@ -32,10 +36,10 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
   Check out a branch or search and checkout.
 
 - <line color="red">✗</line> **`bottom` (`bt`)**  
-  Move to the bottom branch in the (to be implemented) stack.
+  Move to the bottom branch in the stack.
 
 - <line color="red">✗</line> **`up`**  
-  Move to the upper branch in the (to be implemented) stack.
+  Move to the upper branch in the stack.
 
 - <line color="green">✓</line> **`status` (`st`)**  
   Run `git status`.
@@ -50,10 +54,10 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
   Rebase the current branch onto another branch.
 
 - <line color="red">✗</line> **`sync` (`sy`)**  
-  Sync local and remote branches (to be implemented).
+  Sync local and remote branches.
 
 - <line color="red">✗</line> **`submit` (`s`)**  
-  Submit changes (to be implemented).
+  Submit changes.
 
 - <line color="green">✓</line> **`pull_request` (`pr`)**  
   Prefix for pull requests
@@ -61,7 +65,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
     Create a pull request
 
 - <line color="red">✗</line> **`clean` (`cl`)**  
-  Delete all branches that have been merged (to be implemented).
+  Delete all branches that have been merged.
 
 - <line color="green">✓</line> **`push` (`pu`)**  
   Force-push the current branch to the remote repository.
@@ -76,6 +80,14 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
     - <line color="green">✓</line> **`switch` (`sw`)**  
       Switch account to work with (e.g., personal or work).
 
+- <line color="red">✗</line> **`conf`**  
+  Generate global or local config
+    - <line color="red">✗</line> **`global` (`gl`)**  
+      Info about the current authenticated user.
+    - <line color="red">✗</line> **`local` (`lo`)**  
+      Switch account to work with (e.g., personal or work).
+- <line color="red">✗</line> **`version` (`v`)**  
+  Check current version
 
 ## License
 
