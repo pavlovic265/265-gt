@@ -11,12 +11,9 @@ VERSION="@latest"
 echo "Installing $BINARY from $REPO..."
 go install "$REPO$VERSION"
 
-# Ensure GOPATH/bin is in the PATH
-GOBIN=$(go env GOPATH)/bin
-if [[ ":$PATH:" != *":$GOBIN:"* ]]; then
-  echo "Adding $GOBIN to PATH..."
-  export PATH=$PATH:$GOBIN
-  echo 'export PATH=$PATH:'"$GOBIN" >>~/.bashrc # Add to bashrc or use .zshrc for zsh
+# Set soft lick to executable
+if [ ! -L /usr/local/bin/gt ]; then
+  ln -s ~/go/bin/265-gt /usr/local/bin/gt
 fi
 
 # Verify installation
