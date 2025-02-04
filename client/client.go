@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/pavlovic265/265-gt/executor"
 )
 
 type CliClient interface {
@@ -14,16 +16,16 @@ type CliClient interface {
 
 var GlobalClient CliClient
 
-func InitCliClient() {
+func InitCliClient(exe executor.Executor) {
 	remoteOrigin, err := getGitRemoteOrigin()
 	if err != nil {
 		fmt.Println("Error retrieving remote URL:", err)
 	}
 
 	if strings.Contains(remoteOrigin, "github.com") {
-		GlobalClient = NewGitHubCli()
+		GlobalClient = NewGitHubCli(exe)
 	} else if strings.Contains(remoteOrigin, "gitlab.com") {
-		GlobalClient = NewGitHubCli()
+		GlobalClient = NewGitHubCli(exe)
 	}
 }
 

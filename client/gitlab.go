@@ -1,9 +1,13 @@
 package client
 
-type gitLabCli struct{}
+import "github.com/pavlovic265/265-gt/executor"
 
-func NewGitLabCli() CliClient {
-	return &gitLabCli{}
+type gitLabCli struct {
+	exe executor.Executor
+}
+
+func NewGitLabCli(exe executor.Executor) CliClient {
+	return &gitLabCli{exe: exe}
 }
 
 func (svc gitLabCli) AuthStatus() error {

@@ -14,19 +14,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var exe = executor.NewExe()
+
 var rootCmd = &cobra.Command{
 	Use:   "gt",
 	Short: "",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		config.InitConfig()
-		client.InitCliClient()
+		client.InitCliClient(exe)
 		return nil
 	},
 }
 
 func main() {
-	exe := executor.NewExe()
-
 	addCommand := commands.NewAddCommand(exe)
 	rootCmd.AddCommand(addCommand.Command())
 
@@ -54,7 +54,8 @@ func main() {
 	moveCommand := commands.NewMoveCommand(exe)
 	rootCmd.AddCommand(moveCommand.Command())
 
-	rootCmd.AddCommand(pullrequests.NewPullRequestCommand())
+	pullRequestCommand := pullrequests.NewPullRequestCommand(exe)
+	rootCmd.AddCommand(pullRequestCommand.Command())
 
 	rootCmd.AddCommand(auth.NewAuth())
 
