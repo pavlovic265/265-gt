@@ -20,8 +20,8 @@ func NewPullRequestCommand(
 func (svc pullRequestCommand) Command() *cobra.Command {
 	pullRequestCmd := &cobra.Command{
 		Use:     "pull_request",
+		Short:   "commands for pull request",
 		Aliases: []string{"pr"},
-		Short:   "pull branch",
 	}
 
 	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe).Command())
