@@ -59,6 +59,8 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
   Prefix for pull requests
   - <line color="green">✓</line> **`create` (`c`)**  
     Create a pull request
+  - <line color="red">✗</line> **`list` (`li`)**  
+    List pull requests
 
 - <line color="red">✗</line> **`clean` (`cl`)**  
   Delete all branches that have been merged.
