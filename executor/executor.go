@@ -21,16 +21,15 @@ func NewExe() Executor {
 
 func (exe exe) Execute(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
-	//	cmd.Stdout = os.Stdout
-	//	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("error executing `%s %s` with err (%v)",
+		return fmt.Errorf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),
 			err,
 		)
-		os.Exit(1)
 	}
 
 	return nil
@@ -38,18 +37,17 @@ func (exe exe) Execute(name string, args ...string) error {
 
 func (exe exe) ExecuteWithStdin(name, input string, args ...string) error {
 	cmd := exec.Command(name, args...)
-	//	cmd.Stdout = os.Stdout
-	//	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	cmd.Stdin = strings.NewReader(input)
 
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("error executing `%s %s` with err (%v)",
+		return fmt.Errorf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),
 			err,
 		)
-		os.Exit(1)
 	}
 
 	return nil
@@ -58,14 +56,13 @@ func (exe exe) ExecuteWithStdin(name, input string, args ...string) error {
 func (exe exe) ExecuteWithOutput(name string, args ...string) ([]byte, error) {
 	cmd := exec.Command(name, args...)
 
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("error executing `%s %s` with err (%v)",
+	output, err := cmd.CombinedOutput()
+	if err != nil && string(output) != "" {
+		return nil, fmt.Errorf("error executing `%s %s` with err (%v)",
 			name,
 			strings.Join(args, " "),
-			err,
+			fmt.Errorf("%w", err),
 		)
-		os.Exit(1)
 	}
 
 	return output, nil
