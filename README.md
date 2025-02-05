@@ -7,7 +7,7 @@ gt is a command-line utility designed to simplify and streamline common Git work
 Requirements, install [go lang 1.23](https://go.dev/doc/install)
 
 ```bash
- curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main//scripts/install.sh | bash
+ curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh | bash
 ```
     
 
