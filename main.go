@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 func main() {
 	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewSwichCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewSwitchCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewPushCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewPullCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewCreateCommand(exe).Command())

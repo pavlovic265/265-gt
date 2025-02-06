@@ -23,7 +23,7 @@ func (svc authCommand) Command() *cobra.Command {
 		Short: "auth user",
 	}
 	authCmd.AddCommand(NewStatusCommand(svc.exe).Command())
-	authCmd.AddCommand(NewSwichCommand(svc.exe).Command())
+	authCmd.AddCommand(NewSwitchCommand(svc.exe).Command())
 
 	return authCmd
 }

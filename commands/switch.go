@@ -5,23 +5,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type swichCommand struct {
+type switchCommand struct {
 	exe executor.Executor
 }
 
-func NewSwichCommand(
+func NewSwitchCommand(
 	exe executor.Executor,
-) swichCommand {
-	return swichCommand{
+) switchCommand {
+	return switchCommand{
 		exe: exe,
 	}
 }
 
-func (svc swichCommand) Command() *cobra.Command {
+func (svc switchCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:     "swich",
+		Use:     "switch",
 		Aliases: []string{"sw"},
-		Short:   "swich back to previous branch",
+		Short:   "switch back to previous branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"checkout", "-"}, args...)
 

@@ -10,30 +10,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type swichCommand struct {
+type switchCommand struct {
 	exe executor.Executor
 }
 
-func NewSwichCommand(
+func NewSwitchCommand(
 	exe executor.Executor,
-) swichCommand {
-	return swichCommand{
+) switchCommand {
+	return switchCommand{
 		exe: exe,
 	}
 }
 
-func (svc swichCommand) Command() *cobra.Command {
+func (svc switchCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:     "swich",
+		Use:     "switch",
 		Aliases: []string{"sw"},
-		Short:   "swich accounts",
+		Short:   "switch accounts",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				if err := svc.swichUser(args[0]); err != nil {
+				if err := svc.switchUser(args[0]); err != nil {
 					return err
 				}
 			} else {
-				if err := svc.selectAndSwichUser(); err != nil {
+				if err := svc.selectAndswitchUser(); err != nil {
 					return err
 				}
 			}
@@ -42,28 +42,29 @@ func (svc swichCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc swichCommand) swichUser(user string) error {
-	var token string
+func (svc switchCommand) switchUser(user string) error {
+	var existUser bool
 	acocunts := config.GlobalConfig.GitHub.Accounts
 	for _, acc := range acocunts {
 		if user == acc.User {
-			token = acc.Token
+			existUser = true
 			break
 		}
 	}
-	if token == "" {
+	if !existUser {
 		return fmt.Errorf("user (%s) does not exits in config", user)
 	}
 
-	exeArgs := []string{"auth", "login", "--with-token"}
-	err := svc.exe.ExecuteWithStdin("gt", token, exeArgs...)
+	exeArgs := []string{"auth", "switch", "--user", user}
+	output, err := svc.exe.ExecuteWithOutput("gh", exeArgs...)
 	if err != nil {
 		return err
 	}
+	fmt.Println(string(output))
 	return nil
 }
 
-func (svc swichCommand) selectAndSwichUser() error {
+func (svc switchCommand) selectAndswitchUser() error {
 	acocunts := config.GlobalConfig.GitHub.Accounts
 	var users []string
 	for _, acc := range acocunts {
@@ -81,12 +82,11 @@ func (svc swichCommand) selectAndSwichUser() error {
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-			fmt.Println("Swiching accounts...")
-			err := svc.swichUser(m.Selected)
+			err := svc.switchUser(m.Selected)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Swiched to %s\n", m.Selected)
+			fmt.Printf("switched to %s\n", m.Selected)
 		}
 	} else {
 		return err
