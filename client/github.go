@@ -25,7 +25,6 @@ func (svc gitHubCli) AuthStatus() error {
 	}
 
 	outputStr := string(output)
-	fmt.Println("er routputStr ", outputStr)
 	sections := strings.Split(strings.Join(strings.Split(outputStr, "\n")[1:], "\n"), "\n\n")
 
 	for _, section := range sections {
