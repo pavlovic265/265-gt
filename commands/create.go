@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +25,10 @@ func (svc createCommand) Command() *cobra.Command {
 		Aliases: []string{"c"},
 		Short:   "create branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := []string{"checkout", "-b"}
+			if len(args) == 0 {
+				return fmt.Errorf("missing branch name")
+			}
+			exeArgs := []string{"checkout", "-b", args[0]}
 
 			return svc.exe.Execute("git", exeArgs...)
 		},
