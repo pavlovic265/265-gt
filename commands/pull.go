@@ -30,7 +30,8 @@ func (svc pullCommand) Command() *cobra.Command {
 			}
 
 			exeArgs := []string{"pull", "origin", *currentBranch}
-			if err := svc.exe.Execute("git", exeArgs...); err != nil {
+			_, err = svc.exe.Execute("git", exeArgs...)
+			if err != nil {
 				return err
 			}
 

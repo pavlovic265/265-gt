@@ -28,9 +28,10 @@ func (svc createCommand) Command() *cobra.Command {
 			if len(args) == 0 {
 				return fmt.Errorf("missing branch name")
 			}
-			exeArgs := []string{"checkout", "-b", args[0]}
 
-			return svc.exe.Execute("git", exeArgs...)
+			exeArgs := []string{"checkout", "-b", args[0]}
+			_, err := svc.exe.Execute("git", exeArgs...)
+			return err
 		},
 	}
 }

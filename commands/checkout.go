@@ -30,7 +30,8 @@ func (svc checkoutCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				exeArgs := []string{"checkout", args[0]}
-				if err := svc.exe.Execute("git", exeArgs...); err != nil {
+				_, err := svc.exe.Execute("git", exeArgs...)
+				if err != nil {
 					return err
 				}
 			} else {
@@ -61,10 +62,10 @@ func (svc checkoutCommand) checkoutBranch(
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
 			fmt.Printf("Checking out branch '%s'...\n", m.Selected)
 			exeArgs := []string{"checkout", m.Selected}
-			if err := svc.exe.Execute("git", exeArgs...); err != nil {
+			_, err := svc.exe.Execute("git", exeArgs...)
+			if err != nil {
 				return err
 			}
-
 		}
 	} else {
 		return err

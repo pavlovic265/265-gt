@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -21,7 +20,7 @@ func NewGitHubCli(exe executor.Executor) CliClient {
 
 func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 	exeArgs := []string{"auth", "status"}
-	output, err := svc.exe.ExecuteWithOutput("gh", exeArgs...)
+	output, err := svc.exe.Execute("gh", exeArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 
 func (svc gitHubCli) AuthStatus() error {
 	exeArgs := []string{"auth", "status"}
-	output, err := svc.exe.ExecuteWithOutput("gh", exeArgs...)
+	output, err := svc.exe.Execute("gh", exeArgs...)
 	if err != nil {
 		return err
 	}
@@ -86,7 +85,8 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	}
 
 	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill"}
-	if err := svc.exe.Execute("gh", exeArgs...); err != nil {
+	_, err = svc.exe.Execute("gh", exeArgs...)
+	if err != nil {
 		return err
 	}
 
@@ -107,9 +107,8 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	}
 	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author"}
 
-	var out bytes.Buffer
-
-	if err := svc.exe.ExecuteWithStdout("gh", &out, exeArgs...); err != nil {
+	out, err := svc.exe.Execute("gh", exeArgs...)
+	if err != nil {
 		return nil, err
 	}
 	var rawPRs []struct {
@@ -120,7 +119,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Login string `json:"login"`
 		} `json:"author"`
 	}
-	err = json.Unmarshal(out.Bytes(), &rawPRs)
+	err = json.Unmarshal(out, &rawPRs)
 	if err != nil {
 		return nil, err
 	}

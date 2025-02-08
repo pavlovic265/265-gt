@@ -24,7 +24,8 @@ func (svc contCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"rebase", "--continue"}
 
-			return svc.exe.Execute("git", exeArgs...)
+			_, err := svc.exe.Execute("git", exeArgs...)
+			return err
 		},
 	}
 }
