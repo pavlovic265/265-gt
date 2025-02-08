@@ -92,7 +92,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
       Info about the current authenticated user.
     - <line color="red">✗</line> **`local` (`lo`)**  
       Switch account to work with (e.g., personal or work).
-- <line color="red">✗</line> **`version` (`v`)**  
+- <line color="green">✓</line> **`version` (`v`)**  
   Check current version
 
 ## License
