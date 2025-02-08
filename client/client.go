@@ -12,6 +12,7 @@ import (
 type CliClient interface {
 	AuthStatus() error
 	CreatePullRequest(args []string) error
+	ListPullRequests(args []string) ([]PullRequest, error)
 }
 
 var GlobalClient CliClient

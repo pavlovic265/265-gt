@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,6 +11,7 @@ import (
 type Executor interface {
 	Execute(name string, args ...string) error
 	ExecuteWithStdin(name, input string, args ...string) error
+	ExecuteWithStdout(name string, output *bytes.Buffer, args ...string) error
 	ExecuteWithOutput(name string, args ...string) ([]byte, error)
 }
 
@@ -22,6 +24,22 @@ func NewExe() Executor {
 func (exe exe) Execute(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error executing `%s %s` with err (%v)",
+			name,
+			strings.Join(args, " "),
+			err,
+		)
+	}
+
+	return nil
+}
+
+func (exe exe) ExecuteWithStdout(name string, output *bytes.Buffer, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = output
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {

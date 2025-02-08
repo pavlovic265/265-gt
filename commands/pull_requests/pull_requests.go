@@ -25,6 +25,7 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 	}
 
 	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe).Command())
+	pullRequestCmd.AddCommand(NewListCommand(svc.exe).Command())
 
 	return pullRequestCmd
 }
