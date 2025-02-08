@@ -1,6 +1,10 @@
 package commands
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -22,9 +26,25 @@ func (svc versionCommand) Command() *cobra.Command {
 		Use:   "version",
 		Short: "version of current build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"checkout", "-"}, args...)
+			url := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", "pavlovic265", "265-gt")
 
-			return svc.exe.Execute("git", exeArgs...)
+			resp, err := http.Get(url)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+
+			var result struct {
+				TagName string `json:"tag_name"`
+			}
+
+			if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+				return err
+			}
+
+			fmt.Println(result.TagName)
+
+			return nil
 		},
 	}
 }
