@@ -80,7 +80,12 @@ func (svc gitHubCli) AuthStatus() error {
 func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	fmt.Println("Creating pull request on GitHub...")
 
-	exeArgs := []string{"pr", "create", "--assignee", config.GlobalConfig.GitHub.Assignee, "--fill"}
+	acc, err := svc.getActiveAccount()
+	if err != nil {
+		return err
+	}
+
+	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill"}
 	if err := svc.exe.Execute("gh", exeArgs...); err != nil {
 		return err
 	}

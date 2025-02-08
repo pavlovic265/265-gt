@@ -18,7 +18,6 @@ type Account struct {
 }
 
 type GitHub struct {
-	Assignee string    `yaml:"assignee"`
 	Accounts []Account `yaml:"accounts"`
 }
 
