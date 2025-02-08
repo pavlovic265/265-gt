@@ -3,6 +3,7 @@ package pullrequests
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -45,7 +46,7 @@ func (svc listCommand) selectPullRequest(
 ) error {
 	var strPrs []string
 	for _, pr := range prs {
-		strPrs = append(strPrs, fmt.Sprintf("%s - %s", pr.Title, pr.Author))
+		strPrs = append(strPrs, fmt.Sprintf("%d:%s", pr.Number, pr.Title))
 	}
 	initialModel := components.ListModel{
 		AllChoices: strPrs,
@@ -58,15 +59,17 @@ func (svc listCommand) selectPullRequest(
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-			splited := strings.Split(m.Selected, " - ")
+			splited := strings.Split(m.Selected, ":")
+			prNumber, err := strconv.Atoi(splited[0])
+			if err != nil {
+				return fmt.Errorf("faild to get pr number id")
+			}
 
 			for _, pr := range prs {
-				if splited[0] == pr.Title && splited[1] == pr.Author {
-					fmt.Println(pr.URL)
+				if prNumber == pr.Number {
 					exec.Command("open", pr.URL).Start()
 				}
 			}
-
 		}
 	} else {
 		return err
