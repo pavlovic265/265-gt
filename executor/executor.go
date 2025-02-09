@@ -11,7 +11,8 @@ import (
 type Executor interface {
 	WithGit() Executor
 	WithGh() Executor
-	WithArgs(name []string) Executor
+	WithName(name string) Executor
+	WithArgs(args []string) Executor
 	Run() error
 	RunWithOutput() (bytes.Buffer, error)
 }
@@ -28,6 +29,11 @@ func NewExe() Executor {
 		HasOutput: true,
 		Args:      []string{},
 	}
+}
+
+func (exe exe) WithName(name string) Executor {
+	exe.Name = name
+	return exe
 }
 
 func (exe exe) WithGit() Executor {
