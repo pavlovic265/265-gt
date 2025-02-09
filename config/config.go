@@ -1,14 +1,13 @@
 package config
 
 import (
-	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
 
+	"github.com/pavlovic265/265-gt/executor"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,13 +26,13 @@ type Config struct {
 
 var GlobalConfig *Config
 
-func InitConfig() {
+func InitConfig(exe executor.Executor) {
 	globalConfig, err := loadGlobalConfig()
 	if err != nil {
 		fmt.Println("globalConfig", err)
 		globalConfig = &Config{}
 	}
-	localConfig, err := loadLoaclConfig()
+	localConfig, err := loadLocalConfig(exe)
 	if err != nil {
 		fmt.Println("localConfig", err)
 		localConfig = &Config{}
@@ -82,26 +81,26 @@ func loadGlobalConfig() (*Config, error) {
 	return cfg, nil
 }
 
-func loadLoaclConfig() (*Config, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &out // Capture standard error as well
-	err := cmd.Run()
+func loadLocalConfig(exe executor.Executor) (*Config, error) {
+	exeArgs := []string{"rev-parse", "--show-toplevel"}
+	output, err := exe.Execute("git", exeArgs...)
 	if err != nil {
-		return nil, fmt.Errorf("error running git command: %w - %s", err, strings.TrimSuffix(out.String(), "\n"))
+		return nil, err
 	}
-	localConfig := strings.TrimSpace(out.String())
+	localConfig := strings.TrimSpace(output.String())
 
 	configPath := filepath.Join(localConfig, ".gtconfig.yaml")
 
 	file, err := os.Open(configPath)
+	cfg := &Config{}
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file: %w", err)
+		if os.IsNotExist(err) {
+			return cfg, nil
+		}
+		return nil, err
 	}
 	defer file.Close()
 
-	cfg := &Config{}
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(cfg); err != nil {
 		return nil, fmt.Errorf("failed to decode config file: %w", err)

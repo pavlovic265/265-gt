@@ -12,7 +12,8 @@ func GetCurrentBranchName(exe executor.Executor) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	currentBranch := string(output[:len(output)-1])
+	strOutput := output.String()
+	currentBranch := strOutput[:len(strOutput)-1]
 
 	return &currentBranch, nil
 }
@@ -24,7 +25,7 @@ func GetBranches(exe executor.Executor) ([]string, error) {
 		return nil, err
 	}
 
-	lines := strings.Split(string(output), "\n")
+	lines := strings.Split(output.String(), "\n")
 	var branches []string
 	for _, line := range lines {
 		branch := strings.TrimSpace(line)

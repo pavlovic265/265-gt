@@ -24,10 +24,15 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "git status",
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"status"}, args...)
 
-			svc.exe.Execute("git", exeArgs...)
+			_, err := svc.exe.Execute("git", exeArgs...)
+			if err != nil {
+				return err
+			}
+
+			return nil
 		},
 	}
 }

@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/pavlovic265/265-gt/config"
@@ -25,7 +24,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 		return nil, err
 	}
 
-	outputStr := string(output)
+	outputStr := output.String()
 	sections := strings.Split(strings.Join(strings.Split(outputStr, "\n")[1:], "\n"), "\n\n")
 
 	for _, section := range sections {
@@ -56,23 +55,23 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 
 func (svc gitHubCli) AuthStatus() error {
 	exeArgs := []string{"auth", "status"}
-	output, err := svc.exe.Execute("gh", exeArgs...)
+	_, err := svc.exe.Execute("gh", exeArgs...)
 	if err != nil {
 		return err
 	}
 
-	outputStr := string(output)
-	sections := strings.Split(strings.Join(strings.Split(outputStr, "\n")[1:], "\n"), "\n\n")
-
-	for _, section := range sections {
-		if strings.Contains(section, "- Active account: true") {
-			fmt.Fprintf(os.Stderr, "%s\n", section)
-			return nil
-		}
-	}
-
-	fmt.Fprintf(os.Stderr, "There are no active accounts\n")
-
+	//	outputStr := output.String()
+	//	sections := strings.Split(strings.Join(strings.Split(outputStr, "\n")[1:], "\n"), "\n\n")
+	//
+	//	for _, section := range sections {
+	//		if strings.Contains(section, "- Active account: true") {
+	//			fmt.Fprintf(os.Stderr, "%s\n", section)
+	//			return nil
+	//		}
+	//	}
+	//
+	//	fmt.Fprintf(os.Stderr, "There are no active accounts\n")
+	//
 	return nil
 }
 
@@ -119,7 +118,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Login string `json:"login"`
 		} `json:"author"`
 	}
-	err = json.Unmarshal(out, &rawPRs)
+	err = json.Unmarshal(out.Bytes(), &rawPRs)
 	if err != nil {
 		return nil, err
 	}

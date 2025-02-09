@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
@@ -27,8 +25,6 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "see status of current auth user",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Checking status...")
-
 			return client.GlobalClient.AuthStatus()
 		},
 	}

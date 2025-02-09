@@ -56,11 +56,10 @@ func (svc switchCommand) switchUser(user string) error {
 	}
 
 	exeArgs := []string{"auth", "switch", "--user", user}
-	output, err := svc.exe.Execute("gh", exeArgs...)
+	_, err := svc.exe.Execute("gh", exeArgs...)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(output))
 	return nil
 }
 

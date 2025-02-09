@@ -16,7 +16,7 @@ var exe = executor.NewExe()
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		config.InitConfig()
+		config.InitConfig(exe)
 		client.InitCliClient(exe)
 	},
 }
