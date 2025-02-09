@@ -3,14 +3,12 @@ package executor
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
 )
 
 type Executor interface {
-	Execute(name string, args ...string) (bytes.Buffer, error)
 	WithGit() Executor
 	WithGh() Executor
 	WithArgs(name []string) Executor
@@ -62,7 +60,6 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	cmd := exec.Command(exe.Name, exe.Args...)
 
 	if exe.HasOutput {
-		// multiOut := io.MultiWriter(os.Stdout, &output)
 		cmd.Stdout = os.Stdout
 		cmd.Stdout = &output
 	} else {
@@ -73,23 +70,6 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	err := cmd.Run()
 	if err != nil {
 		return bytes.Buffer{}, fmt.Errorf("error executing `%s %s`: %v", exe.Name, strings.Join(exe.Args, " "), err)
-	}
-
-	return output, nil
-}
-
-func (exe exe) Execute(name string, args ...string) (bytes.Buffer, error) {
-	var output bytes.Buffer
-
-	multiOut := io.MultiWriter(os.Stdout, &output)
-	cmd := exec.Command(name, args...)
-
-	cmd.Stdout = multiOut
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return bytes.Buffer{}, fmt.Errorf("error executing `%s %s`: %v", name, strings.Join(args, " "), err)
 	}
 
 	return output, nil

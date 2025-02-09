@@ -83,7 +83,7 @@ func loadGlobalConfig() (*Config, error) {
 
 func loadLocalConfig(exe executor.Executor) (*Config, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
-	output, err := exe.Execute("git", exeArgs...)
+	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}

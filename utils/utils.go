@@ -8,7 +8,7 @@ import (
 
 func GetCurrentBranchName(exe executor.Executor) (*string, error) {
 	exeArgs := []string{"rev-parse", "--abbrev-ref", "HEAD"}
-	output, err := exe.Execute("git", exeArgs...)
+	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func GetCurrentBranchName(exe executor.Executor) (*string, error) {
 
 func GetBranches(exe executor.Executor) ([]string, error) {
 	exeArgs := []string{"branch", "--list"}
-	output, err := exe.Execute("git", exeArgs...)
+	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}
