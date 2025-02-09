@@ -53,13 +53,13 @@ func (svc moveCommand) Command() *cobra.Command {
 
 func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) error {
 	exeArgs := []string{"checkout", parentBranch}
-	_, err := svc.exe.Execute("git", exeArgs...)
+	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
 
 	exeArgs = []string{"rebase", "--onto", parentBranch, currentBranch + "~1", currentBranch}
-	_, err = svc.exe.Execute("git", exeArgs...)
+	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}

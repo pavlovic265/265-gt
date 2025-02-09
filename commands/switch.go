@@ -23,8 +23,8 @@ func (svc switchCommand) Command() *cobra.Command {
 		Aliases: []string{"sw"},
 		Short:   "switch back to previous branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"checkout", "-"}, args...)
-			_, err := svc.exe.Execute("git", exeArgs...)
+			exeArgs := []string{"checkout", "-"}
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			return err
 		},
 	}

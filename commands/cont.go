@@ -23,8 +23,7 @@ func (svc contCommand) Command() *cobra.Command {
 		Short: "short for rebase --contine",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"rebase", "--continue"}
-
-			_, err := svc.exe.Execute("git", exeArgs...)
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			return err
 		},
 	}

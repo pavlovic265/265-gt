@@ -19,7 +19,7 @@ func NewGitHubCli(exe executor.Executor) CliClient {
 
 func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 	exeArgs := []string{"auth", "status"}
-	output, err := svc.exe.Execute("gh", exeArgs...)
+	output, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}
@@ -55,36 +55,23 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 
 func (svc gitHubCli) AuthStatus() error {
 	exeArgs := []string{"auth", "status"}
-	_, err := svc.exe.Execute("gh", exeArgs...)
+	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
 
-	//	outputStr := output.String()
-	//	sections := strings.Split(strings.Join(strings.Split(outputStr, "\n")[1:], "\n"), "\n\n")
-	//
-	//	for _, section := range sections {
-	//		if strings.Contains(section, "- Active account: true") {
-	//			fmt.Fprintf(os.Stderr, "%s\n", section)
-	//			return nil
-	//		}
-	//	}
-	//
-	//	fmt.Fprintf(os.Stderr, "There are no active accounts\n")
-	//
 	return nil
 }
 
 func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	fmt.Println("Creating pull request on GitHub...")
-
 	acc, err := svc.getActiveAccount()
 	if err != nil {
 		return err
 	}
 
 	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill"}
-	_, err = svc.exe.Execute("gh", exeArgs...)
+	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
@@ -104,12 +91,14 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	if err != nil {
 		return nil, err
 	}
-	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author"}
+	fmt.Println(acc.User)
 
-	out, err := svc.exe.Execute("gh", exeArgs...)
+	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author"}
+	out, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}
+
 	var rawPRs []struct {
 		Number int    `json:"number"`
 		Title  string `json:"title"`

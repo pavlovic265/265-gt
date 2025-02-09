@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
@@ -29,8 +27,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 		Short:   "checkout branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				exeArgs := []string{"checkout", args[0]}
-				_, err := svc.exe.Execute("git", exeArgs...)
+				err := svc.checkoutBranch(args[0])
 				if err != nil {
 					return err
 				}
@@ -39,7 +36,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				return svc.checkoutBranch(branches)
+				return svc.selectAndCheckoutBranch(branches)
 			}
 			return nil
 		},
@@ -47,6 +44,17 @@ func (svc checkoutCommand) Command() *cobra.Command {
 }
 
 func (svc checkoutCommand) checkoutBranch(
+	branch string,
+) error {
+	exeArgs := []string{"checkout", branch}
+	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc checkoutCommand) selectAndCheckoutBranch(
 	choices []string,
 ) error {
 	initialModel := components.ListModel{
@@ -60,9 +68,7 @@ func (svc checkoutCommand) checkoutBranch(
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-			fmt.Printf("Checking out branch '%s'...\n", m.Selected)
-			exeArgs := []string{"checkout", m.Selected}
-			_, err := svc.exe.Execute("git", exeArgs...)
+			err := svc.checkoutBranch(m.Selected)
 			if err != nil {
 				return err
 			}

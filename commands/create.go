@@ -30,7 +30,7 @@ func (svc createCommand) Command() *cobra.Command {
 			}
 
 			exeArgs := []string{"checkout", "-b", args[0]}
-			_, err := svc.exe.Execute("git", exeArgs...)
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			return err
 		},
 	}

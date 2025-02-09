@@ -56,7 +56,7 @@ func (svc switchCommand) switchUser(user string) error {
 	}
 
 	exeArgs := []string{"auth", "switch", "--user", user}
-	_, err := svc.exe.Execute("gh", exeArgs...)
+	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}

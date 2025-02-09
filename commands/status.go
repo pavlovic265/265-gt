@@ -27,7 +27,7 @@ func (svc statusCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"status"}, args...)
 
-			_, err := svc.exe.Execute("git", exeArgs...)
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}

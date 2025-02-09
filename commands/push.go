@@ -30,7 +30,7 @@ func (svc pushCommand) Command() *cobra.Command {
 			}
 
 			exeArgs := []string{"push", "--force", "origin", *currentBranch}
-			_, err = svc.exe.Execute("git", exeArgs...)
+			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}

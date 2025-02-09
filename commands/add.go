@@ -24,7 +24,7 @@ func (svc addCommand) Command() *cobra.Command {
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"add"}, args...)
-			_, err := svc.exe.Execute("git", exeArgs...)
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			return err
 		},
 	}
