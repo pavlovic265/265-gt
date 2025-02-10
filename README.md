@@ -4,7 +4,13 @@ gt is a command-line utility designed to simplify and streamline common Git work
 
 ## Installation
 
-Requirements, install [go lang 1.23](https://go.dev/doc/install)
+Requirments:
+- Go lang 1.23 version
+
+Tested on
+- Go lang 1.23 version
+- Git 2.39.5  version
+- Github cli 2.66.1 version
 
 ```bash
  curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh | bash
@@ -92,8 +98,10 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
       Info about the current authenticated user.
     - <line color="red">✗</line> **`local` (`lo`)**  
       Switch account to work with (e.g., personal or work).
-- <line color="red">✗</line> **`version` (`v`)**  
+- <line color="green">✓</line> **`version` (`v`)**  
   Check current version
+- <line color="green">✓</line> **`update`**  
+  Update cli to newer version
 
 ## License
 
