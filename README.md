@@ -45,6 +45,13 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 - <line color="green">✓</line> **`checkout` (`co`)**  
   Check out a branch or search and checkout.
 
+- <line color="red">✗</line> **`commit` (`cm`)**  
+  Create commit
+  - <line color="red">✗</line> **`add` (`a`)**  
+  Add and create commit
+  - <line color="red">✗</line> **`empty` (`em`)**  
+  Create empty commit
+
 - <line color="red">✗</line> **`bottom` (`bt`)**  
   Move to the bottom branch in the stack.
 
