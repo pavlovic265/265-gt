@@ -50,7 +50,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != *currentBranch {
+					if branch != *currentBranch && (branch != "main" || branch != "master") {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}
