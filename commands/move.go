@@ -63,6 +63,12 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
+	if err := utils.DeleteParent(svc.exe, currentBranch); err != nil {
+		return err
+	}
+	if err := utils.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
+		return err
+	}
 
 	return nil
 }
