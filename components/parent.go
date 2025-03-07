@@ -6,7 +6,7 @@ import (
 
 // git config --global alias.set-parent '!f() { git config branch.$(git rev-parse --abbrev-ref HEAD).parent "$1"; }; f'
 func SetParent(exe executor.Executor, parent string, child string) error {
-	exeArgs := []string{"config", "branch." + child + ".parent", parent}
+	exeArgs := []string{"config", "gt.branch." + child + ".parent", parent}
 	err := exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
@@ -16,7 +16,7 @@ func SetParent(exe executor.Executor, parent string, child string) error {
 
 // git config --global alias.get-parent '!git config --get branch.$(git rev-parse --abbrev-ref HEAD).parent 2>/dev/null || echo "No parent set"'
 func GetParent(exe executor.Executor, branch string) (*string, error) {
-	exeArgs := []string{"config", "--get", "branch." + branch + ".parent"}
+	exeArgs := []string{"config", "--get", "gt.branch." + branch + ".parent"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func GetParent(exe executor.Executor, branch string) (*string, error) {
 
 // git config --global alias.delete-parent '!git config --unset branch.$(git rev-parse --abbrev-ref HEAD).parent 2>/dev/null || echo "No parent to delete"'
 func DeleteParent(exe executor.Executor, branch string) error {
-	exeArgs := []string{"config", "--unset", "branch." + branch + ".parent"}
+	exeArgs := []string{"config", "--unset", "gt.branch." + branch + ".parent"}
 	err := exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
