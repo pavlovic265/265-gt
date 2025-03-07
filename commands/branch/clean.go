@@ -26,7 +26,7 @@ func (svc cleanCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "clean",
 		Aliases:            []string{"cl"},
-		Short:              "git clean",
+		Short:              "clean branches one by one",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
