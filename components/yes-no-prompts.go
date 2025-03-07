@@ -13,7 +13,7 @@ type YesNoPrompt struct {
 }
 
 func (m YesNoPrompt) IsYes() bool {
-	if m.answer != "" && (m.answer == "y" || m.answer == "Y") {
+	if m.answer != "" && m.answer == "Yes" {
 		return true
 	}
 	return false
