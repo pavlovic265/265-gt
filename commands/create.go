@@ -3,7 +3,9 @@ package commands
 import (
 	"fmt"
 
+	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -28,9 +30,20 @@ func (svc createCommand) Command() *cobra.Command {
 			if len(args) == 0 {
 				return fmt.Errorf("missing branch name")
 			}
+			branch := args[0]
 
-			exeArgs := []string{"checkout", "-b", args[0]}
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+			parent, err := utils.GetCurrentBranchName(svc.exe)
+			if err != nil {
+				return err
+			}
+
+			err = components.SetParent(svc.exe, *parent, branch)
+			if err != nil {
+				return err
+			}
+
+			exeArgs := []string{"checkout", "-b"}
+			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			return err
 		},
 	}
