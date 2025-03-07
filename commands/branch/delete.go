@@ -39,7 +39,10 @@ func (svc deleteCommand) Command() *cobra.Command {
 				if *currentBranch == branch {
 					return fmt.Errorf("cant delete branch you are on")
 				}
-				err := svc.deleteBranch(args[0])
+				if branch == "main" || branch == "master" {
+					return fmt.Errorf("you can't delete base branch")
+				}
+				err := svc.deleteBranch(branch)
 				if err != nil {
 					return err
 				}
@@ -50,7 +53,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != *currentBranch && (branch != "main" || branch != "master") {
+					if branch != *currentBranch && branch != "main" && branch != "master" {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}
