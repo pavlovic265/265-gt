@@ -65,11 +65,9 @@ func (svc cleanCommand) deleteBranch(
 	}
 
 	if model, ok := m.(components.YesNoPrompt); ok {
-		fmt.Println("start Operation for branch ", branch)
 		if model.Quitting {
 			fmt.Println("Operation canceled")
 		}
-		fmt.Println("is yes", model.IsYes())
 
 		if model.IsYes() {
 			exeArgs := []string{"branch", "-D", branch}
@@ -78,7 +76,6 @@ func (svc cleanCommand) deleteBranch(
 				return err
 			}
 			utils.DeleteParent(svc.exe, branch)
-			fmt.Printf("Deleted %s branch\n", branch)
 		}
 
 	}
