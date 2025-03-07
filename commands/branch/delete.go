@@ -54,7 +54,6 @@ func (svc deleteCommand) Command() *cobra.Command {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}
-
 				return svc.selectAndDeleteBranch(branchesWithoutCurrent)
 			}
 			return nil
