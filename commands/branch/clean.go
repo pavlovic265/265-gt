@@ -41,6 +41,7 @@ func (svc cleanCommand) Command() *cobra.Command {
 
 			for _, branch := range branches {
 				if branch != *currentBranch {
+					fmt.Println("")
 					svc.deleteBranch(branch)
 				}
 			}
@@ -67,12 +68,15 @@ func (svc cleanCommand) deleteBranch(
 			fmt.Println("Operation canceled")
 		}
 
-		exeArgs := []string{"branch", "-D", branch}
-		err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-		if err != nil {
-			return err
+		if model.IsYes() {
+			exeArgs := []string{"branch", "-D", branch}
+			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+			if err != nil {
+				return err
+			}
+			utils.DeleteParent(svc.exe, branch)
 		}
-		utils.DeleteParent(svc.exe, branch)
+
 	}
 
 	return nil

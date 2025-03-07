@@ -12,6 +12,13 @@ type YesNoPrompt struct {
 	Quitting bool
 }
 
+func (m YesNoPrompt) IsYes() bool {
+	if m.answer != "" && (m.answer == "y" || m.answer == "Y") {
+		return true
+	}
+	return false
+}
+
 func NewYesNoPrompt(question string) YesNoPrompt {
 	return YesNoPrompt{
 		question: question,
