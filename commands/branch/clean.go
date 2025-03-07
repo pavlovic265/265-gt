@@ -39,24 +39,21 @@ func (svc cleanCommand) Command() *cobra.Command {
 				return err
 			}
 
-			var branchsToDelete []string
 			for _, branch := range branches {
 				if branch != *currentBranch {
-					branchsToDelete = append(branchsToDelete, branch)
+					svc.deleteBranch(branch)
 				}
 			}
-
-			svc.deleteBranchs(branchsToDelete)
 
 			return nil
 		},
 	}
 }
 
-func (svc cleanCommand) deleteBranchs(
-	branchs []string,
+func (svc cleanCommand) deleteBranch(
+	branch string,
 ) error {
-	initialModel := components.NewYesNoPrompt("Do you want to delete %s? (Y/n) ", branchs)
+	initialModel := components.NewYesNoPrompt("Do you want to delete %s? (Y/n) ")
 
 	program := tea.NewProgram(initialModel)
 
@@ -69,6 +66,13 @@ func (svc cleanCommand) deleteBranchs(
 		if model.Quitting {
 			fmt.Println("Operation canceled")
 		}
+
+		exeArgs := []string{"branch", "-D", branch}
+		err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+		if err != nil {
+			return err
+		}
+		utils.DeleteParent(svc.exe, branch)
 	}
 
 	return nil
