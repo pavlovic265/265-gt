@@ -76,7 +76,7 @@ func (svc cleanCommand) deleteBranch(
 				return err
 			}
 			utils.DeleteParent(svc.exe, branch)
-			fmt.Printf("Deleted %s: %t\n", branch)
+			fmt.Printf("Deleted %s branch\n", branch)
 		}
 
 	}
