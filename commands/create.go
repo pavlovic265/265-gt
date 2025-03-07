@@ -42,9 +42,17 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
-			exeArgs := []string{"checkout", "-b"}
+			exeArgs := []string{"checkout", "-b", branch}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-			return err
+			if err != nil {
+				err := components.DeleteParent(svc.exe, branch)
+				if err != nil {
+					return err
+				}
+
+				return err
+			}
+			return nil
 		},
 	}
 }
