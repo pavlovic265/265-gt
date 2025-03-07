@@ -65,7 +65,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
-	exeArgs := []string{"checkout", branch}
+	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
