@@ -24,6 +24,7 @@ func (svc branchCommand) Command() *cobra.Command {
 		Short:   "git branch",
 	}
 	branchCmd.AddCommand(NewDeleteCommand(svc.exe).Command())
+	branchCmd.AddCommand(NewCleanCommand(svc.exe).Command())
 
 	return branchCmd
 }
