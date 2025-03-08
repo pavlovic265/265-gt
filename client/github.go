@@ -35,7 +35,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 			for _, row := range rows {
 				if strings.Contains(row, "keyring") {
 					account := strings.Split(row, " ")
-					user = account[len(account)-1]
+					user = account[len(account)-2]
 				}
 				if strings.Contains(row, "Token:") {
 					tokenPrefix = strings.Split(strings.Split(row, " ")[1], "*")[0]
@@ -44,7 +44,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 
 			accoutns := config.GlobalConfig.GitHub.Accounts
 			for _, acc := range accoutns {
-				if acc.User == user || strings.HasPrefix(acc.Token, tokenPrefix) {
+				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
 				}
 			}
