@@ -7,6 +7,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 )
 
 type gitHubCli struct {
@@ -70,7 +71,16 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill"}
+	branch, err := utils.GetCurrentBranchName(svc.exe)
+	if err != nil {
+		return err
+	}
+	parent, err := utils.GetParent(svc.exe, *branch)
+	if err != nil {
+		return err
+	}
+
+	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill", "--base", *parent}
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
