@@ -87,9 +87,9 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		"--base", *parent,
 		//"--title", "My PR",
 		//"--body", "This PR contains changes...",
-		"--head", *branch,
-		"--dry-run",
+		//"--head", *branch,
 		"--fill",
+		"--dry-run",
 	}
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
