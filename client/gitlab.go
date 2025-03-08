@@ -14,6 +14,10 @@ func (svc gitLabCli) AuthStatus() error {
 	return nil
 }
 
+func (svc gitLabCli) AuthLogin(user string) error {
+	return nil
+}
+
 func (svc gitLabCli) CreatePullRequest(args []string) error {
 	return nil
 }

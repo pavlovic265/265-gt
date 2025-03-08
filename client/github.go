@@ -64,6 +64,26 @@ func (svc gitHubCli) AuthStatus() error {
 	return nil
 }
 
+func (svc gitHubCli) AuthLogin(user string) error {
+	accoutns := config.GlobalConfig.GitHub.Accounts
+	var token string
+	for _, acc := range accoutns {
+		if acc.User == user {
+			token = acc.Token
+			break
+		}
+	}
+
+	//
+	exeArgs := []string{"auth", "login", "--with-token"}
+	err := svc.exe.WithGh().WithArgs(exeArgs).WithStdin(token).Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	fmt.Println("Creating pull request on GitHub...")
 	acc, err := svc.getActiveAccount()
