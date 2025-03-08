@@ -79,12 +79,13 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	if err != nil {
 		return err
 	}
+	qualifiedParent := "origin/" + *parent
 
 	exeArgs := []string{
 		"pr",
 		"create",
 		"--assignee", acc.User,
-		"--base", *parent,
+		"--base", qualifiedParent,
 		"--title", "My PR",
 		"--body", "This PR contains changes...",
 		//"--head", *branch,
