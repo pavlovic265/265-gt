@@ -37,7 +37,6 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 					account := strings.Split(row, " ")
 					user = account[len(account)-2]
 				}
-				fmt.Println(":>>>>", user)
 				if strings.Contains(row, "Token:") {
 					tokenPrefix = strings.Split(strings.Split(row, " ")[1], "*")[0]
 				}
@@ -128,7 +127,6 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(acc.User)
 
 	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author"}
 	out, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
