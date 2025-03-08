@@ -88,6 +88,7 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		"--base", qualifiedParent,
 		"--title", "My PR",
 		"--body", "This PR contains changes...",
+		"--repo", "pavlovic265/265-gt",
 		//"--head", *branch,
 		//"--fill",
 		//"--dry-run",
