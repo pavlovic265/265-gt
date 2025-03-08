@@ -46,7 +46,7 @@ func (svc cleanCommand) Command() *cobra.Command {
 						fmt.Println(err.Error())
 					}
 					if shouldBrake {
-						return nil
+						break
 					}
 				}
 			}
