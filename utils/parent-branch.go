@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/pavlovic265/265-gt/executor"
 )
 
@@ -19,7 +21,7 @@ func GetParent(exe executor.Executor, branch string) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	parent := output.String()
+	parent := strings.TrimSuffix(output.String(), "\n")
 	return &parent, nil
 }
 
