@@ -49,7 +49,7 @@ func (svc loginCommand) Command() *cobra.Command {
 
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-					fmt.Println("Authentication started")
+					fmt.Println("Authentication started for", m.Selected)
 					if err := client.GlobalClient.AuthLogin(m.Selected); err != nil {
 						return err
 					}
