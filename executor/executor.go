@@ -13,6 +13,7 @@ type Executor interface {
 	WithGh() Executor
 	WithName(name string) Executor
 	WithArgs(args []string) Executor
+	WithStdin(stdin string) Executor
 	Run() error
 	RunWithOutput() (bytes.Buffer, error)
 }
@@ -21,6 +22,7 @@ type exe struct {
 	Name      string
 	HasOutput bool
 	Args      []string
+	Stdin     string
 }
 
 func NewExe() Executor {
@@ -28,6 +30,7 @@ func NewExe() Executor {
 		Name:      "",
 		HasOutput: true,
 		Args:      []string{},
+		Stdin:     "",
 	}
 }
 
@@ -51,6 +54,11 @@ func (exe exe) WithArgs(args []string) Executor {
 	return exe
 }
 
+func (exe exe) WithStdin(stdin string) Executor {
+	exe.Stdin = stdin
+	return exe
+}
+
 func (exe exe) Run() error {
 	exe.HasOutput = false
 	_, err := exe.RunWithOutput()
@@ -64,6 +72,10 @@ func (exe exe) Run() error {
 func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	var output bytes.Buffer
 	cmd := exec.Command(exe.Name, exe.Args...)
+
+	if exe.Stdin != "" {
+		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	}
 
 	if exe.HasOutput {
 		cmd.Stdout = os.Stdout
