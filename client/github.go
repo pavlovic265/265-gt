@@ -37,6 +37,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 					account := strings.Split(row, " ")
 					user = account[len(account)-2]
 				}
+				fmt.Println(":>>>>", user)
 				if strings.Contains(row, "Token:") {
 					tokenPrefix = strings.Split(strings.Split(row, " ")[1], "*")[0]
 				}
