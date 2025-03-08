@@ -75,6 +75,7 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 
 	err := cmd.Run()
 	if err != nil {
+		fmt.Println((fmt.Errorf("err %w", err).Error()))
 		return bytes.Buffer{}, fmt.Errorf("error executing `%s %s`: %v", exe.Name, strings.Join(exe.Args, " "), err)
 	}
 
