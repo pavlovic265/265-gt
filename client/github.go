@@ -80,7 +80,15 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	exeArgs := []string{"pr", "create", "--assignee", acc.User, "--fill", "--base", *parent}
+	exeArgs := []string{
+		"pr",
+		"create",
+		"--assignee", acc.User,
+		"--base", *parent,
+		"--title", "My PR",
+		"--body", "This PR contains changes...",
+		"--head", *branch,
+	}
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
