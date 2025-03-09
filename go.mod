@@ -3,7 +3,6 @@ module github.com/pavlovic265/265-gt
 go 1.23
 
 require (
-	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/spf13/cobra v1.8.1
 	gopkg.in/yaml.v2 v2.4.0
