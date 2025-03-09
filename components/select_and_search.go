@@ -23,20 +23,20 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			return m, tea.Quit
-		case "up", "k":
+		case tea.KeyUp.String(), tea.KeyCtrlK.String():
 			if m.Cursor > 0 {
 				m.Cursor--
 			}
-		case "down", "j":
+		case tea.KeyDown.String(), tea.KeyCtrlJ.String():
 			if m.Cursor < len(m.Choices)-1 {
 				m.Cursor++
 			}
-		case "enter":
+		case tea.KeyEnter.String():
 			m.Selected = m.Choices[m.Cursor]
 			return m, tea.Quit
-		case "backspace":
+		case tea.KeyBackspace.String():
 			if len(m.Query) > 0 {
 				m.Query = m.Query[:len(m.Query)-1]
 			}
@@ -45,7 +45,6 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Query += msg.String()
 			}
 		}
-
 		// Filter branches based on query
 		m.filterChoices()
 	}

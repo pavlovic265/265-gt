@@ -39,10 +39,10 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "n", "N":
 			m.answer = "No"
 			return m, tea.Quit
-		case "enter":
+		case tea.KeyEnter.String():
 			m.answer = "Yes"
 			return m, tea.Quit
-		case "q", "ctrl+c", "esc":
+		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			m.Quitting = true
 			return m, tea.Quit
 		}
