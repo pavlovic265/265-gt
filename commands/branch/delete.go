@@ -65,13 +65,13 @@ func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
 	parent := utils.GetParent(svc.exe, branch)
+	utils.RelinkParentChildren(svc.exe, parent, branch)
 
 	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
-	utils.RelinkParentChildren(svc.exe, parent, branch)
 
 	return nil
 }
