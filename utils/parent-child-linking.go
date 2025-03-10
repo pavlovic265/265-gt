@@ -39,7 +39,11 @@ func RelinkParentChildren(
 	children = append(children, splitBranchChildren...)
 	childrenStr := marshalChildren(children)
 
-	SetChildren(exe, parent, childrenStr)
+	if childrenStr != "" {
+		SetChildren(exe, parent, childrenStr)
+	} else {
+		DeleteChildren(exe, parent)
+	}
 }
 
 func unmarshalChildren(children string) []string {
