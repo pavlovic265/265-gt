@@ -78,11 +78,17 @@ func (svc cleanCommand) deleteBranch(
 		}
 
 		if model.IsYes() {
+
+			parent := utils.GetParent(svc.exe, branch)
+			fmt.Println("before ", parent)
 			exeArgs := []string{"branch", "-D", branch}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return false, err
 			}
+
+			parent = utils.GetParent(svc.exe, branch)
+			fmt.Println("after ", parent)
 			svc.cleanBranchs(branch)
 		}
 
