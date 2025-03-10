@@ -45,7 +45,7 @@ func RelinkParentChildren(
 
 	if len(splitBranchChildren) != 0 {
 		for _, child := range splitBranchChildren {
-			fmt.Printf("assign (%s) to parent (%s)\n", child, parent)
+			fmt.Printf("assign branch (%s) to parent (%s)\n", child, parent)
 			if err := SetParent(exe, parent, child); err != nil {
 				return err
 			}
@@ -58,6 +58,7 @@ func RelinkParentChildren(
 	fmt.Println("childrenStr: ", childrenStr, len(childrenStr), childrenStr != "", childrenStr != " ")
 
 	if len(childrenStr) != 0 {
+		fmt.Printf("assign children (%s) to branch (%s)\n", childrenStr, parent)
 		if err := SetChildren(exe, parent, childrenStr); err != nil {
 			return err
 		}
