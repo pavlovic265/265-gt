@@ -84,12 +84,15 @@ func (svc cleanCommand) deleteBranch(
 			if err != nil {
 				return false, err
 			}
-
-			if err := utils.DeleteFromParentChildren(svc.exe, parent, branch); err != nil {
-				return false, err
-			}
+			utils.RelinkParentChildren(svc.exe, parent, branch)
 		}
 	}
+	/**
+	 * test3 - parent (test2) children()
+	 * test2 - parent (test1) children(test3) -> getting parent(test1), children(test3) - delring test2 - delting parent(test1)(children(test2) - adding parent(test1)(children(test3))
+	 * test1 - parent (main)  children(test2)
+	 * main
+	 **/
 
 	return false, nil
 }

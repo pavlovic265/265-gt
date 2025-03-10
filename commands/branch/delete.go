@@ -71,10 +71,7 @@ func (svc deleteCommand) deleteBranch(
 	if err != nil {
 		return err
 	}
-
-	if err := utils.DeleteFromParentChildren(svc.exe, parent, branch); err != nil {
-		return err
-	}
+	utils.RelinkParentChildren(svc.exe, parent, branch)
 
 	return nil
 }
