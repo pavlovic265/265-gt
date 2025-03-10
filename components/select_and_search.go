@@ -70,7 +70,7 @@ func (m ListModel) View() string {
 		s += line + "\n"
 	}
 
-	s += "\nPress q to quit.\n"
+	s += "\nPress CTRL+q to quit.\n"
 
 	return s
 }
