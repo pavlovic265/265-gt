@@ -45,12 +45,14 @@ func RelinkParentChildren(
 
 	if len(splitBranchChildren) != 0 {
 		for _, child := range splitBranchChildren {
-			fmt.Printf("assign branch (%s) to parent (%s)\n", child, parent)
-			if err := SetParent(exe, parent, child); err != nil {
-				return err
+			if len(child) != 0 {
+				fmt.Printf("assign branch (%s) to parent (%s)\n", child, parent)
+				if err := SetParent(exe, parent, child); err != nil {
+					return err
+				}
+				fmt.Printf("child (%s) len (%d)\n", child, len(child))
+				children = append(children, child)
 			}
-			fmt.Printf("child (%s) len (%d)\n", child, len(child))
-			children = append(children, child)
 		}
 	}
 
