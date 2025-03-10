@@ -30,3 +30,26 @@ func DeleteParent(exe executor.Executor, branch string) error {
 	}
 	return nil
 }
+
+func DeleteFromParentChildren(exe executor.Executor, parent, branch string) error {
+	children := GetChildren(exe, parent)
+	splitChldren := strings.Split(children, " ")
+	if len(splitChldren) == 0 {
+		return nil
+	}
+
+	var newChildren []string
+
+	for _, child := range splitChldren {
+		if child != branch {
+			newChildren = append(newChildren, child)
+		}
+	}
+	if len(newChildren) > 0 {
+		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
+		if err := SetChildren(exe, parent, joinChildren); err != nil {
+			return err
+		}
+	}
+	return nil
+}

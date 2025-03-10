@@ -64,13 +64,17 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
+	parent := utils.GetParent(svc.exe, branch)
+
 	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
-	// utils.DeleteParent(svc.exe, branch)
-	// utils.DeleteChildren(svc.exe, branch)
+
+	if err := utils.DeleteFromParentChildren(svc.exe, parent, branch); err != nil {
+		return err
+	}
 
 	return nil
 }
