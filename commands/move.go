@@ -65,10 +65,11 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
-	if err := svc.setChildrenBranch(parentBranch, currentBranch); err != nil {
+	if err := utils.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
 		return err
 	}
-	if err := utils.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
+
+	if err := svc.setChildrenBranch(parentBranch, currentBranch); err != nil {
 		return err
 	}
 
@@ -76,12 +77,9 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 }
 
 func (svc moveCommand) setChildrenBranch(parent, child string) error {
-	children, err := utils.GetChildren(svc.exe, parent)
-	if err != nil {
-		return err
-	}
+	children := utils.GetChildren(svc.exe, parent)
 
-	splitedChildren := strings.Split(*children, " ")
+	splitedChildren := strings.Split(children, " ")
 	splitedChildren = append(splitedChildren, child)
 	joinedChildren := strings.Join(splitedChildren, " ")
 
