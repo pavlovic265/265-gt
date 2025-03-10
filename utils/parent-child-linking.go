@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
@@ -20,6 +21,9 @@ func RelinkParentChildren(
 	parent string,
 	branch string,
 ) error {
+	fmt.Println("branch ", branch)
+	fmt.Println("parent ", parent)
+	fmt.Println(":>>>>>>>>>>>>>>>>>")
 	branchChildren := GetChildren(exe, branch)
 	splitBranchChildren := unmarshalChildren(branchChildren)
 	if splitBranchChildren == nil {
