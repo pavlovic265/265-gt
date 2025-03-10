@@ -54,5 +54,7 @@ func (m YesNoPrompt) View() string {
 	if m.Quitting {
 		return "Canceled by user\n"
 	}
-	return fmt.Sprintf("%s %s", m.question, m.answer)
+	s := fmt.Sprintf("%s %s", m.question, m.answer)
+	s += "\nPress CTRL+q to quit.\n"
+	return s
 }
