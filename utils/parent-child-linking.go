@@ -56,10 +56,6 @@ func RelinkParentChildren(
 		if err := SetChildren(exe, parent, childrenStr); err != nil {
 			return err
 		}
-	} else {
-		if err := DeleteChildren(exe, parent); err != nil {
-			return err
-		}
 	}
 
 	return nil
