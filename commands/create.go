@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils"
@@ -38,17 +39,35 @@ func (svc createCommand) Command() *cobra.Command {
 			exeArgs := []string{"checkout", "-b", branch}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				err := utils.DeleteParent(svc.exe, branch)
-				if err != nil {
-					return err
-				}
-
 				return err
 			}
+
 			if err := utils.SetParent(svc.exe, *parent, branch); err != nil {
 				return err
 			}
+
+			if err := svc.setChildrenBranch(*parent, branch); err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}
+}
+
+func (svc createCommand) setChildrenBranch(parent, child string) error {
+	children, err := utils.GetChildren(svc.exe, parent)
+	if err != nil {
+		return err
+	}
+
+	splitedChildren := strings.Split(*children, " ")
+	splitedChildren = append(splitedChildren, child)
+	joinedChildren := strings.Join(splitedChildren, " ")
+
+	if err := utils.SetChildren(svc.exe, joinedChildren, parent); err != nil {
+		return err
+	}
+
+	return nil
 }
