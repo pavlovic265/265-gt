@@ -110,6 +110,7 @@ func (svc cleanCommand) cleanBranchs(parent, branch string) {
 				newChildren = append(newChildren, child)
 			}
 		}
+		fmt.Println("4.5 ", newChildren)
 		if len(newChildren) > 0 {
 
 			joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
