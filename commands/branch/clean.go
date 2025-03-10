@@ -92,17 +92,24 @@ func (svc cleanCommand) deleteBranch(
 
 func (svc cleanCommand) cleanBranchs(branch string) {
 	parent := utils.GetParent(svc.exe, branch)
+	fmt.Println("0 ", parent)
 	children := utils.GetChildren(svc.exe, parent)
+	fmt.Println("1 ", children)
 	splitChldren := strings.Split(children, " ")
+	fmt.Println("2 ", splitChldren)
 
 	if len(splitChldren) > 0 {
+		fmt.Println("3 ", len(splitChldren))
 		var newChildren []string
+
 		for _, child := range splitChldren {
+			fmt.Println("4 ", child, branch)
 			if child != branch {
 				newChildren = append(newChildren, child)
 			}
 		}
 		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
+		fmt.Println("5 ", joinChildren)
 
 		utils.SetChildren(svc.exe, parent, joinChildren)
 	}
