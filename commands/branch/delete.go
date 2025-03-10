@@ -69,8 +69,9 @@ func (svc deleteCommand) deleteBranch(
 	if err != nil {
 		return err
 	}
-	utils.DeleteParent(svc.exe, branch)
-	utils.DeleteChildren(svc.exe, branch)
+	// utils.DeleteParent(svc.exe, branch)
+	// utils.DeleteChildren(svc.exe, branch)
+
 	return nil
 }
 

@@ -85,7 +85,7 @@ func (svc cleanCommand) deleteBranch(
 				return false, err
 			}
 
-			svc.cleanBranchs(parent, branch)
+			svc.deleteFromParent(parent, branch)
 		}
 
 	}
@@ -93,35 +93,27 @@ func (svc cleanCommand) deleteBranch(
 	return false, nil
 }
 
-func (svc cleanCommand) cleanBranchs(parent, branch string) {
-	fmt.Println("0 ", parent)
+func (svc cleanCommand) deleteFromParent(parent, branch string) {
 	children := utils.GetChildren(svc.exe, parent)
-	fmt.Println("1 ", children)
 	splitChldren := strings.Split(children, " ")
-	fmt.Println("2 ", splitChldren)
-
-	if len(splitChldren) > 0 {
-		fmt.Println("3 ", len(splitChldren))
-		var newChildren []string
-
-		for _, child := range splitChldren {
-			fmt.Println("4 ", child, branch)
-			if child != branch {
-				newChildren = append(newChildren, child)
-			}
-		}
-		fmt.Println("4.5 ", newChildren)
-		if len(newChildren) > 0 {
-
-			joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
-			fmt.Println("5 ", joinChildren)
-
-			utils.SetChildren(svc.exe, parent, joinChildren)
-		} else {
-			utils.DeleteChildren(svc.exe, parent)
-		}
+	if len(splitChldren) == 0 {
 		return
 	}
-	utils.DeleteChildren(svc.exe, branch)
-	utils.DeleteParent(svc.exe, branch)
+
+	var newChildren []string
+
+	for _, child := range splitChldren {
+		if child != branch {
+			newChildren = append(newChildren, child)
+		}
+	}
+	if len(newChildren) > 0 {
+		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
+		utils.SetChildren(svc.exe, parent, joinChildren)
+	} else {
+		utils.DeleteChildren(svc.exe, parent)
+	}
+
+	// utils.DeleteChildren(svc.exe, branch)
+	// utils.DeleteParent(svc.exe, branch)
 }
