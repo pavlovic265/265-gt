@@ -2,6 +2,7 @@ package branch
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
@@ -82,11 +83,30 @@ func (svc cleanCommand) deleteBranch(
 			if err != nil {
 				return false, err
 			}
-			utils.DeleteParent(svc.exe, branch)
-			utils.DeleteChildren(svc.exe, branch)
 		}
 
 	}
 
 	return false, nil
+}
+
+func (svc cleanCommand) cleanBranchs(branch string) {
+	parent := utils.GetParent(svc.exe, branch)
+	children := utils.GetChildren(svc.exe, parent)
+	splitChldren := strings.Split(children, " ")
+
+	if len(splitChldren) > 0 {
+		var newChildren []string
+		for _, child := range splitChldren {
+			if child != branch {
+				newChildren = append(newChildren, child)
+			}
+		}
+		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
+
+		utils.SetChildren(svc.exe, parent, joinChildren)
+	}
+
+	utils.DeleteParent(svc.exe, branch)
+	utils.DeleteChildren(svc.exe, branch)
 }
