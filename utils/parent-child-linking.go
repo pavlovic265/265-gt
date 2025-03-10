@@ -21,16 +21,18 @@ func RelinkParentChildren(
 	parent string,
 	branch string,
 ) error {
-	fmt.Println("branch :", branch)
-	fmt.Println("parent :", parent)
+	fmt.Println("branch:", branch)
+	fmt.Println("parent:", parent)
 	branchChildren := GetChildren(exe, branch)
+	fmt.Println("branchChildren", branchChildren, len(branchChildren))
 	splitBranchChildren := unmarshalChildren(branchChildren)
-	fmt.Println("splitBranchChildren  ", splitBranchChildren, len(splitBranchChildren))
+
 	if splitBranchChildren == nil {
 		return nil
 	}
 
 	parentChildren := GetChildren(exe, parent)
+	fmt.Println("parentChildren", parentChildren, len(parentChildren))
 	splitParentChildren := unmarshalChildren(parentChildren)
 	if splitParentChildren == nil {
 		return nil
@@ -53,16 +55,12 @@ func RelinkParentChildren(
 		}
 	}
 
-	fmt.Println("children ", children, len(children))
-	if len(children) != 0 {
-		childrenStr := marshalChildren(children)
+	childrenStr := marshalChildren(children)
+	fmt.Println("childrenStr: ", childrenStr, len(childrenStr), childrenStr != "", childrenStr != " ")
 
-		fmt.Println("childrenStr: ", childrenStr, len(childrenStr), childrenStr != "", childrenStr != " ")
-
-		if childrenStr != "" {
-			if err := SetChildren(exe, parent, childrenStr); err != nil {
-				return err
-			}
+	if childrenStr != "" {
+		if err := SetChildren(exe, parent, childrenStr); err != nil {
+			return err
 		}
 	}
 
