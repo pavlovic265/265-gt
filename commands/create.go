@@ -60,7 +60,7 @@ func (svc createCommand) setChildrenBranch(parent, child string) error {
 
 	splitedChildren := strings.Split(children, " ")
 	splitedChildren = append(splitedChildren, child)
-	joinedChildren := strings.Join(splitedChildren, " ")
+	joinedChildren := strings.TrimSpace(strings.Join(splitedChildren, " "))
 
 	if err := utils.SetChildren(svc.exe, parent, joinedChildren); err != nil {
 		return err
