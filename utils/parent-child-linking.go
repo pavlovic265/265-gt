@@ -25,6 +25,7 @@ func RelinkParentChildren(
 	fmt.Println("parent :", parent)
 	branchChildren := GetChildren(exe, branch)
 	splitBranchChildren := unmarshalChildren(branchChildren)
+	fmt.Println("splitBranchChildren  ", splitBranchChildren, len(splitBranchChildren))
 	if splitBranchChildren == nil {
 		return nil
 	}
@@ -46,7 +47,9 @@ func RelinkParentChildren(
 		if err := SetParent(exe, parent, child); err != nil {
 			return err
 		}
-		children = append(children, child)
+		if len(child) != 0 {
+			children = append(children, child)
+		}
 	}
 
 	fmt.Println("children ", children)
