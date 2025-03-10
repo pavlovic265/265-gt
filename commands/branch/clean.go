@@ -118,9 +118,10 @@ func (svc cleanCommand) cleanBranchs(parent, branch string) {
 
 			utils.SetChildren(svc.exe, parent, joinChildren)
 		} else {
-			utils.DeleteChildren(svc.exe, branch)
+			utils.DeleteChildren(svc.exe, parent)
 		}
 		return
 	}
+	utils.DeleteChildren(svc.exe, branch)
 	utils.DeleteParent(svc.exe, branch)
 }
