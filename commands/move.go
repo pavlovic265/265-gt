@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
@@ -63,10 +65,27 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
-	if err := utils.DeleteParent(svc.exe, currentBranch); err != nil {
+	if err := svc.setChildrenBranch(parentBranch, currentBranch); err != nil {
 		return err
 	}
 	if err := utils.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc moveCommand) setChildrenBranch(parent, child string) error {
+	children, err := utils.GetChildren(svc.exe, parent)
+	if err != nil {
+		return err
+	}
+
+	splitedChildren := strings.Split(*children, " ")
+	splitedChildren = append(splitedChildren, child)
+	joinedChildren := strings.Join(splitedChildren, " ")
+
+	if err := utils.SetChildren(svc.exe, joinedChildren, parent); err != nil {
 		return err
 	}
 
