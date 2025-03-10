@@ -83,6 +83,7 @@ func (svc cleanCommand) deleteBranch(
 			if err != nil {
 				return false, err
 			}
+			svc.cleanBranchs(branch)
 		}
 
 	}
