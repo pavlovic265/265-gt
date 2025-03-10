@@ -95,17 +95,14 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	if err != nil {
 		return err
 	}
-	parent, err := utils.GetParent(svc.exe, *branch)
-	if err != nil {
-		return err
-	}
+	parent := utils.GetParent(svc.exe, *branch)
 
 	exeArgs := []string{
 		"pr",
 		"create",
 		"--fill",
 		"--assignee", acc.User,
-		"--base", *parent,
+		"--base", parent,
 	}
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {

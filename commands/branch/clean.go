@@ -83,6 +83,7 @@ func (svc cleanCommand) deleteBranch(
 				return false, err
 			}
 			utils.DeleteParent(svc.exe, branch)
+			utils.DeleteChildren(svc.exe, branch)
 		}
 
 	}

@@ -56,16 +56,13 @@ func (svc createCommand) Command() *cobra.Command {
 }
 
 func (svc createCommand) setChildrenBranch(parent, child string) error {
-	children, err := utils.GetChildren(svc.exe, parent)
-	if err != nil {
-		return err
-	}
+	children := utils.GetChildren(svc.exe, parent)
 
-	splitedChildren := strings.Split(*children, " ")
+	splitedChildren := strings.Split(children, " ")
 	splitedChildren = append(splitedChildren, child)
 	joinedChildren := strings.Join(splitedChildren, " ")
 
-	if err := utils.SetChildren(svc.exe, joinedChildren, parent); err != nil {
+	if err := utils.SetChildren(svc.exe, parent, joinedChildren); err != nil {
 		return err
 	}
 

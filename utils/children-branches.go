@@ -15,14 +15,11 @@ func SetChildren(exe executor.Executor, parent string, children string) error {
 	return nil
 }
 
-func GetChildren(exe executor.Executor, branch string) (*string, error) {
+func GetChildren(exe executor.Executor, branch string) string {
 	exeArgs := []string{"config", "--get", "branch." + branch + ".children"}
-	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	if err != nil {
-		return nil, err
-	}
+	output, _ := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	parent := strings.TrimSuffix(output.String(), "\n")
-	return &parent, nil
+	return parent
 }
 
 func DeleteChildren(exe executor.Executor, branch string) error {
