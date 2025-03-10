@@ -78,18 +78,14 @@ func (svc cleanCommand) deleteBranch(
 		}
 
 		if model.IsYes() {
-
 			parent := utils.GetParent(svc.exe, branch)
-			fmt.Println("before ", parent)
 			exeArgs := []string{"branch", "-D", branch}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return false, err
 			}
 
-			parent = utils.GetParent(svc.exe, branch)
-			fmt.Println("after ", parent)
-			svc.cleanBranchs(branch)
+			svc.cleanBranchs(parent, branch)
 		}
 
 	}
@@ -97,9 +93,7 @@ func (svc cleanCommand) deleteBranch(
 	return false, nil
 }
 
-func (svc cleanCommand) cleanBranchs(branch string) {
-	fmt.Println("-1 ", branch)
-	parent := utils.GetParent(svc.exe, branch)
+func (svc cleanCommand) cleanBranchs(parent, branch string) {
 	fmt.Println("0 ", parent)
 	children := utils.GetChildren(svc.exe, parent)
 	fmt.Println("1 ", children)
