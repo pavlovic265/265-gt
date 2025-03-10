@@ -49,9 +49,10 @@ func RelinkParentChildren(
 		children = append(children, child)
 	}
 
+	fmt.Println("children ", children)
 	childrenStr := marshalChildren(children)
 
-	fmt.Println("childrenStr: ", childrenStr)
+	fmt.Println("childrenStr: ", childrenStr, childrenStr != "")
 
 	if childrenStr != "" {
 		if err := SetChildren(exe, parent, childrenStr); err != nil {
