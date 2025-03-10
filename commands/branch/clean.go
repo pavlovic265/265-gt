@@ -110,12 +110,16 @@ func (svc cleanCommand) cleanBranchs(parent, branch string) {
 				newChildren = append(newChildren, child)
 			}
 		}
-		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
-		fmt.Println("5 ", joinChildren)
+		if len(newChildren) > 0 {
 
-		utils.SetChildren(svc.exe, parent, joinChildren)
+			joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
+			fmt.Println("5 ", joinChildren)
+
+			utils.SetChildren(svc.exe, parent, joinChildren)
+		} else {
+			utils.DeleteChildren(svc.exe, branch)
+		}
+		return
 	}
-
 	utils.DeleteParent(svc.exe, branch)
-	utils.DeleteChildren(svc.exe, branch)
 }
