@@ -52,11 +52,11 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
   - <line color="red">✗</line> **`empty` (`em`)**  
   Create empty commit
 
-- <line color="red">✗</line> **`branch` (`br`)**  
+- <line color="green">✗</line> **`branch` (`br`)**  
   Create commit
-  - <line color="red">✗</line> **`delete` (`dl`)**  
+  - <line color="green">✓</line> **`delete` (`dl`)**  
   Delete branch
-  - <line color="red">✗</line> **`clean` (`cl`)**  
+  - <line color="green">✓</line> **`clean` (`cl`)**  
   Start cleaning process to delete branc one by one
 
 - <line color="red">✗</line> **`bottom` (`bt`)**  
