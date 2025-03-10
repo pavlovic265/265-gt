@@ -92,6 +92,7 @@ func (svc cleanCommand) deleteBranch(
 }
 
 func (svc cleanCommand) cleanBranchs(branch string) {
+	fmt.Println("-1 ", branch)
 	parent := utils.GetParent(svc.exe, branch)
 	fmt.Println("0 ", parent)
 	children := utils.GetChildren(svc.exe, parent)
