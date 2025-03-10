@@ -50,6 +50,8 @@ func DeleteFromParentChildren(exe executor.Executor, parent, branch string) erro
 		if err := SetChildren(exe, parent, joinChildren); err != nil {
 			return err
 		}
+	} else {
+		DeleteChildren(exe, parent)
 	}
 	return nil
 }
