@@ -78,21 +78,21 @@ func (svc cleanCommand) deleteBranch(
 
 		if model.IsYes() {
 			parent := utils.GetParent(svc.exe, branch)
+			parentChildren := utils.GetChildren(svc.exe, parent)
+			branchChildren := utils.GetChildren(svc.exe, branch)
 
 			exeArgs := []string{"branch", "-D", branch}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return false, err
 			}
-			utils.RelinkParentChildren(svc.exe, parent, branch)
+
+			err = utils.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+			if err != nil {
+				return false, err
+			}
 		}
 	}
-	/**
-	 * test3 - parent (test2) children()
-	 * test2 - parent (test1) children(test3) -> getting parent(test1), children(test3) - delring test2 - delting parent(test1)(children(test2) - adding parent(test1)(children(test3))
-	 * test1 - parent (main)  children(test2)
-	 * main
-	 **/
 
 	return false, nil
 }

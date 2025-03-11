@@ -1,82 +1,62 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
 )
 
-/**
- * test3 - parent (test2) children()
- * test2 - parent (test1) children(test3)
- *       -> getting parent(test1), children(test3)
- *       - delring test2 - delting parent(test1)(children(test2)
- *       - adding parent(test1)(children(test3))
- * test1 - parent (main)  children(test2)
- * main
- **/
 func RelinkParentChildren(
 	exe executor.Executor,
 	parent string,
+	parentChildren string,
 	branch string,
+	branchChildren string,
 ) error {
-	fmt.Println("branch:", branch)
-	fmt.Println("parent:", parent)
-
-	parentChildren := GetChildren(exe, parent)
-	fmt.Printf("parent children (%s) len (%d)\n", parentChildren, len(parentChildren))
-	splitParentChildren := unmarshalChildren(parentChildren)
-	if splitParentChildren == nil {
+	if parent == "" {
+		// branch is not tracked
 		return nil
 	}
 
+	// 1. get branch and children
+	splitBranchChildren := unmarshalChildren(branchChildren)
+
+	// 2. get parent and children
+	splitParentChildren := unmarshalChildren(parentChildren)
+
 	var children []string
+	// 3. filter branch from parent children
 	for _, child := range splitParentChildren {
 		if child != branch {
 			children = append(children, child)
 		}
 	}
 
-	branchChildren := GetChildren(exe, branch)
-	fmt.Printf("branch children (%s) len (%d)\n", branchChildren, len(branchChildren))
-	fmt.Println("", len(branchChildren) != 0)
-	splitBranchChildren := unmarshalChildren(branchChildren)
-
-	if len(splitBranchChildren) != 0 {
-		for _, child := range splitBranchChildren {
-			if len(child) != 0 {
-				fmt.Printf("assign branch (%s) to parent (%s)\n", child, parent)
-				if err := SetParent(exe, parent, child); err != nil {
-					return err
-				}
-				fmt.Printf("child (%s) len (%d)\n", child, len(child))
-				children = append(children, child)
-			}
+	// 4. assing branch children to parent children and assing new parent to branch children
+	for _, child := range splitBranchChildren {
+		// 4.1 assign new parent to children
+		if err := SetParent(exe, parent, child); err != nil {
+			return err
 		}
+		// 4.2 assign child to parent children
+		children = append(children, child)
 	}
 
 	childrenStr := marshalChildren(children)
-	fmt.Println("childrenStr: ", childrenStr, len(childrenStr), childrenStr != "", childrenStr != " ")
 
-	if len(childrenStr) != 0 {
-		fmt.Printf("assign children (%s) to branch (%s)\n", childrenStr, parent)
-		if err := SetChildren(exe, parent, childrenStr); err != nil {
-			return err
-		}
+	if err := SetChildren(exe, parent, childrenStr); err != nil {
+		return err
 	}
 
-	fmt.Println(":>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	return nil
 }
 
 func unmarshalChildren(children string) []string {
-	splitChildren := strings.Split(children, " ")
-	if len(splitChildren) == 0 {
+	if len(children) == 0 {
 		return nil
 	}
 
-	return splitChildren
+	return strings.Split(children, " ")
 }
 
 func marshalChildren(children []string) string {
