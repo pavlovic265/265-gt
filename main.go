@@ -4,7 +4,6 @@ import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
 	"github.com/pavlovic265/265-gt/commands/auth"
-	"github.com/pavlovic265/265-gt/commands/branch"
 	createconfig "github.com/pavlovic265/265-gt/commands/create_config"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
@@ -33,11 +32,12 @@ func main() {
 	rootCmd.AddCommand(commands.NewContCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewCheckoutCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewMoveCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewDeleteCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewCleanCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewVersionCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUpdateCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe).Command())
-	rootCmd.AddCommand(branch.NewBranchCommand(exe).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe).Command())
 
 	rootCmd.Execute()
