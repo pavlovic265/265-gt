@@ -17,11 +17,11 @@ var (
 	noStyle      = lipgloss.NewStyle()
 	helpStyle    = blurredStyle
 
-	doneButtonFocus = focusedStyle.Render("[ Done ]")
-	doneButtonBlur  = blurredStyle.Render("[ Done ]")
+	DoneButtonFocus = focusedStyle.Render("[ Done ]")
+	DoneButtonBlur  = blurredStyle.Render("[ Done ]")
 
-	addButtonFocus = focusedStyle.Render("[ Add ]")
-	addButtonBlur  = blurredStyle.Render("[ Add ]")
+	AddButtonFocus = focusedStyle.Render("[ Add ]")
+	AddButtonBlur  = blurredStyle.Render("[ Add ]")
 )
 
 type accountsModel struct {
@@ -122,13 +122,13 @@ func (am accountsModel) View() string {
 		}
 	}
 
-	doneButton := &doneButtonBlur
+	doneButton := &DoneButtonBlur
 	if am.focusIndex == len(am.inputs) {
-		doneButton = &doneButtonFocus
+		doneButton = &DoneButtonFocus
 	}
-	addButton := &addButtonBlur
+	addButton := &AddButtonBlur
 	if am.focusIndex == len(am.inputs)+1 {
-		addButton = &addButtonFocus
+		addButton = &AddButtonFocus
 	}
 
 	fmt.Fprintf(&b, "\n\n%s  %s\n\n", *doneButton, *addButton)

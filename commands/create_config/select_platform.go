@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/config"
 )
 
 type selectPlatformModel struct {
@@ -13,7 +14,10 @@ type selectPlatformModel struct {
 	choices []string
 }
 
-var choices = []string{"GitHub", "GitLab (not implemented yet)"}
+var choices = []string{
+	config.GitHubPlatform.String(),
+	config.GitLabPlatform.String() + " (not implemented yet)",
+}
 
 func newSelectPlatformModel() selectPlatformModel {
 	return selectPlatformModel{
