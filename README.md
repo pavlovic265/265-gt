@@ -49,11 +49,10 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 | `create` (`c`)              | ✅     | Create a new branch                          |
 | `checkout` (`co`)           | ✅     | Checkout/search branch                       |
 | `commit` (`cm`)             | ❌     | Create commit                                |
-|   `add` (`a`)               | ❌     | Add + create commit                          |
-|   `empty` (`em`)            | ❌     | Create empty commit                          |
-| `branch` (`br`)             | ✅     | Create commit (description needs verification)|
-|   `delete` (`dl`)           | ✅     | Delete branch                                |
-|   `clean` (`cl`)            | ✅     | Interactive branch cleanup                  |
+| `add`                       | ✅     | Stage changes (`git add`)                   |
+|  `empty` (`em`)            | ❌     | Create empty commit                          |
+|   `branch delete` (`branch dl`)           | ✅     | Delete branch                                |
+|   `branch clean` (`branch cl`)            | ✅     | Interactive branch cleanup                  |
 | `move` (`mv`)               | ✅     | Rebase branch                                |
 | **Navigation**              |        |                                              |
 | `bottom` (`bt`)             | ❌     | Move to bottom of stack                     |
@@ -64,23 +63,17 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 | `pull` (`pl`)               | ✅     | Pull latest changes                         |
 | `sync` (`sy`)               | ❌     | Sync local/remote branches                  |
 | `submit` (`s`)              | ❌     | Submit changes                              |
-| **Pull Requests**           |        |                                              |
-| `pull_request` (`pr`)       | ✅     | PR management                               |
-|   `create` (`c`)            | ✅     | Create PR                                   |
-|   `list` (`li`)             | ✅     | List PRs                                    |
-| **Configuration**           |        |                                              |
-| `conf`                      | ✅     | Config generation                           |
-|   `global` (`gl`)           | ✅     | Global config                               |
-|   `local` (`lo`)            | ✅     | Local config                                |
-| **Maintenance**             |        |                                              |
-| `clean` (`cl`)              | ✅     | Delete merged branches                      |
-| `add`                       | ✅     | Stage changes (`git add`)                   |
-| **Auth Management**         |        |                                              |
-| `auth`                      | ✅     | Account management                          |
-|   `login` (`lg`)            | ✅     | Login user with token from config            |
-|   `logout` (`lo`)           | ✅     | Logout user from config                     |
-|   `status` (`st`)           | ✅     | Show auth status                            |
-|   `switch` (`sw`)           | ✅     | Switch accounts                             |
+| **Pull Requests**           |        | PR management                               |
+|   `pull_request create` (`pr c`)            | ✅     | Create PR                                   |
+|   `pull_request list` (`pr li`)             | ✅     | List PRs                                    |
+| **Configuration**           |        |Config generation                          |
+|   `config global` (`conf gl`)           | ✅     | Global config                               |
+|   `config local` (`conf lo`)            | ✅     | Local config                                |
+| **Auth Management**         |        |Account management                          |
+|   `auth login` (`auth lg`)            | ✅     | Login user with token from config            |
+|   `auth logout` (`auth lo`)           | ✅     | Logout user from config                     |
+|   `auth status` (`auth st`)           | ✅     | Show auth status                            |
+|   `auth switch` (`auth sw`)           | ✅     | Switch accounts                             |
 | **Miscellaneous**           |        |                                              |
 | `version` (`v`)             | ✅     | Check version                               |
 | `update`                    | ✅     | Update CLI                                  |
