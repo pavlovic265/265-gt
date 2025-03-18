@@ -40,7 +40,7 @@ func (svc cleanCommand) Command() *cobra.Command {
 			}
 
 			for _, branch := range branches {
-				if branch != *currentBranch {
+				if branch != *currentBranch && !IsProtectedBranch(branch) {
 					shouldBrake, err := svc.deleteBranch(branch)
 					if err != nil {
 						fmt.Println(err.Error())
