@@ -51,8 +51,8 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 | `commit` (`cm`)             | ❌     | Create commit                                |
 | `add`                       | ✅     | Stage changes (`git add`)                   |
 |  `empty` (`em`)            | ❌     | Create empty commit                          |
-|   `branch delete` (`branch dl`)           | ✅     | Delete branch                                |
-|   `branch clean` (`branch cl`)            | ✅     | Interactive branch cleanup                  |
+|   `delete` (`dl`)           | ✅     | Delete branch                                |
+|   `clean` (`cl`)            | ✅     | Check and clean all local branch exclude local protected      |
 | `move` (`mv`)               | ✅     | Rebase branch                                |
 | **Navigation**              |        |                                              |
 | `bottom` (`bt`)             | ❌     | Move to bottom of stack                     |
