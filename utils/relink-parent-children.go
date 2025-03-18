@@ -19,10 +19,10 @@ func RelinkParentChildren(
 	}
 
 	// 1. get branch and children
-	splitBranchChildren := unmarshalChildren(branchChildren)
+	splitBranchChildren := UnmarshalChildren(branchChildren)
 
 	// 2. get parent and children
-	splitParentChildren := unmarshalChildren(parentChildren)
+	splitParentChildren := UnmarshalChildren(parentChildren)
 
 	var children []string
 	// 3. filter branch from parent children
@@ -51,7 +51,7 @@ func RelinkParentChildren(
 	return nil
 }
 
-func unmarshalChildren(children string) []string {
+func UnmarshalChildren(children string) []string {
 	if len(children) == 0 {
 		return nil
 	}
