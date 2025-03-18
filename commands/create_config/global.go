@@ -63,15 +63,13 @@ func (svc globalCommand) Command() *cobra.Command {
 						Accounts: accounts,
 					}
 				}
-
-				yamlData, err := yaml.Marshal(&newConfig)
+				encoder := yaml.NewEncoder(file)
+				encoder.SetIndent(2)
+				err = encoder.Encode(&newConfig)
 				if err != nil {
 					return err
 				}
-				_, err = file.Write(yamlData)
-				if err != nil {
-					return err
-				}
+				defer encoder.Close()
 
 				return nil
 			} else if err != nil {
