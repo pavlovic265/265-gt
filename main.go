@@ -36,6 +36,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewCleanCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewVersionCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUpdateCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewDownCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe).Command())
