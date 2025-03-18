@@ -24,6 +24,7 @@ func (svc authCommand) Command() *cobra.Command {
 	}
 	authCmd.AddCommand(NewStatusCommand(svc.exe).Command())
 	authCmd.AddCommand(NewLoginCommand(svc.exe).Command())
+	authCmd.AddCommand(NewLogoutCommand(svc.exe).Command())
 	authCmd.AddCommand(NewSwitchCommand(svc.exe).Command())
 
 	return authCmd

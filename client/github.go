@@ -84,6 +84,28 @@ func (svc gitHubCli) AuthLogin(user string) error {
 	return nil
 }
 
+func (svc gitHubCli) AuthLogout(user string) error {
+	accoutns := config.Config.GlobalConfig.GitHub.Accounts
+	foundUser := false
+	for _, acc := range accoutns {
+		if acc.User == user {
+			foundUser = true
+			break
+		}
+	}
+	if !foundUser {
+		return fmt.Errorf("can't find user in config")
+	}
+
+	exeArgs := []string{"auth", "logout", "-u", user}
+	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	fmt.Println("Creating pull request on GitHub...")
 	acc, err := svc.getActiveAccount()

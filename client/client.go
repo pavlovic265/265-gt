@@ -12,6 +12,7 @@ import (
 type CliClient interface {
 	AuthStatus() error
 	AuthLogin(user string) error
+	AuthLogout(user string) error
 	CreatePullRequest(args []string) error
 	ListPullRequests(args []string) ([]PullRequest, error)
 }

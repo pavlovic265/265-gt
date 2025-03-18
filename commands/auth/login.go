@@ -23,7 +23,6 @@ func NewLoginCommand(
 	}
 }
 
-// gh auth login --with-token <<< "token"
 func (svc loginCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "login",
