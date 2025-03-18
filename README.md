@@ -78,6 +78,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 | **Auth Management**         |        |                                              |
 | `auth`                      | ✅     | Account management                          |
 |   `login` (`lg`)            | ✅     | Login user with token from config            |
+|   `logout` (`lo`)           | ✅     | Logout user from config                     |
 |   `status` (`st`)           | ✅     | Show auth status                            |
 |   `switch` (`sw`)           | ✅     | Switch accounts                             |
 | **Miscellaneous**           |        |                                              |
