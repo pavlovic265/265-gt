@@ -69,15 +69,15 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 |   `create` (`c`)            | ✅     | Create PR                                   |
 |   `list` (`li`)             | ✅     | List PRs                                    |
 | **Configuration**           |        |                                              |
-| `conf`                      | ❌     | Config generation                           |
-|   `global` (`gl`)           | ❌     | Global config                               |
-|   `local` (`lo`)            | ❌     | Local config                                |
+| `conf`                      | ✅     | Config generation                           |
+|   `global` (`gl`)           | ✅     | Global config                               |
+|   `local` (`lo`)            | ✅     | Local config                                |
 | **Maintenance**             |        |                                              |
 | `clean` (`cl`)              | ✅     | Delete merged branches                      |
 | `add`                       | ✅     | Stage changes (`git add`)                   |
 | **Auth Management**         |        |                                              |
 | `auth`                      | ✅     | Account management                          |
-|   `login` (`lg`)           | ✅     | Login user with token from config            |
+|   `login` (`lg`)            | ✅     | Login user with token from config            |
 |   `status` (`st`)           | ✅     | Show auth status                            |
 |   `switch` (`sw`)           | ✅     | Switch accounts                             |
 | **Miscellaneous**           |        |                                              |
