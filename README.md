@@ -55,8 +55,8 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 |   `clean` (`cl`)            | ✅     | Check and clean all local branch exclude local protected      |
 | `move` (`mv`)               | ✅     | Rebase branch                                |
 | **Navigation**              |        |                                              |
-| `bottom` (`bt`)             | ❌     | Move to bottom of stack                     |
-| `up`                        | ❌     | Move up in stack                            |
+| `down`              | ✅     | Move to down in stack                     |
+| `up`                        | ✅     | Move up in stack                            |
 | `switch` (`sw`)             | ✅     | Switch to previous branch                   |
 | **Remote Operations**       |        |                                              |
 | `push` (`pu`)               | ✅     | Force-push to remote                        |
