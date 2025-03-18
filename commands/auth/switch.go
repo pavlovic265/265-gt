@@ -44,7 +44,7 @@ func (svc switchCommand) Command() *cobra.Command {
 
 func (svc switchCommand) switchUser(user string) error {
 	var existUser bool
-	acocunts := config.GlobalConfig.GitHub.Accounts
+	acocunts := config.Config.GlobalConfig.GitHub.Accounts
 	for _, acc := range acocunts {
 		if user == acc.User {
 			existUser = true
@@ -64,7 +64,7 @@ func (svc switchCommand) switchUser(user string) error {
 }
 
 func (svc switchCommand) selectAndswitchUser() error {
-	acocunts := config.GlobalConfig.GitHub.Accounts
+	acocunts := config.Config.GlobalConfig.GitHub.Accounts
 	var users []string
 	for _, acc := range acocunts {
 		users = append(users, acc.User)

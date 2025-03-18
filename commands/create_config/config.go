@@ -24,6 +24,7 @@ func (svc configCommand) Command() *cobra.Command {
 		Short:   "create config",
 	}
 	configCmd.AddCommand(NewGlobalCommand(svc.exe).Command())
+	configCmd.AddCommand(NewLocalCommand(svc.exe).Command())
 
 	return configCmd
 }

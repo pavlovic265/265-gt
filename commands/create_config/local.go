@@ -12,32 +12,28 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type globalCommand struct {
+type localCommand struct {
 	exe executor.Executor
 }
 
-func NewGlobalCommand(
+func NewLocalCommand(
 	exe executor.Executor,
-) globalCommand {
-	return globalCommand{
+) localCommand {
+	return localCommand{
 		exe: exe,
 	}
 }
 
-func (svc globalCommand) Command() *cobra.Command {
+func (svc localCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "global",
-		Aliases:            []string{"gl"},
-		Short:              "generate global config",
+		Use:                "local",
+		Aliases:            []string{"lo"},
+		Short:              "generate local config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			homeDir, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-			filePath := filepath.Join(homeDir, config.FileName)
+			filePath := filepath.Join(".", config.FileName)
 
-			_, err = os.Stat(filePath)
+			_, err := os.Stat(filePath)
 			if errors.Is(err, os.ErrNotExist) {
 				file, err := os.Create(filePath)
 				if err != nil {
@@ -45,26 +41,19 @@ func (svc globalCommand) Command() *cobra.Command {
 				}
 				defer file.Close()
 
-				platform, err := HandleSelectPlatform()
+				branches, err := HandleAddProtectedBranch()
 				if err != nil {
 					return err
 				}
 
-				accounts, err := HandleAddAccunts()
-				if err != nil {
-					return err
-				}
-
-				globalConfig := config.GlobalConfigStruct{}
-				if *platform == config.GitHubPlatform.String() {
-					globalConfig.GitHub = config.GitHub{
-						Accounts: accounts,
-					}
+				// add branch to skip for deletions
+				localConfg := config.LocalConfigStruct{
+					Protected: branches,
 				}
 
 				encoder := yaml.NewEncoder(file)
 				encoder.SetIndent(2)
-				err = encoder.Encode(&globalConfig)
+				err = encoder.Encode(&localConfg)
 				if err != nil {
 					return err
 				}

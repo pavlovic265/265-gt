@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
@@ -21,78 +20,70 @@ type GitHub struct {
 	Accounts []Account `yaml:"accounts"`
 }
 
-type Config struct {
+type GlobalConfigStruct struct {
 	GitHub GitHub `yaml:"github"`
 }
 
-var GlobalConfig *Config
+type LocalConfigStruct struct {
+	Protected []string `yaml:"protected"`
+}
+
+type ConfigStruct struct {
+	LocalConfig  LocalConfigStruct
+	GlobalConfig GlobalConfigStruct
+}
+
+var Config ConfigStruct
 
 func InitConfig(exe executor.Executor) {
 	globalConfig, err := loadGlobalConfig()
 	if err != nil {
 		fmt.Println("globalConfig", err)
-		globalConfig = &Config{}
+		globalConfig = GlobalConfigStruct{}
 	}
 	localConfig, err := loadLocalConfig(exe)
 	if err != nil {
 		fmt.Println("localConfig", err)
-		localConfig = &Config{}
+		localConfig = LocalConfigStruct{}
 	}
-	GlobalConfig = mergeConfig(*globalConfig, *localConfig)
+	Config = ConfigStruct{
+		GlobalConfig: globalConfig,
+		LocalConfig:  localConfig,
+	}
 }
 
-func mergeConfig(c1, c2 Config) *Config {
-	merged := c1
-	vMerged := reflect.ValueOf(&merged).Elem()
-	vc2 := reflect.ValueOf(c2)
-
-	for i := 0; i < vMerged.NumField(); i++ {
-		fieldValue := vc2.Field(i)
-		defaultValue := reflect.Zero(fieldValue.Type()).Interface()
-
-		if !reflect.DeepEqual(fieldValue.Interface(), defaultValue) {
-			vMerged.Field(i).Set(fieldValue)
-		}
-	}
-
-	return &merged
-}
-
-func loadGlobalConfig() (*Config, error) {
-	cfg := &Config{}
+func loadGlobalConfig() (GlobalConfigStruct, error) {
+	gconf := GlobalConfigStruct{}
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return gconf, err
 	}
 
-	configPath := filepath.Join(homeDir, ".gtconfig.yaml")
-
+	configPath := filepath.Join(homeDir, FileName)
 	_, err = os.Stat(configPath)
 	if errors.Is(err, os.ErrNotExist) {
-		return cfg, nil
+		return gconf, nil
 	}
-
 	file, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file: %w", err)
+		return gconf, fmt.Errorf("failed to open config file: %w", err)
 	}
 	defer file.Close()
-
 	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config file: %w", err)
+	if err := decoder.Decode(&gconf); err != nil {
+		return gconf, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	return cfg, nil
+	return gconf, nil
 }
 
-func loadLocalConfig(exe executor.Executor) (*Config, error) {
-	cfg := &Config{}
+func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
+	lconf := LocalConfigStruct{}
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
-		return cfg, nil
+		return lconf, nil
 	}
 
 	localConfig := strings.TrimSpace(output.String())
@@ -101,22 +92,22 @@ func loadLocalConfig(exe executor.Executor) (*Config, error) {
 
 	_, err = os.Stat(configPath)
 	if errors.Is(err, os.ErrNotExist) {
-		return cfg, nil
+		return lconf, nil
 	}
 
 	file, err := os.Open(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return cfg, nil
+			return lconf, nil
 		}
-		return nil, err
+		return lconf, err
 	}
 	defer file.Close()
 
 	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config file: %w", err)
+	if err := decoder.Decode(&lconf); err != nil {
+		return lconf, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	return cfg, nil
+	return lconf, nil
 }

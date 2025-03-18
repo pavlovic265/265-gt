@@ -42,7 +42,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 				}
 			}
 
-			accoutns := config.GlobalConfig.GitHub.Accounts
+			accoutns := config.Config.GlobalConfig.GitHub.Accounts
 			for _, acc := range accoutns {
 				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
@@ -65,7 +65,7 @@ func (svc gitHubCli) AuthStatus() error {
 }
 
 func (svc gitHubCli) AuthLogin(user string) error {
-	accoutns := config.GlobalConfig.GitHub.Accounts
+	accoutns := config.Config.GlobalConfig.GitHub.Accounts
 	var token string
 	for _, acc := range accoutns {
 		if acc.User == user {
