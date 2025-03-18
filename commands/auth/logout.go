@@ -11,23 +11,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type loginCommand struct {
+type logoutCommand struct {
 	exe executor.Executor
 }
 
-func NewLoginCommand(
+func NewLogoutCommand(
 	exe executor.Executor,
-) loginCommand {
-	return loginCommand{
+) logoutCommand {
+	return logoutCommand{
 		exe: exe,
 	}
 }
 
-func (svc loginCommand) Command() *cobra.Command {
+func (svc logoutCommand) Command() *cobra.Command {
 	return &cobra.Command{
-		Use:                "login",
+		Use:                "logout",
 		Aliases:            []string{"lo"},
-		Short:              "login user with token",
+		Short:              "logout user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			accoutns := config.Config.GlobalConfig.GitHub.Accounts
@@ -49,7 +49,7 @@ func (svc loginCommand) Command() *cobra.Command {
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
 					fmt.Println("Authentication started for", m.Selected)
-					if err := client.GlobalClient.AuthLogin(m.Selected); err != nil {
+					if err := client.GlobalClient.AuthLogout(m.Selected); err != nil {
 						return err
 					}
 
