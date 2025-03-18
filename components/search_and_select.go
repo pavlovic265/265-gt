@@ -25,11 +25,11 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			return m, tea.Quit
-		case tea.KeyUp.String(), tea.KeyCtrlK.String():
+		case tea.KeyTab.String(), tea.KeyUp.String(), tea.KeyCtrlK.String():
 			if m.Cursor > 0 {
 				m.Cursor--
 			}
-		case tea.KeyDown.String(), tea.KeyCtrlJ.String():
+		case tea.KeyShiftTab.String(), tea.KeyDown.String(), tea.KeyCtrlJ.String():
 			if m.Cursor < len(m.Choices)-1 {
 				m.Cursor++
 			}
