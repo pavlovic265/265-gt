@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Account struct {
@@ -58,7 +59,8 @@ func mergeConfig(c1, c2 Config) *Config {
 }
 
 func loadGlobalConfig() (*Config, error) {
-	// git rev-parse --show-toplevel
+	cfg := &Config{}
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -66,13 +68,17 @@ func loadGlobalConfig() (*Config, error) {
 
 	configPath := filepath.Join(homeDir, ".gtconfig.yaml")
 
+	_, err = os.Stat(configPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return cfg, nil
+	}
+
 	file, err := os.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
 	defer file.Close()
 
-	cfg := &Config{}
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(cfg); err != nil {
 		return nil, fmt.Errorf("failed to decode config file: %w", err)
@@ -82,17 +88,23 @@ func loadGlobalConfig() (*Config, error) {
 }
 
 func loadLocalConfig(exe executor.Executor) (*Config, error) {
+	cfg := &Config{}
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
-		return nil, err
+		return cfg, nil
 	}
+
 	localConfig := strings.TrimSpace(output.String())
 
 	configPath := filepath.Join(localConfig, ".gtconfig.yaml")
 
+	_, err = os.Stat(configPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return cfg, nil
+	}
+
 	file, err := os.Open(configPath)
-	cfg := &Config{}
 	if err != nil {
 		if os.IsNotExist(err) {
 			return cfg, nil
