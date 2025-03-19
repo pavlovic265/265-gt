@@ -23,7 +23,7 @@ func (svc createCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "create",
 		Aliases: []string{"c"},
-		Short:   "create commit",
+		Short:   "create new commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var message string
 			if len(args) == 0 {
