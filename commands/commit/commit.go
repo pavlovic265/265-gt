@@ -24,6 +24,7 @@ func (svc commitCommand) Command() *cobra.Command {
 		Short:   "create commit",
 	}
 	commitCmd.AddCommand(NewCreateCommand(svc.exe).Command())
+	commitCmd.AddCommand(NewEmptyCommand(svc.exe).Command())
 
 	return commitCmd
 }
