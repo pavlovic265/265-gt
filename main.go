@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
 	"github.com/pavlovic265/265-gt/commands/auth"
@@ -43,6 +45,25 @@ func main() {
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe).Command())
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "Generate shell completion scripts",
+		Long:  "Install auto-completion for Bash, Zsh, Fish, or PowerShell",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			switch args[0] {
+			case "bash":
+				cmd.Root().GenBashCompletion(os.Stdout)
+			case "zsh":
+				cmd.Root().GenZshCompletion(os.Stdout)
+			case "fish":
+				cmd.Root().GenFishCompletion(os.Stdout, true)
+			case "powershell":
+				cmd.Root().GenPowerShellCompletion(os.Stdout)
+			}
+		},
+	})
 
 	rootCmd.Execute()
 }
