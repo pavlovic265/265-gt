@@ -17,9 +17,13 @@ on:
   release:
     types: [created]
 
-permissions: read-all
+permissions:
+  actions: read   # Needed to access external actions
+  contents: read  # Needed to checkout code
+  id-token: write # Needed for signing
 
 jobs:
+
   # ========================================================================================================================================
   #     Prerequesite: Create a .slsa-goreleaser.yml in the root directory of your project.
   #       See format in https://github.com/slsa-framework/slsa-github-generator/blob/main/internal/builders/go/README.md#configuration-file
@@ -29,9 +33,9 @@ jobs:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read   # To read workflow path.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.9.0
     with:
-      go-version: 1.23
+      go-version: 1.17
       # =============================================================================================================
       #     Optional: For more options, see https://github.com/slsa-framework/slsa-github-generator#golang-projects
       # =============================================================================================================
