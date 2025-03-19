@@ -29,5 +29,5 @@ clean:
 
 release:
 	@echo "Start release..."
-	GH_TOKEN=$(GH_TOKEN_PERSONAL) && goreleaser release --clean
+	GITHUB_TOKEN=$(GH_TOKEN_PERSONAL) && goreleaser release --clean
 	@echo "Release complete."
