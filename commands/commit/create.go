@@ -1,7 +1,6 @@
 package commit
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/pavlovic265/265-gt/executor"
@@ -28,8 +27,7 @@ func (svc createCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var message string
 			if len(args) == 0 {
-				message = time.Now().Format("02-Jan-2006 15:04:05")
-				fmt.Println("Commit message will be: ", message)
+				message = "New commit: " + time.Now().Format("02-Jan-2006 15:04:05")
 			}
 
 			exeArgs := []string{"commit", "-am", message}
