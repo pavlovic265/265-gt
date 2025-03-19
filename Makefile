@@ -29,5 +29,5 @@ clean:
 
 release:
 	@echo "Start release..."
-	goreleaser release
+	goreleaser release --clean
 	@echo "Release complete."
