@@ -38,7 +38,7 @@ func (svc commitCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
-	// commitCmd.AddCommand(NewCreateCommand(svc.exe).Command())
+
 	commitCmd.AddCommand(NewEmptyCommand(svc.exe).Command())
 
 	return commitCmd

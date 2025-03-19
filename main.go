@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pavlovic265/265-gt/client"
@@ -20,6 +21,7 @@ var exe = executor.NewExe()
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		fmt.Println("")
 		config.InitConfig(exe)
 		client.InitCliClient(exe)
 	},
