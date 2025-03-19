@@ -48,9 +48,9 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 | **Branch Operations**       |        |                                              |
 | `create` (`c`)              | ✅     | Create a new branch                          |
 | `checkout` (`co`)           | ✅     | Checkout/search branch                       |
-| `commit` (`cm`)             | ❌     | Create commit                                |
+| `commit` (`cm`)             | ✅     | Create commit                                |
 | `add`                       | ✅     | Stage changes (`git add`)                   |
-|  `empty` (`em`)            | ❌     | Create empty commit                          |
+|  `empty` (`em`)            | ✅     | Create empty commit                          |
 |   `delete` (`dl`)           | ✅     | Delete branch                                |
 |   `clean` (`cl`)            | ✅     | Check and clean all local branch exclude local protected      |
 | `move` (`mv`)               | ✅     | Rebase branch                                |
