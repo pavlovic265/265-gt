@@ -25,9 +25,9 @@ func (svc createCommand) Command() *cobra.Command {
 		Aliases: []string{"c"},
 		Short:   "create new commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var message string
-			if len(args) == 0 {
-				message = "New commit: " + time.Now().Format("02-Jan-2006 15:04:05")
+			message := "New commit: " + time.Now().Format("02-Jan-2006 15:04:05")
+			if len(args) != 0 {
+				message = string(args[0])
 			}
 
 			exeArgs := []string{"commit", "-am", message}
