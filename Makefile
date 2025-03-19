@@ -26,3 +26,8 @@ clean:
 	@echo "Cleaning up..."
 	rm -rf $(BUILD_DIR)
 	@echo "Cleanup complete."
+
+release:
+	@echo "Start release..."
+	goreleaser release
+	@echo "Release complete."
