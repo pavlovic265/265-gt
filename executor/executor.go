@@ -75,6 +75,8 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 
 	if exe.Stdin != "" {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	} else {
+		cmd.Stdin = os.Stdin
 	}
 
 	if exe.HasOutput {
