@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -60,7 +59,6 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
-	fmt.Println("add log")
 
 	exeArgs = []string{"rebase", parentBranch}
 	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
