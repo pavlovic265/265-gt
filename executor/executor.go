@@ -19,18 +19,18 @@ type Executor interface {
 }
 
 type exe struct {
-	Name      string
-	HasOutput bool
-	Args      []string
-	Stdin     string
+	Name string
+
+	Args  []string
+	Stdin string
 }
 
 func NewExe() Executor {
 	return exe{
-		Name:      "",
-		HasOutput: true,
-		Args:      []string{},
-		Stdin:     "",
+		Name: "",
+
+		Args:  []string{},
+		Stdin: "",
 	}
 }
 
@@ -60,10 +60,18 @@ func (exe exe) WithStdin(stdin string) Executor {
 }
 
 func (exe exe) Run() error {
-	exe.HasOutput = false
-	_, err := exe.RunWithOutput()
+	cmd := exec.Command(exe.Name, exe.Args...)
+
+	if exe.Stdin != "" {
+		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
 	if err != nil {
-		return err
+		return fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
 	}
 
 	return nil
@@ -77,11 +85,8 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
 	}
 
-	if exe.HasOutput {
-		cmd.Stdout = &output
-	} else {
-		cmd.Stdout = os.Stdout
-	}
+	// Use a multi-writer to send output to both the buffer and stdout
+	cmd.Stdout = &output
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
