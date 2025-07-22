@@ -18,13 +18,22 @@ func NewCreateCommand(
 	}
 }
 
+var draft bool
+
 func (svc createCommand) Command() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "create",
 		Aliases: []string{"c"},
 		Short:   "Create a pull request",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if draft {
+				args = append([]string{"--draft"}, args...)
+			}
 			return client.GlobalClient.CreatePullRequest(args)
 		},
 	}
+
+	cmd.Flags().BoolVarP(&draft, "draft", "d", false, "Create a draft pull request")
+
+	return cmd
 }
