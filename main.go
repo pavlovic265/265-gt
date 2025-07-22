@@ -12,16 +12,31 @@ import (
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 
 	"github.com/spf13/cobra"
 )
 
 var exe = executor.NewExe()
 
+
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		fmt.Println("")
+		if cmd.Name() == "completion" || cmd.Name() == "version" || 
+		   (cmd.Parent() != nil && cmd.Parent().Name() == "config") ||
+		   (cmd.Parent() != nil && cmd.Parent().Name() == "auth") {
+			config.InitConfig(exe)
+			client.InitCliClient(exe)
+			return
+		}
+
+		// Check if we're in a git repository
+		if err := utils.EnsureGitRepository(exe); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 		config.InitConfig(exe)
 		client.InitCliClient(exe)
 	},

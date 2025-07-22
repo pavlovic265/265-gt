@@ -22,7 +22,9 @@ var GlobalClient CliClient
 func InitCliClient(exe executor.Executor) {
 	remoteOrigin, err := getGitRemoteOrigin()
 	if err != nil {
-		fmt.Println("Error retrieving remote URL:", err)
+		// Don't fail here, just log the warning - some commands might work without remote
+		fmt.Println("⚠️  Warning: No remote origin found. Some features may be limited.")
+		return
 	}
 
 	if strings.Contains(remoteOrigin, "github.com") {

@@ -21,6 +21,7 @@ func (svc addCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "add",
 		Short:              "git add",
+		Aliases:            []string{"a"},
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"add"}, args...)
