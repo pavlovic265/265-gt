@@ -85,7 +85,6 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
 	}
 
-	// Use a multi-writer to send output to both the buffer and stdout
 	cmd.Stdout = &output
 	cmd.Stderr = os.Stderr
 
