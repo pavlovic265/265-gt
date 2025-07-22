@@ -126,6 +126,10 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		"--assignee", acc.User,
 		"--base", parent,
 	}
+
+	// Add any additional args (like --draft)
+	exeArgs = append(exeArgs, args...)
+
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
