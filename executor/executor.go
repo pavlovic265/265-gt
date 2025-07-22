@@ -87,7 +87,7 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	}
 
 	// Use a multi-writer to send output to both the buffer and stdout
-	cmd.Stdout = io.MultiWriter(os.Stdout, &output)
+	cmd.Stdout = &output
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
@@ -97,3 +97,5 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 
 	return output, nil
 }
+
+
