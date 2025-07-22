@@ -78,7 +78,6 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	}
 
 	if exe.HasOutput {
-		cmd.Stdout = os.Stdout
 		cmd.Stdout = &output
 	} else {
 		cmd.Stdout = os.Stdout
