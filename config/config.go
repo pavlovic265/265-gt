@@ -83,6 +83,8 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
+		// This should not happen since we already checked for git repository in main.go
+		// But handle gracefully just in case
 		return lconf, nil
 	}
 
