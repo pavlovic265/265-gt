@@ -30,7 +30,7 @@ func (svc commitCommand) Command() *cobra.Command {
 				message = string(args[0])
 			}
 
-			exeArgs := []string{"commit", "-am", message}
+			exeArgs := []string{"commit", "-m", message}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
