@@ -3,7 +3,6 @@ package executor
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -20,18 +19,18 @@ type Executor interface {
 }
 
 type exe struct {
-	Name      string
+	Name string
 
-	Args      []string
-	Stdin     string
+	Args  []string
+	Stdin string
 }
 
 func NewExe() Executor {
 	return exe{
-		Name:      "",
+		Name: "",
 
-		Args:      []string{},
-		Stdin:     "",
+		Args:  []string{},
+		Stdin: "",
 	}
 }
 
@@ -72,7 +71,7 @@ func (exe exe) Run() error {
 
 	err := cmd.Run()
 	if err != nil {
-		return  fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
+		return fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
 	}
 
 	return nil
@@ -97,5 +96,3 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 
 	return output, nil
 }
-
-
