@@ -16,6 +16,7 @@ type Executor interface {
 	WithStdin(stdin string) Executor
 	Run() error
 	RunWithOutput() (bytes.Buffer, error)
+	RunSilent() error
 }
 
 type exe struct {
@@ -94,4 +95,21 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 	}
 
 	return output, nil
+}
+
+func (exe exe) RunSilent() error {
+	cmd := exec.Command(exe.Name, exe.Args...)
+
+	if exe.Stdin != "" {
+		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	}
+
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
+	}
+
+	return nil
 }
