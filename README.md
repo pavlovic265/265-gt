@@ -84,6 +84,7 @@ sudo mv gt /usr/local/bin/
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `add` | - | Stage changes | `gt add` |
+| `unstage` | `us` | Unstage changes | `gt unstage` |
 | `commit` | `cm` | Create commit with message | `gt commit "Add new feature"` |
 | `empty` | `em` | Create empty commit | `gt empty "WIP"` |
 
@@ -158,6 +159,11 @@ gt commit "Add user authentication module"
 # Make some changes and commit
 gt add
 gt commit "Add password validation"
+
+# Oops, need to unstage some files
+gt unstage file1.txt file2.txt
+gt add file1.txt
+gt commit "Add only file1.txt"
 
 # Push to remote
 gt push
