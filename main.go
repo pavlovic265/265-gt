@@ -19,13 +19,12 @@ import (
 
 var exe = executor.NewExe()
 
-
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if cmd.Name() == "completion" || cmd.Name() == "version" || 
-		   (cmd.Parent() != nil && cmd.Parent().Name() == "config") ||
-		   (cmd.Parent() != nil && cmd.Parent().Name() == "auth") {
+		if cmd.Name() == "completion" || cmd.Name() == "version" ||
+			(cmd.Parent() != nil && cmd.Parent().Name() == "config") ||
+			(cmd.Parent() != nil && cmd.Parent().Name() == "auth") {
 			config.InitConfig(exe)
 			client.InitCliClient(exe)
 			return
@@ -58,6 +57,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewUpdateCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewDownCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe).Command())
