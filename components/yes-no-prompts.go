@@ -52,9 +52,11 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
-		return "Canceled by user\n"
+		return "\n❌ Operation canceled by user\n"
 	}
-	s := fmt.Sprintf("%s %s", m.question, m.answer)
-	s += "\nPress CTRL+q to quit.\n"
+	
+	// Just show the question without options
+	s := fmt.Sprintf("%s", m.question)
+	
 	return s
 }
