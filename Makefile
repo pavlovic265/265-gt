@@ -28,6 +28,12 @@ clean:
 	@echo "Cleanup complete."
 
 release:
-	@echo "Start release..."
+	@if [ -z "$(v)" ]; then \
+		echo "❌ Error: Tag version is required. Usage: make release v=v0.30.0"; \
+		exit 1; \
+	fi
+	@echo "🚀 Starting release for tag $(v)..."
+	git tag $(v)
+	git push origin $(v)
 	GITHUB_TOKEN=$(GH_TOKEN_PERSONAL) goreleaser release --clean
-	@echo "Release complete."
+	@echo "✅ Release complete."
