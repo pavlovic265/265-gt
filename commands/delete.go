@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
@@ -79,6 +80,7 @@ func (svc deleteCommand) deleteBranch(
 		return err
 	}
 
+	fmt.Println(config.SuccessIndicator("Branch '" + branch + "' deleted successfully"))
 	return nil
 }
 

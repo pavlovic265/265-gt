@@ -1,6 +1,9 @@
 package commands
 
 import (
+	"fmt"
+
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +28,11 @@ func (svc switchCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"checkout", "-"}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			return err
+			if err != nil {
+				return err
+			}
+			fmt.Println(config.SuccessIndicator("Switched to previous branch"))
+			return nil
 		},
 	}
 }

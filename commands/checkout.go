@@ -1,8 +1,11 @@
 package commands
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
@@ -51,6 +54,7 @@ func (svc checkoutCommand) checkoutBranch(
 	if err != nil {
 		return err
 	}
+	fmt.Println(config.SuccessIndicator("Switched to branch '" + branch + "'"))
 	return nil
 }
 

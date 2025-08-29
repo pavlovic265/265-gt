@@ -60,7 +60,7 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	if cleanableCount == 0 {
-		fmt.Println(config.SuccessStyle.Render("✨ No branches to clean up!"))
+		fmt.Println(config.SuccessIndicator("No branches to clean up!"))
 		return nil
 	}
 
@@ -77,7 +77,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 		shouldBreak, err := svc.deleteBranch(branch)
 		if err != nil {
-			fmt.Printf("%s Error: %v\n", config.ErrorStyle.Render("❌"), err)
+			fmt.Printf("%s Error: %v\n", config.ErrorIconOnly(), err)
 			continue
 		}
 		
@@ -88,7 +88,7 @@ func (svc cleanCommand) cleanBranches() error {
 		deletedCount++
 	}
 
-	fmt.Printf("\n%s Cleaned up %d branches\n", config.SuccessStyle.Render("✨"), deletedCount)
+	fmt.Printf("\n%s Cleaned up %d branches\n", config.SuccessIconOnly(), deletedCount)
 	return nil
 }
 
@@ -129,7 +129,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   %s %s\n", config.SuccessStyle.Render("✅"), gitOutput)
+			fmt.Printf("   %s %s\n", config.SuccessIconOnly(), gitOutput)
 		}
 	}
 

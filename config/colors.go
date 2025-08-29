@@ -40,4 +40,30 @@ var (
 		Background(lipgloss.Color("#FF87B4")). // Highlight background
 		Padding(0, 1).
 		Bold(true)
-) 
+)
+
+// Status indicators with ASCII icons
+const (
+	SuccessIcon = "✓"
+	ErrorIcon   = "✗"
+)
+
+// SuccessIndicator returns a styled success message with checkmark icon
+func SuccessIndicator(message string) string {
+	return SuccessStyle.Render(SuccessIcon + " " + message)
+}
+
+// ErrorIndicator returns a styled error message with X icon
+func ErrorIndicator(message string) string {
+	return ErrorStyle.Render(ErrorIcon + " " + message)
+}
+
+// SuccessIconOnly returns just the styled success icon
+func SuccessIconOnly() string {
+	return SuccessStyle.Render(SuccessIcon)
+}
+
+// ErrorIconOnly returns just the styled error icon
+func ErrorIconOnly() string {
+	return ErrorStyle.Render(ErrorIcon)
+} 

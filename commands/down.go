@@ -1,6 +1,9 @@
 package commands
 
 import (
+	"fmt"
+
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
@@ -35,6 +38,7 @@ func (svc downCommand) Command() *cobra.Command {
 				return err
 			}
 
+			fmt.Println(config.SuccessIndicator("Moved down to branch '" + parent + "'"))
 			return nil
 		},
 	}

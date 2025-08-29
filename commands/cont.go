@@ -1,6 +1,9 @@
 package commands
 
 import (
+	"fmt"
+
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +27,11 @@ func (svc contCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"rebase", "--continue"}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			return err
+			if err != nil {
+				return err
+			}
+			fmt.Println(config.SuccessIndicator("Rebase continued successfully"))
+			return nil
 		},
 	}
 }
