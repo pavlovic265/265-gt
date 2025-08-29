@@ -67,6 +67,9 @@ func (exe exe) Run() error {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
 	}
 
+	// Set GIT_EDITOR to true to prevent interactive editor from opening
+	cmd.Env = append(os.Environ(), "GIT_EDITOR=true")
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -86,6 +89,9 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
 	}
 
+	// Set GIT_EDITOR to true to prevent interactive editor from opening
+	cmd.Env = append(os.Environ(), "GIT_EDITOR=true")
+
 	cmd.Stdout = &output
 	cmd.Stderr = os.Stderr
 
@@ -103,6 +109,9 @@ func (exe exe) RunSilent() error {
 	if exe.Stdin != "" {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
 	}
+
+	// Set GIT_EDITOR to true to prevent interactive editor from opening
+	cmd.Env = append(os.Environ(), "GIT_EDITOR=true")
 
 	cmd.Stderr = os.Stderr
 
