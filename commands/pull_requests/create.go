@@ -1,7 +1,10 @@
 package pullrequests
 
 import (
+	"fmt"
+
 	"github.com/pavlovic265/265-gt/client"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +32,12 @@ func (svc createCommand) Command() *cobra.Command {
 			if draft {
 				args = append([]string{"--draft"}, args...)
 			}
-			return client.GlobalClient.CreatePullRequest(args)
+			err := client.GlobalClient.CreatePullRequest(args)
+			if err != nil {
+				return err
+			}
+			fmt.Println(config.SuccessIndicator("Pull request created successfully"))
+			return nil
 		},
 	}
 

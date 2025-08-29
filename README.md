@@ -149,6 +149,28 @@ Configure repository-specific settings like:
 
 ## 🎨 Usage Examples
 
+### Status Indicators
+The tool uses beautiful ASCII icons to show operation status:
+
+```bash
+# Success indicators (✓)
+gt create feature/new-feature
+# ✓ Branch 'feature/new-feature' created and switched to successfully
+
+gt auth login
+# ✓ Successfully authenticated with username
+
+gt auth status
+# ✓ Authentication successful
+
+# Error indicators (✗)
+gt auth status
+# ✗ Authentication failed
+
+gt delete main
+# ✗ Error: Cannot delete protected branch
+```
+
 ### Typical Workflow
 ```bash
 # Start a new feature

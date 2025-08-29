@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
@@ -50,6 +51,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
+			fmt.Println(config.SuccessIndicator("Branch '" + branch + "' created and switched to successfully"))
 			return nil
 		},
 	}

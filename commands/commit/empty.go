@@ -1,8 +1,10 @@
 package commit
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -32,6 +34,7 @@ func (svc emptyCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			fmt.Println(config.SuccessIndicator("Empty commit created with message: '" + message + "'"))
 			return nil
 		},
 	}

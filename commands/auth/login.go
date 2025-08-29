@@ -53,7 +53,7 @@ func (svc loginCommand) Command() *cobra.Command {
 						return err
 					}
 
-					fmt.Println("Successfully authenticated with", m.Selected)
+					fmt.Println(config.SuccessIndicator("Successfully authenticated with " + m.Selected))
 				}
 			} else {
 				return err

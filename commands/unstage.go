@@ -1,6 +1,9 @@
 package commands
 
 import (
+	"fmt"
+
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -25,7 +28,15 @@ func (svc unstageCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"restore", "--staged"}, args...)
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			return err
+			if err != nil {
+				return err
+			}
+			if len(args) == 0 {
+				fmt.Println(config.SuccessIndicator("All staged changes unstaged"))
+			} else {
+				fmt.Println(config.SuccessIndicator("Files unstaged successfully"))
+			}
+			return nil
 		},
 	}
 }
