@@ -9,8 +9,8 @@ Creates a rebase conflict scenario with the following structure:
 
 1. **Create root branch** - Creates a `root-branch` with initial content
 2. **Create sub-root branch** - Creates `sub-root-branch` from root with additional content
-3. **Create sub-sub-root branch** - Creates `sub-sub-root-branch` from sub-root with more content
-4. **Merge sub-root to root** - Merges `sub-root-branch` into `root-branch`
+3. **Create sub-sub-root branch** - Creates `sub-sub-root-branch` from sub-root, modifying lines 2 and 3
+4. **Modify root branch** - Modifies `root-branch` to change the same lines 2 and 3 (creating conflicts)
 5. **Rebase sub-sub-root to root** - Attempts to rebase `sub-sub-root-branch` onto `root-branch`, causing conflicts
 
 ### `cleanup_conflicts.sh`
@@ -78,8 +78,20 @@ main (original)
 ## Example Conflict Scenario
 
 The script creates a scenario where:
-- `root-branch` has content from both root and sub-root branches
-- `sub-sub-root-branch` has content that conflicts with the merged root branch
-- Rebasing `sub-sub-root-branch` onto `root-branch` will cause conflicts because both branches modified the same lines in different ways
+- `root-branch` modifies lines 2 and 3 with "ROOT MODIFIED" content
+- `sub-sub-root-branch` modifies the same lines 2 and 3 with "SUB-SUB-ROOT MODIFIED" content
+- When you rebase `sub-sub-root-branch` onto `root-branch`, Git will detect conflicts on lines 2 and 3
+
+## Testing with gt move
+
+After running the script, you can test conflicts with the `gt move` command:
+
+```bash
+# Make sure you're on the sub-sub-root-branch
+git checkout sub-sub-root-branch
+
+# This will cause conflicts when rebasing onto root-branch
+gt move root-branch
+```
 
 This is a realistic scenario that can occur in real development workflows when feature branches diverge and need to be rebased onto updated main branches.

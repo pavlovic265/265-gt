@@ -74,11 +74,11 @@ echo "✅ sub-root-branch created (base branch of sub-sub-root-branch)"
 echo "Step 3: Creating sub-sub-root branch from sub-root..."
 git checkout -b sub-sub-root-branch
 
-# Add content to sub-sub-root branch
+# Modify the SAME lines that will be modified in root branch - this creates conflicts
 cat > test_file.txt << 'EOF'
 This is the initial content of the test file.
-Line 2: Some important information
-Line 3: More content here
+Line 2: SUB-SUB-ROOT MODIFIED - Some important information
+Line 3: SUB-SUB-ROOT MODIFIED - More content here
 Line 4: Final line of content
 Line 5: ROOT BRANCH - Additional content
 Line 6: ROOT BRANCH - More modifications
@@ -99,13 +99,26 @@ echo "   └── sub-root-branch (base branch of sub-sub-root-branch)"
 echo "       └── sub-sub-root-branch"
 echo ""
 
-# Step 4: Merge sub-root branch to root branch
-echo "Step 4: Merging sub-root branch to root branch..."
+# Step 4: Modify root branch AFTER creating sub-sub-root to create conflicts
+echo "Step 4: Modifying root branch to create conflicts..."
 git checkout root-branch
-git merge sub-root-branch --no-ff -m "Merge sub-root branch into root"
 
-# Now root branch has the content from sub-root
-echo "Root branch now contains merged content from sub-root"
+# Modify the SAME lines that were modified in sub-sub-root branch
+cat > test_file.txt << 'EOF'
+This is the initial content of the test file.
+Line 2: ROOT MODIFIED - Some important information
+Line 3: ROOT MODIFIED - More content here
+Line 4: Final line of content
+Line 5: ROOT BRANCH - Additional content
+Line 6: ROOT BRANCH - More modifications
+Line 7: ROOT BRANCH - New functionality added
+Line 8: ROOT BRANCH - Additional features added
+EOF
+
+git add test_file.txt
+git commit -m "Modify lines 2 and 3 in root branch (conflicts with sub-sub-root)"
+
+echo "Root branch now has conflicting changes on lines 2 and 3"
 
 # Step 5: Move sub-sub-root to root -> this will cause rebase conflicts
 echo "Step 5: Attempting to rebase sub-sub-root onto root (this will cause conflicts)..."
@@ -146,4 +159,14 @@ git rebase root-branch || {
 
 echo ""
 echo "🎯 Rebase conflict creation script completed!"
-echo "You now have rebase conflicts to practice resolving."
+echo ""
+echo "📋 Summary of what was created:"
+echo "   - root-branch: Modified lines 2 and 3 with 'ROOT MODIFIED'"
+echo "   - sub-sub-root-branch: Modified lines 2 and 3 with 'SUB-SUB-ROOT MODIFIED'"
+echo ""
+echo "🔧 To test conflicts with gt move:"
+echo "   1. Make sure you're on sub-sub-root-branch: git checkout sub-sub-root-branch"
+echo "   2. Run: gt move root-branch"
+echo "   3. This will cause conflicts on lines 2 and 3 of test_file.txt"
+echo ""
+echo "🧹 To clean up: ./test/cleanup_conflicts.sh"
