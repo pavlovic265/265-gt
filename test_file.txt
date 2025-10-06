@@ -1,4 +1,5 @@
 This is the initial content of the test file.
 Line 2: Some important information
-Line 3: More content here
+Line 3: MODIFIED in main branch - More content here
 Line 4: Final line of content
+Line 5: New line added in main branch
