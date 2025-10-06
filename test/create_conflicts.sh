@@ -47,6 +47,8 @@ EOF
 git add test_file.txt
 git commit -m "Add content to root branch"
 
+echo "✅ root-branch created (base branch)"
+
 # Step 2: Create sub-root branch (parent: root)
 echo "Step 2: Creating sub-root branch from root..."
 git checkout -b sub-root-branch
@@ -65,6 +67,8 @@ EOF
 
 git add test_file.txt
 git commit -m "Add content to sub-root branch"
+
+echo "✅ sub-root-branch created (base branch of sub-sub-root-branch)"
 
 # Step 3: Create sub-sub-root branch (parent: sub-root)
 echo "Step 3: Creating sub-sub-root branch from sub-root..."
@@ -86,6 +90,14 @@ EOF
 
 git add test_file.txt
 git commit -m "Add content to sub-sub-root branch"
+
+echo "✅ sub-sub-root-branch created"
+echo ""
+echo "🌳 Current branch hierarchy:"
+echo "   root-branch (base branch)"
+echo "   └── sub-root-branch (base branch of sub-sub-root-branch)"
+echo "       └── sub-sub-root-branch"
+echo ""
 
 # Step 4: Merge sub-root branch to root branch
 echo "Step 4: Merging sub-root branch to root branch..."
@@ -120,11 +132,16 @@ git rebase root-branch || {
     echo "📄 Conflicted file content:"
     cat test_file.txt
     echo ""
-    echo "🌳 Branch structure:"
+    echo "🌳 Branch structure after merge:"
     echo "   main (original)"
-    echo "   ├── root-branch (merged with sub-root)"
+    echo "   ├── root-branch (merged with sub-root content)"
     echo "   │   └── sub-root-branch (merged into root)"
     echo "   └── sub-sub-root-branch (currently rebasing onto root)"
+    echo ""
+    echo "📋 Original hierarchy was:"
+    echo "   root-branch (base branch)"
+    echo "   └── sub-root-branch (base branch of sub-sub-root-branch)"
+    echo "       └── sub-sub-root-branch"
 }
 
 echo ""

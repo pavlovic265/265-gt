@@ -58,11 +58,19 @@ When conflicts occur during rebase:
 6. **Continue rebase**: `git rebase --continue`
 7. **Repeat** until rebase is complete
 
-## Branch Structure After Creation
+## Branch Structure
 
+### Original Hierarchy (before merge)
+```
+root-branch (base branch)
+└── sub-root-branch (base branch of sub-sub-root-branch)
+    └── sub-sub-root-branch
+```
+
+### After Merge and During Rebase
 ```
 main (original)
-├── root-branch (merged with sub-root)
+├── root-branch (merged with sub-root content)
 │   └── sub-root-branch (merged into root)
 └── sub-sub-root-branch (currently rebasing onto root)
 ```
