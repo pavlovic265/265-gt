@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os/exec"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -27,7 +28,6 @@ func (svc contCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"rebase", "--continue"}
 
-			// Add --no-edit flag if requested
 			if noEdit, _ := cmd.Flags().GetBool("no-edit"); noEdit {
 				exeArgs = append(exeArgs, "--no-edit")
 			}
@@ -36,6 +36,12 @@ func (svc contCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			// Run stty sane to fix any terminal issues that might have occurred
+			// This is especially useful when Git opens an editor (like vim) during rebase
+			// that can mess up terminal display settings
+			exec.Command("stty", "sane").Run()
+
 			fmt.Println(config.SuccessIndicator("Rebase continued successfully"))
 			return nil
 		},
