@@ -7,9 +7,9 @@ This folder contains scripts to create and manage git conflicts for testing and 
 ### `create_conflicts.sh`
 Creates a rebase conflict scenario with the following structure:
 
-1. **Create root-branch** - Creates a `root-branch`, adds file, adds text to file
+1. **Create root-branch** - Creates a `root-branch` with 3 commits, adds file and content
 2. **Create sub-root-branch** - Creates `sub-root-branch`, adds additional text to file
-3. **Modify root-branch** - Goes back to `root-branch`, modifies the same lines (creating conflicts)
+3. **Add conflicting commit** - Goes back to `root-branch`, adds 4th commit that modifies same lines (creating conflicts)
 4. **Ready for testing** - Goes back to `sub-root-branch` ready for `gt move` command
 
 ### `cleanup_conflicts.sh`
@@ -74,9 +74,9 @@ main (original)
 ## Example Conflict Scenario
 
 The script creates a scenario where:
-- `root-branch` modifies lines 2 and 3 with "ROOT MODIFIED" content
-- `sub-root-branch` has the original content on lines 2 and 3
-- When you run `gt move root-branch` from `sub-root-branch`, Git will detect conflicts on lines 2 and 3
+- `root-branch` has 4 commits total, with the 4th commit modifying lines 2 and 3 with "ROOT MODIFIED" content
+- `sub-root-branch` has 1 commit with the original content on lines 2 and 3
+- When you run `gt move root-branch` from `sub-root-branch`, Git will detect conflicts on lines 2 and 3 during the rebase
 
 ## Testing with gt move
 
