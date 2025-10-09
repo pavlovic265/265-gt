@@ -15,6 +15,8 @@
 - **Multi-Platform Support**: Works with GitHub and GitLab
 - **Authentication Management**: Easy account switching and token management
 - **Interactive UI**: Beautiful terminal interface with search and selection capabilities
+- **Panda Syntax Theme**: Stunning color scheme with dark/light theme support
+- **Version Management**: Automatic version checking and upgrade notifications
 
 ## 📋 Requirements
 
@@ -123,8 +125,9 @@ sudo mv gt /usr/local/bin/
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `version` | `v` | Display version information | `gt version` |
-| `update` | - | Update the CLI tool | `gt update` |
-| `status` | - | Show current repository status | `gt status` |
+| `version --latest` | `v -l` | Get latest version from repository | `gt version --latest` |
+| `upgrade` | - | Update the CLI tool | `gt upgrade` |
+| `status` | `st` | Show current repository status | `gt status` |
 
 ## 🔧 Configuration
 
@@ -137,6 +140,7 @@ This will guide you through setting up:
 - API tokens
 - Default branch naming conventions
 - Protected branches
+- Theme preferences (dark/light)
 
 ### Local Configuration
 ```bash
@@ -147,13 +151,29 @@ Configure repository-specific settings like:
 - Custom branch naming patterns
 - Repository-specific workflows
 
+### Theme Configuration
+The tool supports beautiful Panda Syntax theme with dark and light variants:
+
+```yaml
+# ~/.gtconfig.yaml
+theme:
+  type: "dark"  # or "light"
+```
+
+**Panda Syntax Colors:**
+- 🟢 **Success**: `#A9DC52` (Green)
+- 🔴 **Error**: `#FF6188` (Red)
+- 🟡 **Warning**: `#FFD866` (Yellow)
+- 🔵 **Info**: `#78DCE8` (Blue)
+- 🟣 **Debug**: `#AB9DF2` (Purple)
+
 ## 🎨 Usage Examples
 
 ### Status Indicators
-The tool uses beautiful ASCII icons to show operation status:
+The tool uses beautiful ASCII icons and Panda Syntax colors to show operation status:
 
 ```bash
-# Success indicators (✓)
+# Success indicators (✓) - Green
 gt create feature/new-feature
 # ✓ Branch 'feature/new-feature' created and switched to successfully
 
@@ -163,12 +183,37 @@ gt auth login
 gt auth status
 # ✓ Authentication successful
 
-# Error indicators (✗)
+# Error indicators (✗) - Red
 gt auth status
 # ✗ Authentication failed
 
 gt delete main
 # ✗ Error: Cannot delete protected branch
+
+# Version notifications - Blue with colored version numbers
+gt status
+# 🔄 A new release of gt is available: 0.29.0 → 0.32.0
+# To upgrade, run: gt upgrade
+```
+
+### Styled Output Examples
+```bash
+# Git status with colored output
+gt status
+# On branch main                    # Branch name in purple
+# Changes to be committed:          # Section headers in blue
+#   new file:   README.md          # New files in green
+# Changes not staged for commit:    # Section headers in orange
+#   modified:   src/main.go        # Modified files in orange
+# Untracked files:                  # Section headers in red
+#   temp.txt                       # Untracked files in yellow italic
+
+# Version information with styling
+gt version
+# Current version: v0.32.0         # Labels in blue, versions in blue bold
+
+gt version --latest
+# Latest version: v0.32.0          # Labels in blue, versions in blue bold
 ```
 
 ### Typical Workflow
@@ -225,6 +270,8 @@ gt auth status
 - [ ] `submit` - Submit changes for review
 - [ ] Enhanced branch visualization
 - [ ] Integration with more Git platforms
+- [ ] Theme customization options
+- [ ] Additional color schemes
 
 ## 🤝 Contributing
 
@@ -244,13 +291,14 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## 👨‍💻 Author
 
-**Marko Pavlović** - [@pavlovic265](https://github.com/pavlovic265)
+**Марко Павловић** - [@pavlovic265](https://github.com/pavlovic265)
 
 ## 🙏 Acknowledgments
 
 - Built with [Cobra](https://github.com/spf13/cobra) for CLI framework
 - Beautiful terminal UI powered by [Bubble Tea](https://github.com/charmbracelet/bubbletea)
 - Styling with [Lip Gloss](https://github.com/charmbracelet/lipgloss)
+- Color scheme inspired by [Panda Syntax](https://github.com/PandaTheme/panda-syntax-vscode) theme
 
 ---
 
