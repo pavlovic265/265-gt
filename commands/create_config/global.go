@@ -55,7 +55,12 @@ func (svc globalCommand) Command() *cobra.Command {
 					return err
 				}
 
-				globalConfig := config.GlobalConfigStruct{}
+				globalConfig := config.GlobalConfigStruct{
+					Version: config.Version{
+						LastChecked: "",
+						LastVersion: "",
+					},
+				}
 				if *platform == config.GitHubPlatform.String() {
 					globalConfig.GitHub = config.GitHub{
 						Accounts: accounts,
