@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,6 +14,9 @@ type ListModel struct {
 	Cursor     int
 	Query      string
 	Selected   string
+	YankURL    string
+	URLs       []string
+	Yanked     bool
 }
 
 func (m ListModel) Init() tea.Cmd {
@@ -31,14 +35,23 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.Cursor = len(m.Choices) - 1
 			}
+			m.updateYankURL()
 		case tea.KeyTab.String(), tea.KeyDown.String(), tea.KeyCtrlJ.String():
 			if m.Cursor < len(m.Choices)-1 {
 				m.Cursor++
 			} else {
 				m.Cursor = 0
 			}
+			m.updateYankURL()
 		case tea.KeyEnter.String():
 			m.Selected = m.Choices[m.Cursor]
+			return m, tea.Quit
+		case tea.KeyCtrlY.String():
+			if len(m.URLs) == 0 && m.YankURL == "" {
+				return m, nil
+			}
+			m.yankToClipboard(m.YankURL)
+			m.Yanked = true
 			return m, tea.Quit
 		case tea.KeyBackspace.String():
 			if len(m.Query) > 0 {
@@ -49,7 +62,6 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Query += msg.String()
 			}
 		}
-		// Filter branches based on query
 		m.filterChoices()
 	}
 
@@ -74,7 +86,12 @@ func (m ListModel) View() string {
 		s += line + "\n"
 	}
 
-	s += "\nPress CTRL+q to quit.\n"
+	// Only show yank option if there are URLs available
+	if len(m.URLs) > 0 && m.YankURL != "" {
+		s += "\nPress CTRL+q to quit, CTRL+y to yank URL.\n"
+	} else {
+		s += "\nPress CTRL+q to quit.\n"
+	}
 
 	return s
 }
@@ -86,13 +103,42 @@ func (m *ListModel) filterChoices() {
 	}
 
 	var filtered []string
-	for _, choice := range m.AllChoices {
+	var filteredURLs []string
+	for i, choice := range m.AllChoices {
 		if strings.Contains(choice, m.Query) {
 			filtered = append(filtered, choice)
+			if i < len(m.URLs) {
+				filteredURLs = append(filteredURLs, m.URLs[i])
+			}
 		}
 	}
 	m.Choices = filtered
+	m.URLs = filteredURLs
 	if m.Cursor >= len(filtered) {
 		m.Cursor = len(filtered) - 1
+	}
+	m.updateYankURL()
+}
+
+func (m *ListModel) yankToClipboard(url string) {
+	commands := [][]string{
+		{"pbcopy"},                           // macOS
+		{"xclip", "-selection", "clipboard"}, // Linux with xclip
+		{"xsel", "--clipboard", "--input"},   // Linux with xsel
+		{"clip"},                             // Windows
+	}
+
+	for _, cmd := range commands {
+		command := exec.Command(cmd[0], cmd[1:]...)
+		command.Stdin = strings.NewReader(url)
+		if err := command.Run(); err == nil {
+			return
+		}
+	}
+}
+
+func (m *ListModel) updateYankURL() {
+	if m.Cursor >= 0 && m.Cursor < len(m.Choices) && m.Cursor < len(m.URLs) {
+		m.YankURL = m.URLs[m.Cursor]
 	}
 }
