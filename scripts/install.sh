@@ -28,7 +28,6 @@ fi
 # Verify installation
 if command -v $BINARY &>/dev/null; then
   echo "$BINARY installed successfully."
-  $BINARY version
 else
   echo "Installation failed or $BINARY not found in PATH."
 fi
