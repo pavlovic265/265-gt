@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pavlovic265/265-gt/executor"
 	"gopkg.in/yaml.v3"
@@ -120,7 +121,7 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 	return lconf, nil
 }
 
-func SaveGlobalConfig() error {
+func saveGlobalConfig() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -149,4 +150,17 @@ func SaveGlobalConfig() error {
 	}
 
 	return nil
+}
+
+func UpdateLastChecked() error {
+	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+
+	return saveGlobalConfig()
+}
+
+func UpdateVersion(version string) error {
+	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+	Config.GlobalConfig.Version.LastVersion = version
+
+	return saveGlobalConfig()
 }

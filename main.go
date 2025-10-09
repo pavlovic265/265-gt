@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
 	"github.com/pavlovic265/265-gt/commands/auth"
@@ -39,12 +40,15 @@ var rootCmd = &cobra.Command{
 		config.InitConfig(exe)
 		client.InitCliClient(exe)
 
-		// Check for gt tool updates (run in background to avoid blocking)
-		go utils.CheckGTVersion(exe)
+		// Check for gt tool updates (run synchronously with timeout to avoid blocking)
+		utils.CheckGTVersion(exe)
 	},
 }
 
 func main() {
+	// Load .env file if it exists
+	godotenv.Load()
+
 	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewSwitchCommand(exe).Command())

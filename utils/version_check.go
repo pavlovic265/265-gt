@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,30 +20,37 @@ type GitHubRelease struct {
 	HTMLURL string `json:"html_url"`
 }
 
-// VersionCheck struct is now defined in config/config.go
 func CheckGTVersion(exe executor.Executor) {
-	// Only check once per day to avoid spam
 	if !shouldCheckVersion() {
 		return // Silently fail if check is not needed
 	}
 
-	latestVersion, latestURL, err := getLatestGTVersion()
+	// Create context with timeout to avoid blocking
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	latestVersion, latestURL, err := getLatestGTVersionWithContext(ctx)
 	if err != nil {
 		return // Silently fail if we can't get latest version
 	}
 
 	storedVersion := config.Config.GlobalConfig.Version.LastVersion
+	if err := config.UpdateLastChecked(); err != nil {
+		return // Silently fail if we can't update last checked
+	}
+
+	// If no version is stored, show notification to upgrade
+	if len(storedVersion) == 0 {
+		showVersionNotification("unknown", latestVersion, latestURL)
+		return
+	}
+
+	// If we have the latest version, don't show notification
 	if storedVersion == latestVersion {
-		return // Silently fail if we have the latest version
+		return
 	}
 
-	currentVersion, err := getCurrentGTVersion(exe)
-	if err != nil {
-		currentVersion = "unknown"
-	}
-
-	showVersionNotification(currentVersion, latestVersion, latestURL)
-	updateVersionCheck(latestVersion)
+	showVersionNotification(storedVersion, latestVersion, latestURL)
 }
 
 func shouldCheckVersion() bool {
@@ -58,26 +66,16 @@ func shouldCheckVersion() bool {
 		return true // If we can't parse time, check anyway
 	}
 
-	// Check if it's been more than 24 hours since last check
-	return time.Since(lastChecked) > 24*time.Hour
+	// Compare only date (day, month, year), ignore time
+	now := time.Now()
+	lastCheckedDate := time.Date(lastChecked.Year(), lastChecked.Month(), lastChecked.Day(), 0, 0, 0, 0, lastChecked.Location())
+	currentDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
+	// Check if it's a different day
+	return !lastCheckedDate.Equal(currentDate)
 }
 
-func getCurrentGTVersion(exe executor.Executor) (string, error) {
-	output, err := exe.WithName("gt").WithArgs([]string{"version"}).RunWithOutput()
-	if err != nil {
-		return "", err
-	}
-
-	versionStr := strings.TrimSpace(output.String())
-
-	if versionStr != "" {
-		return versionStr, nil
-	}
-
-	return "", fmt.Errorf("could not parse version from: %s", versionStr)
-}
-
-func getLatestGTVersion() (string, string, error) {
+func getLatestGTVersionWithContext(ctx context.Context) (string, string, error) {
 	// Get repository from environment variable
 	repository := os.Getenv("GT_REPOSITORY")
 	if repository == "" {
@@ -85,7 +83,14 @@ func getLatestGTVersion() (string, string, error) {
 	}
 
 	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repository)
-	resp, err := http.Get(apiURL)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
+	if err != nil {
+		return "", "", err
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -108,14 +113,15 @@ func showVersionNotification(current, latest, url string) {
 	currentDisplay := strings.TrimPrefix(current, "v")
 	latestDisplay := strings.TrimPrefix(latest, "v")
 
-	fmt.Printf("\n🔄 A new release of gt is available: %s → %s\n", currentDisplay, latestDisplay)
-	fmt.Printf("To upgrade, run: gt upgrade\n")
-	fmt.Printf("%s\n\n", url)
-}
+	// Use existing styles from colors.go
+	arrowStyle := config.DebugStyle
 
-func updateVersionCheck(latestVersion string) {
-	config.Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
-	config.Config.GlobalConfig.Version.LastVersion = latestVersion
+	fmt.Printf("\n%s A new release of gt is available: %s %s %s\n",
+		config.InfoStyle.Render("🔄"),
+		config.WarningStyle.Render(currentDisplay),
+		arrowStyle.Render(config.ArrowRightIcon),
+		config.WarningStyle.Render(latestDisplay))
 
-	config.SaveGlobalConfig()
+	fmt.Printf("To upgrade, run: %s\n", config.SuccessStyle.Render("gt upgrade"))
+	fmt.Printf("%s\n\n", config.InfoStyle.Render(url))
 }
