@@ -102,6 +102,7 @@ sudo mv gt /usr/local/bin/
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `pull_request create` | `pr c` | Create a new pull request | `gt pr c` |
+| `pull_request create -d` | `pr c -d` | Create a draft pull request | `gt pr c -d` |
 | `pull_request list` | `pr li` | List all pull requests | `gt pr li` |
 
 ### Configuration
