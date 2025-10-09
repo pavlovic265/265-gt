@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/pavlovic265/265-gt/client"
@@ -20,12 +22,17 @@ import (
 
 var exe = executor.NewExe()
 
+const UNKNOWN_COMMAND_ERROR = "unknown command"
+
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if cmd.Name() == "completion" || cmd.Name() == "version" ||
-			(cmd.Parent() != nil && cmd.Parent().Name() == "config") ||
-			(cmd.Parent() != nil && cmd.Parent().Name() == "auth") {
+		isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
+		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
+		isVersion := cmd.Name() == "version"
+		isCompletion := cmd.Name() == "completion"
+
+		if isVersion || isCompletion || isConfig || isAuth {
 			config.InitConfig(exe)
 			client.InitCliClient(exe)
 			return
@@ -40,9 +47,25 @@ var rootCmd = &cobra.Command{
 		config.InitConfig(exe)
 		client.InitCliClient(exe)
 
-		// Check for gt tool updates (run synchronously with timeout to avoid blocking)
 		helpers.CheckGTVersion(exe)
 	},
+	// Override the default error handling to pass unknown commands to git
+	SilenceErrors: true,
+	SilenceUsage:  true,
+}
+
+func passToGit(args []string) {
+	fmt.Printf("Unknown command, passing to git: git %s\n", strings.Join(args, " "))
+
+	err := exe.WithGit().WithArgs(args).Run()
+	if err != nil {
+		// If git command fails, exit with the same exit code
+		if exitError, ok := err.(*exec.ExitError); ok {
+			os.Exit(exitError.ExitCode())
+		}
+		// For other errors, exit with code 1
+		os.Exit(1)
+	}
 }
 
 func main() {
@@ -89,5 +112,21 @@ func main() {
 		},
 	})
 
-	rootCmd.Execute()
+	// Execute the command and handle unknown commands
+	if err := rootCmd.Execute(); err != nil {
+		// Check if this is an unknown command error
+		if strings.Contains(err.Error(), UNKNOWN_COMMAND_ERROR) {
+			// If no arguments provided, show help instead of passing to git
+			if len(os.Args) <= 1 {
+				rootCmd.Help()
+				return
+			}
+			// Pass the command to git
+			passToGit(os.Args[1:])
+		} else {
+			// For other errors, print and exit
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
 }

@@ -88,7 +88,7 @@ sudo mv gt /usr/local/bin/
 | `add` | - | Stage changes | `gt add` |
 | `unstage` | `us` | Unstage changes | `gt unstage` |
 | `commit` | `cm` | Create commit with message | `gt commit "Add new feature"` |
-| `empty` | `em` | Create empty commit | `gt empty "WIP"` |
+| `commit -e` | `cm -e` | Create empty commit | `gt commit -e "WIP"` |
 
 ### Remote Operations
 
