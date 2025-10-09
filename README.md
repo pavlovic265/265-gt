@@ -3,6 +3,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/pavlovic265/265-gt/blob/main/LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org/)
 [![Git Version](https://img.shields.io/badge/Git-2.39.5+-orange.svg)](https://git-scm.com/)
+[![GitHub CLI](https://img.shields.io/badge/GitHub%20CLI-2.81.0+-purple.svg)](https://cli.github.com/)
 
 [![CI](https://github.com/pavlovic265/265-gt/actions/workflows/ci.yml/badge.svg)](https://github.com/pavlovic265/265-gt/actions/workflows/ci.yml)
 [![Build](https://github.com/pavlovic265/265-gt/actions/workflows/build.yml/badge.svg)](https://github.com/pavlovic265/265-gt/actions/workflows/build.yml)
