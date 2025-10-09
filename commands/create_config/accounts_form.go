@@ -116,14 +116,14 @@ func (am accountsModel) View() string {
 		}
 	}
 
-	doneButton := DoneButtonBlur
+	var doneButton string
 	if am.focusIndex == len(am.inputs) {
 		doneButton = config.GetSuccessStyle().Render(DoneButtonFocus)
 	} else {
 		doneButton = config.GetDebugStyle().Render(DoneButtonBlur)
 	}
 
-	addButton := AddButtonBlur
+	var addButton string
 	if am.focusIndex == len(am.inputs)+1 {
 		addButton = config.GetSuccessStyle().Render(AddButtonFocus)
 	} else {

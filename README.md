@@ -1,7 +1,7 @@
 # gt: Git Workflow Utility
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/pavlovic265/265-gt/blob/main/LICENSE)
-[![Go Version](https://img.shields.io/badge/Go-1.23+-blue.svg)](https://golang.org/)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org/)
 [![Git Version](https://img.shields.io/badge/Git-2.39.5+-orange.svg)](https://git-scm.com/)
 
 > A powerful command-line utility designed to simplify and streamline common Git workflows with intelligent branch management and automation.
@@ -20,7 +20,7 @@
 
 ## 📋 Requirements
 
-- **Go**: 1.23 or higher
+- **Go**: 1.24 or higher
 - **Git**: 2.39.5 or higher
 - **GitHub CLI**: 2.81.0 or higher (for GitHub integration)
 

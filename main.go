@@ -70,7 +70,7 @@ func passToGit(args []string) {
 
 func main() {
 	// Load .env file if it exists
-	godotenv.Load()
+	_ = godotenv.Load() // Ignore .env loading errors as the file is optional
 
 	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
@@ -99,15 +99,20 @@ func main() {
 		Long:  "Install auto-completion for Bash, Zsh, Fish, or PowerShell",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			var err error
 			switch args[0] {
 			case "bash":
-				cmd.Root().GenBashCompletion(os.Stdout)
+				err = cmd.Root().GenBashCompletion(os.Stdout)
 			case "zsh":
-				cmd.Root().GenZshCompletion(os.Stdout)
+				err = cmd.Root().GenZshCompletion(os.Stdout)
 			case "fish":
-				cmd.Root().GenFishCompletion(os.Stdout, true)
+				err = cmd.Root().GenFishCompletion(os.Stdout, true)
 			case "powershell":
-				cmd.Root().GenPowerShellCompletion(os.Stdout)
+				err = cmd.Root().GenPowerShellCompletion(os.Stdout)
+			}
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error generating completion: %v\n", err)
+				os.Exit(1)
 			}
 		},
 	})
@@ -118,7 +123,9 @@ func main() {
 		if strings.Contains(err.Error(), UNKNOWN_COMMAND_ERROR) {
 			// If no arguments provided, show help instead of passing to git
 			if len(os.Args) <= 1 {
-				rootCmd.Help()
+				if err := rootCmd.Help(); err != nil {
+					fmt.Fprintf(os.Stderr, "Error showing help: %v\n", err)
+				}
 				return
 			}
 			// Pass the command to git

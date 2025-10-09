@@ -51,7 +51,7 @@ func DeleteFromParentChildren(exe executor.Executor, parent, branch string) erro
 			return err
 		}
 	} else {
-		DeleteChildren(exe, parent)
+		_ = DeleteChildren(exe, parent)
 	}
 	return nil
 }

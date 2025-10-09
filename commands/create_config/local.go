@@ -39,7 +39,7 @@ func (svc localCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				defer file.Close()
+				defer func() { _ = file.Close() }()
 
 				branches, err := HandleAddProtectedBranch()
 				if err != nil {
@@ -57,7 +57,7 @@ func (svc localCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				defer encoder.Close()
+				defer func() { _ = encoder.Close() }()
 
 				return nil
 			} else if err != nil {

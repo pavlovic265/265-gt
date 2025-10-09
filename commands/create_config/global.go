@@ -66,7 +66,7 @@ func (svc globalCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				defer file.Close()
+				defer func() { _ = file.Close() }()
 
 				platform, err := HandleSelectPlatform()
 				if err != nil {
@@ -111,7 +111,7 @@ func (svc globalCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				defer encoder.Close()
+				defer func() { _ = encoder.Close() }()
 
 				return nil
 			} else if err != nil {

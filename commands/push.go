@@ -33,7 +33,7 @@ func (svc pushCommand) Command() *cobra.Command {
 				return err
 			}
 
-				exeArgs := []string{"push", "--force", "origin", pointer.Deref(currentBranch)}
+			exeArgs := []string{"push", "--force", "origin", pointer.Deref(currentBranch)}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err

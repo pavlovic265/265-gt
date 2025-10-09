@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run
+.PHONY: all build clean run lint lint-fix
 
 # Default target, builds the application
 all: build
@@ -38,6 +38,18 @@ clean:
 	@echo "Cleaning up..."
 	rm -rf $(BUILD_DIR)
 	@echo "Cleanup complete."
+
+# Run golangci-lint
+lint:
+	@echo "Running golangci-lint..."
+	golangci-lint run
+	@echo "Linting complete."
+
+# Run golangci-lint with auto-fix
+lint-fix:
+	@echo "Running golangci-lint with auto-fix..."
+	golangci-lint run --fix
+	@echo "Linting with auto-fix complete."
 
 release:
 	@if [ -z "$(v)" ]; then \

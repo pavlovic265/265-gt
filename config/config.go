@@ -81,7 +81,7 @@ func loadGlobalConfig() (GlobalConfigStruct, error) {
 	if err != nil {
 		return gconf, fmt.Errorf("failed to open config file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&gconf); err != nil {
 		return gconf, fmt.Errorf("failed to decode config file: %w", err)
@@ -116,7 +116,7 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 		}
 		return lconf, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&lconf); err != nil {
@@ -139,18 +139,18 @@ func saveGlobalConfig() error {
 	if err != nil {
 		return fmt.Errorf("failed to create temp config file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	encoder := yaml.NewEncoder(file)
 	if err := encoder.Encode(Config.GlobalConfig); err != nil {
-		file.Close()
-		os.Remove(tempPath)
+		_ = file.Close()
+		_ = os.Remove(tempPath)
 		return fmt.Errorf("failed to encode config file: %w", err)
 	}
-	file.Close()
+	_ = file.Close()
 
 	if err := os.Rename(tempPath, configPath); err != nil {
-		os.Remove(tempPath)
+		_ = os.Remove(tempPath)
 		return fmt.Errorf("failed to save config file: %w", err)
 	}
 
@@ -158,13 +158,15 @@ func saveGlobalConfig() error {
 }
 
 func UpdateLastChecked() error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).Format("2006-01-02T15:04:05.000000Z")
+	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).
+		Format("2006-01-02T15:04:05.000000Z")
 
 	return saveGlobalConfig()
 }
 
 func UpdateVersion(version string) error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).Format("2006-01-02T15:04:05.000000Z")
+	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).
+		Format("2006-01-02T15:04:05.000000Z")
 	Config.GlobalConfig.Version.LastVersion = version
 
 	return saveGlobalConfig()

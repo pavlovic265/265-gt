@@ -35,7 +35,7 @@ func (svc statusCommand) Command() *cobra.Command {
 				fmt.Println(config.ErrorIndicator("Authentication failed"))
 				return err
 			}
-			
+
 			fmt.Println(config.SuccessIndicator("Authentication successful"))
 			return nil
 		},

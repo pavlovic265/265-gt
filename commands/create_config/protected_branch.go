@@ -123,14 +123,14 @@ func (pbm protectedBranchModele) View() string {
 	b.WriteString(pbm.branch.View())
 	b.WriteRune('\n')
 
-	doneButton := "[ Done ]"
+	var doneButton string
 	if pbm.focusIndex == 1 {
 		doneButton = config.GetSuccessStyle().Render("[ Done ]")
 	} else {
 		doneButton = config.GetDebugStyle().Render("[ Done ]")
 	}
 
-	addButton := "[ Add ]"
+	var addButton string
 	if pbm.focusIndex == 2 {
 		addButton = config.GetSuccessStyle().Render("[ Add ]")
 	} else {
