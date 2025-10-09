@@ -60,6 +60,9 @@ func (svc globalCommand) Command() *cobra.Command {
 						LastChecked: "",
 						LastVersion: "",
 					},
+					Theme: config.Theme{
+						Type: "dark",
+					},
 				}
 				if *platform == config.GitHubPlatform.String() {
 					globalConfig.GitHub = config.GitHub{

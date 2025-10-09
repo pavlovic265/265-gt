@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/config"
 )
 
 type YesNoPrompt struct {
@@ -52,11 +53,22 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
-		return "\n❌ Operation canceled by user\n"
+		return fmt.Sprintf("\n%s %s\n",
+			config.ErrorIconOnly(),
+			config.GetErrorStyle().Render("Operation canceled by user"))
 	}
-	
-	// Just show the question without options
-	s := fmt.Sprintf("%s", m.question)
-	
+
+	// Style the question with options
+	s := fmt.Sprintf("%s\n", config.GetInfoStyle().Render(m.question))
+	s += fmt.Sprintf("%s %s %s %s\n",
+		config.GetDebugStyle().Render("Press"),
+		config.GetSuccessStyle().Render("Y"),
+		config.GetDebugStyle().Render("for Yes,"),
+		config.GetErrorStyle().Render("N"))
+	s += fmt.Sprintf("%s %s %s\n",
+		config.GetDebugStyle().Render("for No, or"),
+		config.GetCommandStyle().Render("ENTER"),
+		config.GetDebugStyle().Render("for Yes."))
+
 	return s
 }
