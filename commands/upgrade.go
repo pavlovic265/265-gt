@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/pavlovic265/265-gt/config"
@@ -38,8 +40,39 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			// Update version in config after successful upgrade
+			if err := svc.updateVersionInConfig(repository); err != nil {
+				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
+			}
+
 			fmt.Println(config.SuccessIndicator("Tool upgrade successfully"))
 			return nil
 		},
 	}
+}
+
+func (svc UpgradeCommand) updateVersionInConfig(repository string) error {
+	// Get latest version from GitHub API
+	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repository)
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		TagName string `json:"tag_name"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return err
+	}
+
+	// Save the updated config
+	if err := config.UpdateVersion(result.TagName); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -2,50 +2,51 @@ package config
 
 import "github.com/charmbracelet/lipgloss"
 
-// Color palette based on purpose - shared across all commands
+// Color palette based on Panda Syntax theme - superminimal, dark with subtle colors
 var (
-	// Success - Turquoise-Green
+	// Success - Green (Panda theme green)
 	SuccessStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#19F9D8")).
-		Bold(true)
+			Foreground(lipgloss.Color("#A6E22E")).
+			Bold(true)
 
-	// Error - Pink
+	// Error - Red (Panda theme red)
 	ErrorStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FF76B5")).
-		Bold(true)
+			Foreground(lipgloss.Color("#F92672")).
+			Bold(true)
 
-	// Warning - Orange
+	// Warning - Orange (Panda theme orange)
 	WarningStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#F7B36A")).
-		Bold(true)
+			Foreground(lipgloss.Color("#FD971F")).
+			Bold(true)
 
-	// Info - Light Blue
+	// Info - Blue (Panda theme blue)
 	InfoStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#6FC1FF")).
-		Bold(true)
+			Foreground(lipgloss.Color("#66D9EF")).
+			Bold(true)
 
-	// Debug/Meta - Light Purple
+	// Debug/Meta - Purple (Panda theme purple)
 	DebugStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#B180D7")).
-		Bold(true)
+			Foreground(lipgloss.Color("#AE81FF")).
+			Bold(true)
 
-	// Highlight - Light Pink
+	// Highlight - Yellow (Panda theme yellow)
 	HighlightStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FF87B4")).
-		Bold(true)
+			Foreground(lipgloss.Color("#E6DB74")).
+			Bold(true)
 
 	// Title with highlight background
 	TitleStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#19F9D8")). // Success color for title
-		Background(lipgloss.Color("#FF87B4")). // Highlight background
-		Padding(0, 1).
-		Bold(true)
+			Foreground(lipgloss.Color("#A6E22E")). // Success color for title
+			Background(lipgloss.Color("#E6DB74")). // Highlight background
+			Padding(0, 1).
+			Bold(true)
 )
 
 // Status indicators with ASCII icons
 const (
-	SuccessIcon = "✓"
-	ErrorIcon   = "✗"
+	SuccessIcon    = "✓"
+	ErrorIcon      = "✗"
+	ArrowRightIcon = "→"
 )
 
 // SuccessIndicator returns a styled success message with checkmark icon
@@ -66,4 +67,4 @@ func SuccessIconOnly() string {
 // ErrorIconOnly returns just the styled error icon
 func ErrorIconOnly() string {
 	return ErrorStyle.Render(ErrorIcon)
-} 
+}
