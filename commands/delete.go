@@ -8,6 +8,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 		Short:              "delete branch",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
+			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
@@ -45,13 +46,13 @@ func (svc deleteCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := utils.GetBranches(svc.exe)
+				branches, err := helpers.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != utils.Deref(currentBranch) && !utils.IsProtectedBranch(branch) {
+					if branch != utils.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}
@@ -65,9 +66,9 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
-	parent := utils.GetParent(svc.exe, branch)
-	parentChildren := utils.GetChildren(svc.exe, parent)
-	branchChildren := utils.GetChildren(svc.exe, branch)
+	parent := helpers.GetParent(svc.exe, branch)
+	parentChildren := helpers.GetChildren(svc.exe, parent)
+	branchChildren := helpers.GetChildren(svc.exe, branch)
 
 	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
@@ -75,7 +76,7 @@ func (svc deleteCommand) deleteBranch(
 		return err
 	}
 
-	err = utils.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+	err = helpers.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
 	if err != nil {
 		return err
 	}

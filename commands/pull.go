@@ -5,6 +5,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,7 @@ func (svc pullCommand) Command() *cobra.Command {
 		Aliases: []string{"pl"},
 		Short:   "pull branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
+			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}

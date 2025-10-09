@@ -7,6 +7,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils"
 )
 
@@ -113,11 +114,11 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	branch, err := utils.GetCurrentBranchName(svc.exe)
+	branch, err := helpers.GetCurrentBranchName(svc.exe)
 	if err != nil {
 		return err
 	}
-	parent := utils.GetParent(svc.exe, utils.Deref(branch))
+	parent := helpers.GetParent(svc.exe, utils.Deref(branch))
 
 	exeArgs := []string{
 		"pr",

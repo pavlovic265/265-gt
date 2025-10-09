@@ -2,10 +2,10 @@ package commit
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func (svc commitCommand) Command() *cobra.Command {
 		Aliases: []string{"cm"},
 		Short:   "create commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			message := time.Now().Format("02-Jan-2006 15:04:05")
+			message := utils.Now().Format(utils.LayoutUserFriendly)
 			if len(args) != 0 {
 				message = string(args[0])
 			}

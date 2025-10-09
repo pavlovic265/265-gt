@@ -13,7 +13,7 @@ import (
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
 
 	"github.com/spf13/cobra"
 )
@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// Check if we're in a git repository
-		if err := utils.EnsureGitRepository(exe); err != nil {
+		if err := helpers.EnsureGitRepository(exe); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -41,7 +41,7 @@ var rootCmd = &cobra.Command{
 		client.InitCliClient(exe)
 
 		// Check for gt tool updates (run synchronously with timeout to avoid blocking)
-		utils.CheckGTVersion(exe)
+		helpers.CheckGTVersion(exe)
 	},
 }
 

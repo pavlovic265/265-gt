@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -158,13 +158,13 @@ func saveGlobalConfig() error {
 }
 
 func UpdateLastChecked() error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+	Config.GlobalConfig.Version.LastChecked = utils.Now().Format(utils.LayoutISOWithTime)
 
 	return saveGlobalConfig()
 }
 
 func UpdateVersion(version string) error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+	Config.GlobalConfig.Version.LastChecked = utils.Now().Format(utils.LayoutISOWithTime)
 	Config.GlobalConfig.Version.LastVersion = version
 
 	return saveGlobalConfig()

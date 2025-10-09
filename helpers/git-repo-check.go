@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import (
 	"fmt"
@@ -40,4 +40,4 @@ func EnsureGitRepository(exe executor.Executor) error {
 			"Error: %v", currentDir, err)
 	}
 	return nil
-} 
+}

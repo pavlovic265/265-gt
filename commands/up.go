@@ -7,6 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 )
@@ -28,12 +29,12 @@ func (svc upCommand) Command() *cobra.Command {
 		Use:   "up",
 		Short: "move to brunch up in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := utils.GetCurrentBranchName(svc.exe)
+			branch, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
-			childrenStr := utils.GetChildren(svc.exe, utils.Deref(branch))
-			children := utils.UnmarshalChildren(childrenStr)
+			childrenStr := helpers.GetChildren(svc.exe, utils.Deref(branch))
+			children := helpers.UnmarshalChildren(childrenStr)
 
 			if len(children) == 1 {
 				err := svc.checkoutBranch(children[0])

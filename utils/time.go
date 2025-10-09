@@ -2,17 +2,9 @@ package utils
 
 import "time"
 
-func From[T any](v T) *T {
-	return &v
-}
-
-func Deref[T any](ptr *T) T {
-	if ptr != nil {
-		return *ptr
-	}
-	var d T
-	return d
-}
+const LayoutISO = "2006-01-02"
+const LayoutISOWithTime = "2006-01-02T15:04:05.000000Z"
+const LayoutUserFriendly = "02-Jan-2006 15:04:05"
 
 // Now returns the current time in UTC with microsecond precision
 func Now() time.Time {

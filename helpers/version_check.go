@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import (
 	"context"
@@ -12,6 +12,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 )
 
 type GitHubRelease struct {
@@ -67,7 +68,7 @@ func shouldCheckVersion() bool {
 	}
 
 	// Compare only date (day, month, year), ignore time
-	now := time.Now()
+	now := utils.Now()
 	lastCheckedDate := time.Date(lastChecked.Year(), lastChecked.Month(), lastChecked.Day(), 0, 0, 0, 0, lastChecked.Location())
 	currentDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 
