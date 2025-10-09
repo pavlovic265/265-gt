@@ -20,8 +20,14 @@ type GitHub struct {
 	Accounts []Account `yaml:"accounts"`
 }
 
+type Version struct {
+	LastChecked string `yaml:"last_checked"`
+	LastVersion string `yaml:"last_version"`
+}
+
 type GlobalConfigStruct struct {
-	GitHub GitHub `yaml:"github"`
+	GitHub  GitHub  `yaml:"github"`
+	Version Version `yaml:"version"`
 }
 
 type LocalConfigStruct struct {
@@ -112,4 +118,35 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 	}
 
 	return lconf, nil
+}
+
+func SaveGlobalConfig() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	configPath := filepath.Join(homeDir, FileName)
+	tempPath := configPath + ".tmp"
+
+	file, err := os.Create(tempPath)
+	if err != nil {
+		return fmt.Errorf("failed to create temp config file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+	if err := encoder.Encode(Config.GlobalConfig); err != nil {
+		file.Close()
+		os.Remove(tempPath)
+		return fmt.Errorf("failed to encode config file: %w", err)
+	}
+	file.Close()
+
+	if err := os.Rename(tempPath, configPath); err != nil {
+		os.Remove(tempPath)
+		return fmt.Errorf("failed to save config file: %w", err)
+	}
+
+	return nil
 }
