@@ -22,7 +22,7 @@
 
 - **Go**: 1.23 or higher
 - **Git**: 2.39.5 or higher
-- **GitHub CLI**: 2.66.1 or higher (for GitHub integration)
+- **GitHub CLI**: 2.81.0 or higher (for GitHub integration)
 
 ## 🛠️ Installation
 
