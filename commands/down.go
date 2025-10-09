@@ -5,7 +5,8 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -26,11 +27,11 @@ func (svc downCommand) Command() *cobra.Command {
 		Use:   "down",
 		Short: "move to brunch down in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := utils.GetCurrentBranchName(svc.exe)
+			branch, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
-			parent := utils.GetParent(svc.exe, *branch)
+			parent := helpers.GetParent(svc.exe, pointer.Deref(branch))
 
 			exeArgs := []string{"checkout", parent}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()

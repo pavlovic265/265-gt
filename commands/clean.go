@@ -8,15 +8,14 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
 type cleanCommand struct {
 	exe executor.Executor
 }
-
-
 
 func NewCleanCommand(
 	exe executor.Executor,
@@ -39,12 +38,12 @@ func (svc cleanCommand) Command() *cobra.Command {
 }
 
 func (svc cleanCommand) cleanBranches() error {
-	currentBranch, err := utils.GetCurrentBranchName(svc.exe)
+	currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
 	if err != nil {
 		return fmt.Errorf("failed to get current branch: %w", err)
 	}
 
-	branches, err := utils.GetBranches(svc.exe)
+	branches, err := helpers.GetBranches(svc.exe)
 	if err != nil {
 		return fmt.Errorf("failed to get branches: %w", err)
 	}
@@ -54,7 +53,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	cleanableCount := 0
 	for _, branch := range branches {
-		if branch != *currentBranch && !utils.IsProtectedBranch(branch) {
+		if branch != pointer.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
 			cleanableCount++
 		}
 	}
@@ -65,13 +64,13 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	// Show options once at the top
-			fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", config.InfoStyle.Render("Options:"))
-		fmt.Printf("   %s Default: Yes (press Enter)\n", config.HighlightStyle.Render("💡"))
+	fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", config.InfoStyle.Render("Options:"))
+	fmt.Printf("   %s Default: Yes (press Enter)\n", config.HighlightStyle.Render("💡"))
 	fmt.Println()
 
 	deletedCount := 0
 	for _, branch := range branches {
-		if branch == *currentBranch || utils.IsProtectedBranch(branch) {
+		if branch == pointer.Deref(currentBranch) || helpers.IsProtectedBranch(branch) {
 			continue
 		}
 
@@ -80,11 +79,11 @@ func (svc cleanCommand) cleanBranches() error {
 			fmt.Printf("%s Error: %v\n", config.ErrorIconOnly(), err)
 			continue
 		}
-		
+
 		if shouldBreak {
 			break
 		}
-		
+
 		deletedCount++
 	}
 
@@ -93,8 +92,8 @@ func (svc cleanCommand) cleanBranches() error {
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
-	parent := utils.GetParent(svc.exe, branch)
-	
+	parent := helpers.GetParent(svc.exe, branch)
+
 	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", config.InfoStyle.Render(branch))
 	if parent != "" {
 		promptMsg += fmt.Sprintf(" (parent: %s)", config.DebugStyle.Render(parent))
@@ -114,8 +113,8 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 		}
 
 		if model.IsYes() {
-			parentChildren := utils.GetChildren(svc.exe, parent)
-			branchChildren := utils.GetChildren(svc.exe, branch)
+			parentChildren := helpers.GetChildren(svc.exe, parent)
+			branchChildren := helpers.GetChildren(svc.exe, branch)
 
 			exeArgs := []string{"branch", "-D", branch}
 			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
@@ -123,7 +122,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 				return false, err
 			}
 
-			err = utils.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+			err = helpers.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
 			if err != nil {
 				return false, err
 			}

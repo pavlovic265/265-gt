@@ -8,36 +8,35 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 )
 
-type selectPlatformModel struct {
+type selectThemeModel struct {
 	cursor  int
 	choice  string
 	choices []string
 }
 
-var choices = []string{
-	config.GitHubPlatform.String(),
-	config.GitLabPlatform.String() + " (not implemented yet)",
+var themeChoices = []string{
+	"dark",
+	"light",
 }
 
-func newSelectPlatformModel() selectPlatformModel {
-	return selectPlatformModel{
-		choices: choices,
+func newSelectThemeModel() selectThemeModel {
+	return selectThemeModel{
+		choices: themeChoices,
 	}
 }
 
-func (sm selectPlatformModel) Init() tea.Cmd {
+func (sm selectThemeModel) Init() tea.Cmd {
 	return nil
 }
 
-func (sm selectPlatformModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (sm selectThemeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyCtrlQ.String(), tea.KeyCtrlQ.String(), tea.KeyEsc.String():
+		case tea.KeyCtrlC.String(), tea.KeyCtrlQ.String(), tea.KeyEsc.String():
 			return sm, tea.Quit
 
 		case tea.KeyEnter.String():
-			// Send the choice on the channel and exit.
 			sm.choice = sm.choices[sm.cursor]
 			return sm, tea.Quit
 
@@ -58,9 +57,9 @@ func (sm selectPlatformModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return sm, nil
 }
 
-func (sm selectPlatformModel) View() string {
+func (sm selectThemeModel) View() string {
 	s := strings.Builder{}
-	s.WriteString(config.GetInfoStyle().Render("Choose platform?") + "\n\n")
+	s.WriteString(config.GetInfoStyle().Render("Choose theme?") + "\n\n")
 
 	for i := 0; i < len(sm.choices); i++ {
 		if sm.cursor == i {
@@ -80,17 +79,17 @@ func (sm selectPlatformModel) View() string {
 	return s.String()
 }
 
-func HandleSelectPlatform() (*string, error) {
-	platformModel := newSelectPlatformModel()
-	selectProgram := tea.NewProgram(platformModel)
+func HandleSelectTheme() (*string, error) {
+	themeModel := newSelectThemeModel()
+	selectProgram := tea.NewProgram(themeModel)
 	m, err := selectProgram.Run()
 	if err != nil {
 		return nil, err
 	}
 
-	if m, ok := m.(selectPlatformModel); ok && m.choice != "" {
+	if m, ok := m.(selectThemeModel); ok && m.choice != "" {
 		return &m.choice, nil
 	}
 
-	return nil, fmt.Errorf("faild to select platform")
+	return nil, fmt.Errorf("failed to select theme")
 }

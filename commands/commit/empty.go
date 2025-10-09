@@ -2,10 +2,10 @@ package commit
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func (svc emptyCommand) Command() *cobra.Command {
 		Aliases: []string{"e"},
 		Short:   "empty new commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			message := "empty commit - " + time.Now().Format("02-Jan-2006 15:04:05")
+			message := "empty commit - " + timeutils.Now().Format(timeutils.LayoutUserFriendly)
 
 			exeArgs := []string{"commit", "--allow-empty", "-m", message}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()

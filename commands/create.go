@@ -6,7 +6,8 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +33,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return fmt.Errorf("missing branch name")
 			}
 			branch := args[0]
-			parent, err := utils.GetCurrentBranchName(svc.exe)
+			parent, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
@@ -43,11 +44,11 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
-			if err := utils.SetParent(svc.exe, *parent, branch); err != nil {
+			if err := helpers.SetParent(svc.exe, pointer.Deref(parent), branch); err != nil {
 				return err
 			}
 
-			if err := svc.setChildrenBranch(*parent, branch); err != nil {
+			if err := svc.setChildrenBranch(pointer.Deref(parent), branch); err != nil {
 				return err
 			}
 
@@ -58,13 +59,13 @@ func (svc createCommand) Command() *cobra.Command {
 }
 
 func (svc createCommand) setChildrenBranch(parent, child string) error {
-	children := utils.GetChildren(svc.exe, parent)
+	children := helpers.GetChildren(svc.exe, parent)
 
 	splitedChildren := strings.Split(children, " ")
 	splitedChildren = append(splitedChildren, child)
 	joinedChildren := strings.TrimSpace(strings.Join(splitedChildren, " "))
 
-	if err := utils.SetChildren(svc.exe, parent, joinedChildren); err != nil {
+	if err := helpers.SetChildren(svc.exe, parent, joinedChildren); err != nil {
 		return err
 	}
 

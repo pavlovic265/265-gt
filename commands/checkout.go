@@ -7,7 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := utils.GetBranches(svc.exe)
+				branches, err := helpers.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}

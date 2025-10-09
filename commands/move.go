@@ -8,7 +8,8 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	"github.com/pavlovic265/265-gt/helpers"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -30,22 +31,22 @@ func (svc moveCommand) Command() *cobra.Command {
 		Aliases: []string{"mo"},
 		Short:   "rebase branch onto other branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := utils.GetCurrentBranchName(svc.exe)
+			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
 
 			if len(args) > 0 {
 				parentBranch := args[0]
-				if err := svc.rebaseBranchOnto(parentBranch, *currentBranch); err != nil {
+				if err := svc.rebaseBranchOnto(parentBranch, pointer.Deref(currentBranch)); err != nil {
 					return err
 				}
 			} else {
-				branchs, err := utils.GetBranches(svc.exe)
+				branchs, err := helpers.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}
-				if err := svc.rebaseBranch(*currentBranch, branchs); err != nil {
+				if err := svc.rebaseBranch(pointer.Deref(currentBranch), branchs); err != nil {
 					return err
 				}
 			}
@@ -67,7 +68,7 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
-	if err := utils.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
+	if err := helpers.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
 		return err
 	}
 
@@ -80,7 +81,7 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 }
 
 func (svc moveCommand) setChildrenBranch(parent, child string) error {
-	parentChildren := utils.GetChildren(svc.exe, parent)
+	parentChildren := helpers.GetChildren(svc.exe, parent)
 
 	var children string
 	if len(parentChildren) > 0 {
@@ -92,7 +93,7 @@ func (svc moveCommand) setChildrenBranch(parent, child string) error {
 		children = child
 	}
 
-	if err := utils.SetChildren(svc.exe, children, parent); err != nil {
+	if err := helpers.SetChildren(svc.exe, children, parent); err != nil {
 		return err
 	}
 	return nil

@@ -158,13 +158,13 @@ func saveGlobalConfig() error {
 }
 
 func UpdateLastChecked() error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).Format("2006-01-02T15:04:05.000000Z")
 
 	return saveGlobalConfig()
 }
 
 func UpdateVersion(version string) error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().Format(time.RFC3339)
+	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).Format("2006-01-02T15:04:05.000000Z")
 	Config.GlobalConfig.Version.LastVersion = version
 
 	return saveGlobalConfig()
