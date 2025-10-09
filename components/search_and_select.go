@@ -31,21 +31,27 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			return m, tea.Quit
 		case tea.KeyShiftTab.String(), tea.KeyUp.String(), tea.KeyCtrlK.String():
-			if m.Cursor > 0 {
-				m.Cursor--
-			} else {
-				m.Cursor = len(m.Choices) - 1
+			if len(m.Choices) > 0 {
+				if m.Cursor > 0 {
+					m.Cursor--
+				} else {
+					m.Cursor = len(m.Choices) - 1
+				}
+				m.updateYankURL()
 			}
-			m.updateYankURL()
 		case tea.KeyTab.String(), tea.KeyDown.String(), tea.KeyCtrlJ.String():
-			if m.Cursor < len(m.Choices)-1 {
-				m.Cursor++
-			} else {
-				m.Cursor = 0
+			if len(m.Choices) > 0 {
+				if m.Cursor < len(m.Choices)-1 {
+					m.Cursor++
+				} else {
+					m.Cursor = 0
+				}
+				m.updateYankURL()
 			}
-			m.updateYankURL()
 		case tea.KeyEnter.String():
-			m.Selected = m.Choices[m.Cursor]
+			if len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+				m.Selected = m.Choices[m.Cursor]
+			}
 			return m, tea.Quit
 		case tea.KeyCtrlY.String():
 			if len(m.URLs) == 0 && m.YankURL == "" {
@@ -74,19 +80,23 @@ func (m ListModel) View() string {
 		config.GetInfoStyle().Render("Search:"),
 		config.GetHighlightStyle().Render(m.Query))
 
-	for i, choice := range m.Choices {
-		cursor := " "
-		if m.Cursor == i {
-			cursor = config.GetCommandStyle().Render(">")
-		}
+	if len(m.Choices) == 0 {
+		s += config.GetWarningStyle().Render("No items found") + "\n"
+	} else {
+		for i, choice := range m.Choices {
+			cursor := " "
+			if m.Cursor == i {
+				cursor = config.GetCommandStyle().Render(">")
+			}
 
-		styledChoice := choice
-		if m.Cursor == i {
-			styledChoice = config.GetBranchStyle().Render(choice)
-		}
+			styledChoice := choice
+			if m.Cursor == i {
+				styledChoice = config.GetBranchStyle().Render(choice)
+			}
 
-		line := fmt.Sprintf("%s %s", cursor, styledChoice)
-		s += line + "\n"
+			line := fmt.Sprintf("%s %s", cursor, styledChoice)
+			s += line + "\n"
+		}
 	}
 
 	// Only show yank option if there are URLs available
@@ -127,7 +137,9 @@ func (m *ListModel) filterChoices() {
 	}
 	m.Choices = filtered
 	m.URLs = filteredURLs
-	if m.Cursor >= len(filtered) {
+	if len(filtered) == 0 {
+		m.Cursor = 0
+	} else if m.Cursor >= len(filtered) {
 		m.Cursor = len(filtered) - 1
 	}
 	m.updateYankURL()
@@ -151,7 +163,9 @@ func (m *ListModel) yankToClipboard(url string) {
 }
 
 func (m *ListModel) updateYankURL() {
-	if m.Cursor >= 0 && m.Cursor < len(m.Choices) && m.Cursor < len(m.URLs) {
+	if m.Cursor >= 0 && m.Cursor < len(m.Choices) && m.Cursor < len(m.URLs) && len(m.URLs) > 0 {
 		m.YankURL = m.URLs[m.Cursor]
+	} else {
+		m.YankURL = ""
 	}
 }
