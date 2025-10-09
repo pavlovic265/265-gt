@@ -22,6 +22,8 @@ func NewCommitCommand(
 }
 
 func (svc commitCommand) Command() *cobra.Command {
+	var empty bool
+
 	commitCmd := &cobra.Command{
 		Use:     "commit",
 		Aliases: []string{"cm"},
@@ -33,16 +35,26 @@ func (svc commitCommand) Command() *cobra.Command {
 			}
 
 			exeArgs := []string{"commit", "-m", message}
+			if empty {
+				exeArgs = []string{"commit", "--allow-empty", "-m", message}
+				message = "empty commit - " + message
+			}
+
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}
-			fmt.Println(config.SuccessIndicator("Commit created with message: '" + message + "'"))
+
+			if empty {
+				fmt.Println(config.SuccessIndicator("Empty commit created with message: '" + message + "'"))
+			} else {
+				fmt.Println(config.SuccessIndicator("Commit created with message: '" + message + "'"))
+			}
 			return nil
 		},
 	}
 
-	commitCmd.AddCommand(NewEmptyCommand(svc.exe).Command())
+	commitCmd.Flags().BoolVarP(&empty, "empty", "e", false, "create an empty commit")
 
 	return commitCmd
 }
