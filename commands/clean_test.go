@@ -29,7 +29,8 @@ func TestCleanCommand_Command(t *testing.T) {
 	assert.Equal(t, "clean", cmd.Use)
 	assert.Equal(t, []string{"cl"}, cmd.Aliases)
 	assert.Equal(t, "Clean up branches interactively", cmd.Short)
-	assert.Equal(t, "Clean up branches one by one with confirmation. Protected branches and current branch are skipped.", cmd.Long)
+	assert.Equal(t, "Clean up branches one by one with confirmation. "+
+		"Protected branches and current branch are skipped.", cmd.Long)
 }
 
 func TestCleanCommand_RunE_NoBranchesToClean(t *testing.T) {

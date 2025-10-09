@@ -30,10 +30,10 @@ func (svc loginCommand) Command() *cobra.Command {
 		Short:              "login user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accoutns := config.Config.GlobalConfig.GitHub.Accounts
+			accounts := config.Config.GlobalConfig.GitHub.Accounts
 
 			var users []string
-			for _, acc := range accoutns {
+			for _, acc := range accounts {
 				users = append(users, acc.User)
 			}
 
