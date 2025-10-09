@@ -46,7 +46,9 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
 			}
 
-			fmt.Println(config.SuccessIndicator("Tool upgrade successfully"))
+			fmt.Printf("%s %s\n",
+				config.SuccessIconOnly(),
+				config.GetSuccessStyle().Render("Tool upgraded successfully"))
 			return nil
 		},
 	}

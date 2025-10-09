@@ -113,15 +113,13 @@ func showVersionNotification(current, latest, url string) {
 	currentDisplay := strings.TrimPrefix(current, "v")
 	latestDisplay := strings.TrimPrefix(latest, "v")
 
-	// Use existing styles from colors.go
-	arrowStyle := config.DebugStyle
+	fmt.Printf("\n%s %s %s %s %s\n",
+		config.GetInfoStyle().Render("🔄"),
+		config.GetInfoStyle().Render("A new release of gt is available:"),
+		config.GetWarningStyle().Render(currentDisplay),
+		config.GetDebugStyle().Render(config.ArrowRightIcon),
+		config.GetWarningStyle().Render(latestDisplay))
 
-	fmt.Printf("\n%s A new release of gt is available: %s %s %s\n",
-		config.InfoStyle.Render("🔄"),
-		config.WarningStyle.Render(currentDisplay),
-		arrowStyle.Render(config.ArrowRightIcon),
-		config.WarningStyle.Render(latestDisplay))
-
-	fmt.Printf("To upgrade, run: %s\n", config.SuccessStyle.Render("gt upgrade"))
-	fmt.Printf("%s\n\n", config.InfoStyle.Render(url))
+	fmt.Printf("To upgrade, run: %s\n", config.GetSuccessStyle().Render("gt upgrade"))
+	fmt.Printf("%s\n\n", config.GetInfoStyle().Render(url))
 }

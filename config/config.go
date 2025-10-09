@@ -26,9 +26,14 @@ type Version struct {
 	LastVersion string `yaml:"last_version"`
 }
 
+type Theme struct {
+	Type string `yaml:"type"` // "dark" or "light"
+}
+
 type GlobalConfigStruct struct {
 	GitHub  GitHub  `yaml:"github"`
 	Version Version `yaml:"version"`
+	Theme   Theme   `yaml:"theme"`
 }
 
 type LocalConfigStruct struct {

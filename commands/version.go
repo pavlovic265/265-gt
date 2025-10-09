@@ -50,7 +50,9 @@ func (svc versionCommand) getCurrentVersion() error {
 		version = "unknown"
 	}
 
-	fmt.Println(version)
+	fmt.Printf("%s %s\n",
+		config.GetInfoStyle().Render("Current version:"),
+		config.GetCommandStyle().Render(version))
 	return nil
 }
 
@@ -76,6 +78,8 @@ func (svc versionCommand) getLatestVersion() error {
 		return err
 	}
 
-	fmt.Println(result.TagName)
+	fmt.Printf("%s %s\n",
+		config.GetInfoStyle().Render("Latest version:"),
+		config.GetCommandStyle().Render(result.TagName))
 	return nil
 }
