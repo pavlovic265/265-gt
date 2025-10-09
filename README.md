@@ -88,7 +88,7 @@ sudo mv gt /usr/local/bin/
 | `add` | - | Stage changes | `gt add` |
 | `unstage` | `us` | Unstage changes | `gt unstage` |
 | `commit` | `cm` | Create commit with message | `gt commit "Add new feature"` |
-| `empty` | `em` | Create empty commit | `gt empty "WIP"` |
+| `commit -e` | `cm -e` | Create empty commit | `gt commit -e "WIP"` |
 
 ### Remote Operations
 
@@ -102,6 +102,7 @@ sudo mv gt /usr/local/bin/
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `pull_request create` | `pr c` | Create a new pull request | `gt pr c` |
+| `pull_request create -d` | `pr c -d` | Create a draft pull request | `gt pr c -d` |
 | `pull_request list` | `pr li` | List all pull requests | `gt pr li` |
 
 ### Configuration
