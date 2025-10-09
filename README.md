@@ -291,7 +291,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## 👨‍💻 Author
 
-**Марко Павловић** - [@pavlovic265](https://github.com/pavlovic265)
+**Марко Павловић (Marko Pavlović)** - [@pavlovic265](https://github.com/pavlovic265)
 
 ## 🙏 Acknowledgments
 
