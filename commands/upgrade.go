@@ -61,7 +61,7 @@ func (svc UpgradeCommand) updateVersionInConfig(repository string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var result struct {
 		TagName string `json:"tag_name"`

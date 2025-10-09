@@ -69,7 +69,8 @@ func shouldCheckVersion() bool {
 
 	// Compare only date (day, month, year), ignore time
 	now := timeutils.Now()
-	lastCheckedDate := time.Date(lastChecked.Year(), lastChecked.Month(), lastChecked.Day(), 0, 0, 0, 0, lastChecked.Location())
+	lastCheckedDate := time.Date(lastChecked.Year(), lastChecked.Month(), lastChecked.Day(),
+		0, 0, 0, 0, lastChecked.Location())
 	currentDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 
 	// Check if it's a different day
@@ -95,7 +96,7 @@ func getLatestGTVersionWithContext(ctx context.Context) (string, string, error) 
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

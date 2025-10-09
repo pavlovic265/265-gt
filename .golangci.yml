@@ -1,0 +1,50 @@
+version: "2"
+run:
+  go: "1.24"
+  allow-parallel-runners: true
+linters:
+  enable:
+    - lll
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - lll
+        source: (Base64 :=)|(SELECT.+FROM)|(INSERT INTO.+VALUES)|(UPDATE.+SET)|(\(r \*mutationResolver\))|(\(r \*queryResolver\))|(= w.Write)
+      - linters:
+          - errcheck
+        source: ^\s+defer.+\)$
+      - linters:
+          - staticcheck
+        text: "QF1003"
+      - linters:
+          - staticcheck
+        text: "QF1007"
+      - linters:
+          - staticcheck
+        text: "QF1008"
+      - linters:
+          - staticcheck
+        text: "ST1005"
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/UnderTechnologies/signup-service/
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

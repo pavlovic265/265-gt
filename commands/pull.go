@@ -33,7 +33,7 @@ func (svc pullCommand) Command() *cobra.Command {
 				return err
 			}
 
-				exeArgs := []string{"pull", "origin", pointer.Deref(currentBranch)}
+			exeArgs := []string{"pull", "origin", pointer.Deref(currentBranch)}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err

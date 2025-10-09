@@ -52,7 +52,7 @@ func (svc listCommand) selectPullRequest(
 		urls = append(urls, pr.URL)
 	}
 
-	var initialCursor int = 0
+	var initialCursor = 0
 	var currentURL string
 	if len(prs) > 0 {
 		currentURL = prs[initialCursor].URL
@@ -87,7 +87,7 @@ func (svc listCommand) selectPullRequest(
 
 				for _, pr := range prs {
 					if prNumber == pr.Number {
-						exec.Command("open", pr.URL).Start()
+						_ = exec.Command("open", pr.URL).Start() // Ignore errors when opening URL
 					}
 				}
 			}

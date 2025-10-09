@@ -36,7 +36,7 @@ func (svc contCommand) Command() *cobra.Command {
 			// This is especially useful when Git opens an editor (like vim) during rebase
 			// that can mess up terminal display settings
 			// Side effects: Resets any custom terminal settings to standard defaults
-			exec.Command("stty", "sane").Run()
+			_ = exec.Command("stty", "sane").Run() // Ignore stty errors as they're not critical
 
 			fmt.Println(config.SuccessIndicator("Rebase continued successfully"))
 			return nil
