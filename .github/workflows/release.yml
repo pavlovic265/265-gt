@@ -52,7 +52,7 @@ jobs:
     - name: Install GoReleaser
       uses: goreleaser/goreleaser-action@v5
       with:
-        version: latest
+        version: v2.0.0
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
