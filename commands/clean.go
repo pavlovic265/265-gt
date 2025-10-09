@@ -9,7 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +53,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	cleanableCount := 0
 	for _, branch := range branches {
-		if branch != utils.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
+		if branch != pointer.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
 			cleanableCount++
 		}
 	}
@@ -70,7 +70,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	deletedCount := 0
 	for _, branch := range branches {
-		if branch == utils.Deref(currentBranch) || helpers.IsProtectedBranch(branch) {
+		if branch == pointer.Deref(currentBranch) || helpers.IsProtectedBranch(branch) {
 			continue
 		}
 

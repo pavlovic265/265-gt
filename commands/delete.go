@@ -9,7 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +38,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 			}
 			if len(args) > 0 {
 				branch := strings.TrimSpace(args[0])
-				if utils.Deref(currentBranch) == branch {
+				if pointer.Deref(currentBranch) == branch {
 					return fmt.Errorf("cant delete branch you are on")
 				}
 				err := svc.deleteBranch(branch)
@@ -52,7 +52,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != utils.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
+					if branch != pointer.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}

@@ -9,7 +9,8 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
+	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -91,14 +92,14 @@ func (svc globalCommand) Command() *cobra.Command {
 
 				globalConfig := config.GlobalConfigStruct{
 					Version: config.Version{
-						LastChecked: utils.Now().Format(utils.LayoutISOWithTime),
+						LastChecked: timeutils.Now().Format(timeutils.LayoutISOWithTime),
 						LastVersion: latestVersion,
 					},
 					Theme: config.Theme{
-						Type: utils.Deref(theme),
+						Type: pointer.Deref(theme),
 					},
 				}
-				if utils.Deref(platform) == config.GitHubPlatform.String() {
+				if pointer.Deref(platform) == config.GitHubPlatform.String() {
 					globalConfig.GitHub = config.GitHub{
 						Accounts: accounts,
 					}

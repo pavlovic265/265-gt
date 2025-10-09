@@ -7,7 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -44,11 +44,11 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
-			if err := helpers.SetParent(svc.exe, utils.Deref(parent), branch); err != nil {
+			if err := helpers.SetParent(svc.exe, pointer.Deref(parent), branch); err != nil {
 				return err
 			}
 
-			if err := svc.setChildrenBranch(utils.Deref(parent), branch); err != nil {
+			if err := svc.setChildrenBranch(pointer.Deref(parent), branch); err != nil {
 				return err
 			}
 

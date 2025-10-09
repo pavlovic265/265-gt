@@ -9,7 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +38,7 @@ func (svc moveCommand) Command() *cobra.Command {
 
 			if len(args) > 0 {
 				parentBranch := args[0]
-				if err := svc.rebaseBranchOnto(parentBranch, utils.Deref(currentBranch)); err != nil {
+				if err := svc.rebaseBranchOnto(parentBranch, pointer.Deref(currentBranch)); err != nil {
 					return err
 				}
 			} else {
@@ -46,7 +46,7 @@ func (svc moveCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				if err := svc.rebaseBranch(utils.Deref(currentBranch), branchs); err != nil {
+				if err := svc.rebaseBranch(pointer.Deref(currentBranch), branchs); err != nil {
 					return err
 				}
 			}

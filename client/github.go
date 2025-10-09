@@ -8,7 +8,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 )
 
 type gitHubCli struct {
@@ -118,7 +118,7 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	if err != nil {
 		return err
 	}
-	parent := helpers.GetParent(svc.exe, utils.Deref(branch))
+	parent := helpers.GetParent(svc.exe, pointer.Deref(branch))
 
 	exeArgs := []string{
 		"pr",

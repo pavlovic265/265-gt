@@ -6,7 +6,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -33,13 +33,13 @@ func (svc pushCommand) Command() *cobra.Command {
 				return err
 			}
 
-			exeArgs := []string{"push", "--force", "origin", utils.Deref(currentBranch)}
+				exeArgs := []string{"push", "--force", "origin", pointer.Deref(currentBranch)}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(config.SuccessIndicator("Branch '" + utils.Deref(currentBranch) + "' pushed successfully"))
+			fmt.Println(config.SuccessIndicator("Branch '" + pointer.Deref(currentBranch) + "' pushed successfully"))
 			return nil
 		},
 	}

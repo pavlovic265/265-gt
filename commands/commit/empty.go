@@ -5,7 +5,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils"
+	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func (svc emptyCommand) Command() *cobra.Command {
 		Aliases: []string{"e"},
 		Short:   "empty new commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			message := "empty commit - " + utils.Now().Format(utils.LayoutUserFriendly)
+			message := "empty commit - " + timeutils.Now().Format(timeutils.LayoutUserFriendly)
 
 			exeArgs := []string{"commit", "--allow-empty", "-m", message}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()

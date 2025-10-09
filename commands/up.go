@@ -8,7 +8,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils"
+	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func (svc upCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			childrenStr := helpers.GetChildren(svc.exe, utils.Deref(branch))
+			childrenStr := helpers.GetChildren(svc.exe, pointer.Deref(branch))
 			children := helpers.UnmarshalChildren(childrenStr)
 
 			if len(children) == 1 {
