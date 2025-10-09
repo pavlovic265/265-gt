@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/config"
 )
 
 func HandleAddProtectedBranch() ([]string, error) {
@@ -42,6 +43,9 @@ func buildTextInput() textinput.Model {
 	pbm.Focus()
 	pbm.CharLimit = 256
 	pbm.Width = 20
+	pbm.Cursor.Style = config.GetSuccessStyle()
+	pbm.PromptStyle = config.GetSuccessStyle()
+	pbm.TextStyle = config.GetSuccessStyle()
 
 	return pbm
 }
@@ -119,15 +123,21 @@ func (pbm protectedBranchModele) View() string {
 	b.WriteString(pbm.branch.View())
 	b.WriteRune('\n')
 
-	doneButton := &DoneButtonBlur
+	doneButton := "[ Done ]"
 	if pbm.focusIndex == 1 {
-		doneButton = &DoneButtonFocus
+		doneButton = config.GetSuccessStyle().Render("[ Done ]")
+	} else {
+		doneButton = config.GetDebugStyle().Render("[ Done ]")
 	}
-	addButton := &AddButtonBlur
+
+	addButton := "[ Add ]"
 	if pbm.focusIndex == 2 {
-		addButton = &AddButtonFocus
+		addButton = config.GetSuccessStyle().Render("[ Add ]")
+	} else {
+		addButton = config.GetDebugStyle().Render("[ Add ]")
 	}
-	fmt.Fprintf(&b, "\n%s  %s\n\n", *doneButton, *addButton)
+
+	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton, addButton)
 
 	return b.String()
 }

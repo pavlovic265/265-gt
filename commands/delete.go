@@ -37,7 +37,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 			}
 			if len(args) > 0 {
 				branch := strings.TrimSpace(args[0])
-				if *currentBranch == branch {
+				if utils.Deref(currentBranch) == branch {
 					return fmt.Errorf("cant delete branch you are on")
 				}
 				err := svc.deleteBranch(branch)
@@ -51,7 +51,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != *currentBranch && !utils.IsProtectedBranch(branch) {
+					if branch != utils.Deref(currentBranch) && !utils.IsProtectedBranch(branch) {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}

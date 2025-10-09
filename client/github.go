@@ -117,7 +117,7 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	if err != nil {
 		return err
 	}
-	parent := utils.GetParent(svc.exe, *branch)
+	parent := utils.GetParent(svc.exe, utils.Deref(branch))
 
 	exeArgs := []string{
 		"pr",

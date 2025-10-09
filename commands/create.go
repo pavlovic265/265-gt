@@ -43,11 +43,11 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
-			if err := utils.SetParent(svc.exe, *parent, branch); err != nil {
+			if err := utils.SetParent(svc.exe, utils.Deref(parent), branch); err != nil {
 				return err
 			}
 
-			if err := svc.setChildrenBranch(*parent, branch); err != nil {
+			if err := svc.setChildrenBranch(utils.Deref(parent), branch); err != nil {
 				return err
 			}
 

@@ -30,7 +30,7 @@ func (svc downCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			parent := utils.GetParent(svc.exe, *branch)
+			parent := utils.GetParent(svc.exe, utils.Deref(branch))
 
 			exeArgs := []string{"checkout", parent}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()

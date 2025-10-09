@@ -16,8 +16,6 @@ type cleanCommand struct {
 	exe executor.Executor
 }
 
-
-
 func NewCleanCommand(
 	exe executor.Executor,
 ) cleanCommand {
@@ -54,7 +52,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	cleanableCount := 0
 	for _, branch := range branches {
-		if branch != *currentBranch && !utils.IsProtectedBranch(branch) {
+		if branch != utils.Deref(currentBranch) && !utils.IsProtectedBranch(branch) {
 			cleanableCount++
 		}
 	}
@@ -65,13 +63,13 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	// Show options once at the top
-			fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", config.InfoStyle.Render("Options:"))
-		fmt.Printf("   %s Default: Yes (press Enter)\n", config.HighlightStyle.Render("💡"))
+	fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", config.InfoStyle.Render("Options:"))
+	fmt.Printf("   %s Default: Yes (press Enter)\n", config.HighlightStyle.Render("💡"))
 	fmt.Println()
 
 	deletedCount := 0
 	for _, branch := range branches {
-		if branch == *currentBranch || utils.IsProtectedBranch(branch) {
+		if branch == utils.Deref(currentBranch) || utils.IsProtectedBranch(branch) {
 			continue
 		}
 
@@ -80,11 +78,11 @@ func (svc cleanCommand) cleanBranches() error {
 			fmt.Printf("%s Error: %v\n", config.ErrorIconOnly(), err)
 			continue
 		}
-		
+
 		if shouldBreak {
 			break
 		}
-		
+
 		deletedCount++
 	}
 
@@ -94,7 +92,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 	parent := utils.GetParent(svc.exe, branch)
-	
+
 	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", config.InfoStyle.Render(branch))
 	if parent != "" {
 		promptMsg += fmt.Sprintf(" (parent: %s)", config.DebugStyle.Render(parent))

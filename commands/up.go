@@ -32,7 +32,7 @@ func (svc upCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			childrenStr := utils.GetChildren(svc.exe, *branch)
+			childrenStr := utils.GetChildren(svc.exe, utils.Deref(branch))
 			children := utils.UnmarshalChildren(childrenStr)
 
 			if len(children) == 1 {

@@ -32,13 +32,13 @@ func (svc pushCommand) Command() *cobra.Command {
 				return err
 			}
 
-			exeArgs := []string{"push", "--force", "origin", *currentBranch}
+			exeArgs := []string{"push", "--force", "origin", utils.Deref(currentBranch)}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(config.SuccessIndicator("Branch '" + *currentBranch + "' pushed successfully"))
+			fmt.Println(config.SuccessIndicator("Branch '" + utils.Deref(currentBranch) + "' pushed successfully"))
 			return nil
 		},
 	}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -55,16 +56,21 @@ func (svc globalCommand) Command() *cobra.Command {
 					return err
 				}
 
+				theme, err := HandleSelectTheme()
+				if err != nil {
+					return err
+				}
+
 				globalConfig := config.GlobalConfigStruct{
 					Version: config.Version{
 						LastChecked: "",
 						LastVersion: "",
 					},
 					Theme: config.Theme{
-						Type: "dark",
+						Type: utils.Deref(theme),
 					},
 				}
-				if *platform == config.GitHubPlatform.String() {
+				if utils.Deref(platform) == config.GitHubPlatform.String() {
 					globalConfig.GitHub = config.GitHub{
 						Accounts: accounts,
 					}

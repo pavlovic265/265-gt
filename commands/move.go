@@ -37,7 +37,7 @@ func (svc moveCommand) Command() *cobra.Command {
 
 			if len(args) > 0 {
 				parentBranch := args[0]
-				if err := svc.rebaseBranchOnto(parentBranch, *currentBranch); err != nil {
+				if err := svc.rebaseBranchOnto(parentBranch, utils.Deref(currentBranch)); err != nil {
 					return err
 				}
 			} else {
@@ -45,7 +45,7 @@ func (svc moveCommand) Command() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				if err := svc.rebaseBranch(*currentBranch, branchs); err != nil {
+				if err := svc.rebaseBranch(utils.Deref(currentBranch), branchs); err != nil {
 					return err
 				}
 			}

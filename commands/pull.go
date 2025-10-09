@@ -32,13 +32,13 @@ func (svc pullCommand) Command() *cobra.Command {
 				return err
 			}
 
-			exeArgs := []string{"pull", "origin", *currentBranch}
+			exeArgs := []string{"pull", "origin", utils.Deref(currentBranch)}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}
 
-			fmt.Println(config.SuccessIndicator("Branch '" + *currentBranch + "' pulled successfully"))
+			fmt.Println(config.SuccessIndicator("Branch '" + utils.Deref(currentBranch) + "' pulled successfully"))
 			return nil
 		},
 	}

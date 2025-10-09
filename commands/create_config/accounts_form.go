@@ -11,17 +11,11 @@ import (
 )
 
 var (
-	focusedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#19F9D8")) // Success color
-	blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#B180D7")) // Debug/Meta color
-	cursorStyle  = focusedStyle
-	noStyle      = lipgloss.NewStyle()
-	helpStyle    = blurredStyle
+	DoneButtonFocus = "[ Done ]"
+	DoneButtonBlur  = "[ Done ]"
 
-	DoneButtonFocus = focusedStyle.Render("[ Done ]")
-	DoneButtonBlur  = blurredStyle.Render("[ Done ]")
-
-	AddButtonFocus = focusedStyle.Render("[ Add ]")
-	AddButtonBlur  = blurredStyle.Render("[ Add ]")
+	AddButtonFocus = "[ Add ]"
+	AddButtonBlur  = "[ Add ]"
 )
 
 type accountsModel struct {
@@ -45,26 +39,26 @@ func newAccountsModel() accountsModel {
 func buildUserInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = cursorStyle
+	t.Cursor.Style = config.GetSuccessStyle()
 
 	t.Placeholder = "User"
 	t.Focus()
 	t.CharLimit = 32
-	t.PromptStyle = focusedStyle
+	t.PromptStyle = config.GetSuccessStyle()
 
-	t.TextStyle = focusedStyle
+	t.TextStyle = config.GetSuccessStyle()
 	return t
 }
 
 func buildTokenInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = cursorStyle
+	t.Cursor.Style = config.GetSuccessStyle()
 
 	t.Placeholder = "Token"
 	t.CharLimit = 128
-	t.PromptStyle = focusedStyle
-	t.TextStyle = focusedStyle
+	t.PromptStyle = config.GetSuccessStyle()
+	t.TextStyle = config.GetSuccessStyle()
 	return t
 }
 
@@ -122,16 +116,21 @@ func (am accountsModel) View() string {
 		}
 	}
 
-	doneButton := &DoneButtonBlur
+	doneButton := DoneButtonBlur
 	if am.focusIndex == len(am.inputs) {
-		doneButton = &DoneButtonFocus
-	}
-	addButton := &AddButtonBlur
-	if am.focusIndex == len(am.inputs)+1 {
-		addButton = &AddButtonFocus
+		doneButton = config.GetSuccessStyle().Render(DoneButtonFocus)
+	} else {
+		doneButton = config.GetDebugStyle().Render(DoneButtonBlur)
 	}
 
-	fmt.Fprintf(&b, "\n\n%s  %s\n\n", *doneButton, *addButton)
+	addButton := AddButtonBlur
+	if am.focusIndex == len(am.inputs)+1 {
+		addButton = config.GetSuccessStyle().Render(AddButtonFocus)
+	} else {
+		addButton = config.GetDebugStyle().Render(AddButtonBlur)
+	}
+
+	fmt.Fprintf(&b, "\n\n%s  %s\n\n", doneButton, addButton)
 
 	return b.String()
 }
@@ -173,14 +172,14 @@ func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 		if i == am.focusIndex {
 			// Set focused state
 			cmds[i] = am.inputs[i].Focus()
-			am.inputs[i].PromptStyle = focusedStyle
-			am.inputs[i].TextStyle = focusedStyle
+			am.inputs[i].PromptStyle = config.GetSuccessStyle()
+			am.inputs[i].TextStyle = config.GetSuccessStyle()
 			continue
 		}
 		// Remove focused state
 		am.inputs[i].Blur()
-		am.inputs[i].PromptStyle = noStyle
-		am.inputs[i].TextStyle = noStyle
+		am.inputs[i].PromptStyle = lipgloss.NewStyle()
+		am.inputs[i].TextStyle = lipgloss.NewStyle()
 	}
 
 	return am, tea.Batch(cmds...)
