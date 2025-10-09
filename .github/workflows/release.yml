@@ -49,10 +49,10 @@ jobs:
     - name: Build
       run: make build
       
-    - name: Install GoReleaser
-      uses: goreleaser/goreleaser-action@v5
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v6
       with:
-        version: v2.0.0
+        version: '~> v2'
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
