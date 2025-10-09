@@ -61,6 +61,39 @@ sudo mv gt /usr/local/bin/
    gt down                     # Move down in branch stack
    ```
 
+## 🔄 Git Pass-Through
+
+**gt** automatically passes unknown commands to git, so you can use any git command through gt:
+
+```bash
+# These all work seamlessly
+gt log --oneline -5
+gt branch --list
+gt diff --name-only
+gt status
+gt add .
+gt commit -m "My commit"
+```
+
+When an unknown command is used, gt will show:
+```
+Unknown command, passing to git: git [command]
+[git output]
+```
+
+This means you can use gt as a drop-in replacement for git while getting the benefits of gt's enhanced commands.
+
+## ⚠️ Known Issues
+
+### Terminal Display Issues with Rebase
+
+When using `gt cont` (which runs `git rebase --continue`), the terminal display may become corrupted if your git editor is set to vim. This is a known issue with vim's terminal handling during rebase operations.
+
+**Automatic Fix:**
+`gt cont` automatically runs `stty sane` after the rebase operation to reset terminal settings and fix display issues. This means you don't need to manually reset your terminal after using `gt cont`.
+
+The issue occurs because vim changes terminal settings during the rebase process and doesn't restore them properly when exiting.
+
 ## 📖 Command Reference
 
 ### Branch Operations
