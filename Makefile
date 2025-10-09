@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run lint lint-fix release patch minor major
+.PHONY: all build clean run lint lint-fix release patch minor major mocks
 
 # Default target, builds the application
 all: build
@@ -100,3 +100,10 @@ minor:
 
 major:
 	@$(MAKE) release bump=major
+
+# Generate mocks for all interfaces
+mocks:
+	@echo "🔧 Generating mocks..."
+	@mkdir -p mocks
+	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@echo "✅ Mocks generated successfully"
