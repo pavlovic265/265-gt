@@ -4,6 +4,12 @@ BINARY_NAME=gt
 # Directory to store the build output
 BUILD_DIR=build
 
+# Load environment variables from .env file if it exists
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
+
 .PHONY: all build clean run
 
 # Default target, builds the application
@@ -13,7 +19,13 @@ all: build
 build:
 	@echo "Building $(BINARY_NAME)..."
 	mkdir -p $(BUILD_DIR)
-	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
+	@if [ -n "$(GT_REPOSITORY)" ]; then \
+		echo "Building with repository: $(GT_REPOSITORY)"; \
+		GT_REPOSITORY=$(GT_REPOSITORY) go build -o $(BUILD_DIR)/$(BINARY_NAME) .; \
+	else \
+		echo "Building with default repository"; \
+		go build -o $(BUILD_DIR)/$(BINARY_NAME) .; \
+	fi
 	@echo "Build complete."
 
 # Run the built binary

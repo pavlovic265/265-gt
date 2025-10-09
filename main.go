@@ -38,6 +38,9 @@ var rootCmd = &cobra.Command{
 
 		config.InitConfig(exe)
 		client.InitCliClient(exe)
+
+		// Check for gt tool updates (run in background to avoid blocking)
+		go utils.CheckGTVersion(exe)
 	},
 }
 
@@ -54,7 +57,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewDeleteCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewCleanCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewVersionCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewUpdateCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewUpgradeCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewDownCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
