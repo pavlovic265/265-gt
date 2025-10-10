@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -109,15 +108,4 @@ func TestShowVersionNotification(t *testing.T) {
 			showVersionNotification(tt.current, tt.latest, tt.url)
 		})
 	}
-}
-
-func TestGetLatestGTVersionWithContext_NetworkRequest(t *testing.T) {
-	ctx := context.Background()
-	// This will likely fail due to network request, but we're testing the setup
-	_, _, err := getLatestGTVersionWithContext(ctx)
-
-	// We expect an error due to network request, but not the environment variable error
-	// Since we removed GT_REPOSITORY dependency, we just check that we get some error
-	// (likely network-related in test environment)
-	_ = err // Acknowledge the error but don't assert on it since it's network-dependent
 }
