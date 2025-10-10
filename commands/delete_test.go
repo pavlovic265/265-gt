@@ -12,7 +12,9 @@ import (
 )
 
 // Test helper to create a delete command with mock executor and git helper
-func createDeleteCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
+func createDeleteCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)

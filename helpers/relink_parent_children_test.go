@@ -13,8 +13,8 @@ func TestRelinkParentChildren(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create mocks
-	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{}
 
 	// Test data
 	parent := "main"
@@ -22,25 +22,45 @@ func TestRelinkParentChildren(t *testing.T) {
 	branch := "feature1"
 	branchChildren := "feature1.1 feature1.2"
 
-	// Set up expectations
-	mockGitHelper.EXPECT().
-		SetParent(mockExecutor, parent, "feature1.1").
-		Return(nil).
+	// Set up expectations for SetParent calls
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(2)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch.feature1.1.parent", "main"}).
+		Return(mockExecutor).
 		Times(1)
 
-	mockGitHelper.EXPECT().
-		SetParent(mockExecutor, parent, "feature1.2").
-		Return(nil).
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch.feature1.2.parent", "main"}).
+		Return(mockExecutor).
 		Times(1)
 
-	mockGitHelper.EXPECT().
-		SetChildren(mockExecutor, parent, "feature2 feature1.1 feature1.2").
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(2)
+
+	// Set up expectations for SetChildren call
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch.main.children", "feature2 feature1.1 feature1.2"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
 		Return(nil).
 		Times(1)
 
 	// Execute the function
-	err := RelinkParentChildren(
-		mockGitHelper,
+	err := gitHelper.RelinkParentChildren(
 		mockExecutor,
 		parent,
 		parentChildren,
@@ -59,8 +79,8 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create mocks
-	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{}
 
 	// Test data with empty parent
 	parent := ""
@@ -71,8 +91,7 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 	// No expectations needed since function should return early
 
 	// Execute the function
-	err := RelinkParentChildren(
-		mockGitHelper,
+	err := gitHelper.RelinkParentChildren(
 		mockExecutor,
 		parent,
 		parentChildren,
@@ -91,8 +110,8 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create mocks
-	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{}
 
 	// Test data
 	parent := "main"
@@ -102,14 +121,23 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 
 	// Set up expectation for error
 	expectedError := errors.New("git config error")
-	mockGitHelper.EXPECT().
-		SetParent(mockExecutor, parent, "feature1.1").
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch.feature1.1.parent", "main"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
 		Return(expectedError).
 		Times(1)
 
 	// Execute the function
-	err := RelinkParentChildren(
-		mockGitHelper,
+	err := gitHelper.RelinkParentChildren(
 		mockExecutor,
 		parent,
 		parentChildren,
@@ -120,5 +148,8 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 	// Assertions
 	if err == nil {
 		t.Error("Expected error, got nil")
+	}
+	if err.Error() != expectedError.Error() {
+		t.Errorf("Expected error '%v', got '%v'", expectedError, err)
 	}
 }

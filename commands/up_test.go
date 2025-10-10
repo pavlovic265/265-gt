@@ -13,7 +13,9 @@ import (
 )
 
 // Test helper to create an up command with mock executor and git helper
-func createUpCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
+func createUpCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)

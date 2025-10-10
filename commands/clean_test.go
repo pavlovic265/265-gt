@@ -11,7 +11,9 @@ import (
 )
 
 // Test helper to create a clean command with mock executor and git helper
-func createCleanCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
+func createCleanCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)

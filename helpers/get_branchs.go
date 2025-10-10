@@ -37,4 +37,3 @@ func (gh *GitHelperImpl) GetBranches(exe executor.Executor) ([]string, error) {
 	}
 	return branches, nil
 }
-

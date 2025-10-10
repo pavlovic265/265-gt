@@ -44,4 +44,3 @@ func (gh *GitHelperImpl) EnsureGitRepository(exe executor.Executor) error {
 	}
 	return nil
 }
-

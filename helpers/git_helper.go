@@ -28,7 +28,9 @@ type GitHelper interface {
 	IsProtectedBranch(branch string) bool
 
 	// Utility functions
-	RelinkParentChildren(exe executor.Executor, parent string, parentChildren string, branch string, branchChildren string) error
+	RelinkParentChildren(
+		exe executor.Executor, parent string, parentChildren string, branch string, branchChildren string,
+	) error
 	UnmarshalChildren(children string) []string
 }
 

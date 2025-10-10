@@ -13,7 +13,9 @@ import (
 )
 
 // Test helper to create a push command with mock executor and git helper
-func createPushCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
+func createPushCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
