@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
@@ -113,18 +112,8 @@ func TestShowVersionNotification(t *testing.T) {
 }
 
 func TestGetLatestGTVersionWithContext_EnvironmentVariable(t *testing.T) {
-	// Save original environment variable
-	originalRepo := os.Getenv("GT_REPOSITORY")
-	defer func() {
-		if originalRepo != "" {
-			os.Setenv("GT_REPOSITORY", originalRepo)
-		} else {
-			os.Unsetenv("GT_REPOSITORY")
-		}
-	}()
-
 	// Test with missing environment variable
-	os.Unsetenv("GT_REPOSITORY")
+	t.Setenv("GT_REPOSITORY", "")
 
 	ctx := context.Background()
 	_, _, err := getLatestGTVersionWithContext(ctx)
@@ -140,18 +129,8 @@ func TestGetLatestGTVersionWithContext_EnvironmentVariable(t *testing.T) {
 }
 
 func TestGetLatestGTVersionWithContext_WithRepository(t *testing.T) {
-	// Save original environment variable
-	originalRepo := os.Getenv("GT_REPOSITORY")
-	defer func() {
-		if originalRepo != "" {
-			os.Setenv("GT_REPOSITORY", originalRepo)
-		} else {
-			os.Unsetenv("GT_REPOSITORY")
-		}
-	}()
-
 	// Set a test repository
-	os.Setenv("GT_REPOSITORY", "testuser/testrepo")
+	t.Setenv("GT_REPOSITORY", "testuser/testrepo")
 
 	ctx := context.Background()
 	// This will likely fail due to network request, but we're testing the setup

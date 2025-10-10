@@ -69,14 +69,28 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 		GetBranches(mockExecutor).
 		Return([]string{"main", "feature-branch", "test-branch"}, nil)
 
-	// Set up expectations for IsProtectedBranch
+	// Set up expectations for IsProtectedBranch - use AnyTimes since it's called in a loop
 	mockGitHelper.EXPECT().
-		IsProtectedBranch("feature-branch").
-		Return(false)
+		IsProtectedBranch(gomock.Any()).
+		Return(false).
+		AnyTimes()
+
+	// Set up expectations for GetParent, GetChildren, and RelinkParentChildren
+	// These are called during the interactive cleanup process
+	mockGitHelper.EXPECT().
+		GetParent(gomock.Any(), gomock.Any()).
+		Return("").
+		AnyTimes()
 
 	mockGitHelper.EXPECT().
-		IsProtectedBranch("test-branch").
-		Return(false)
+		GetChildren(gomock.Any(), gomock.Any()).
+		Return("").
+		AnyTimes()
+
+	mockGitHelper.EXPECT().
+		RelinkParentChildren(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(nil).
+		AnyTimes()
 
 	// Execute the command (this will trigger the interactive selection)
 	err := cmd.RunE(cmd, []string{})

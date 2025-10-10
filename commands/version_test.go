@@ -43,6 +43,9 @@ func TestVersionCommand_RunE_WithLatestFlag(t *testing.T) {
 	_, ctrl, cmd := createVersionCommandWithMock(t)
 	defer ctrl.Finish()
 
+	// Ensure GT_REPOSITORY is not set for this test
+	t.Setenv("GT_REPOSITORY", "")
+
 	// Set the latest flag
 	err := cmd.Flags().Set("latest", "true")
 	require.NoError(t, err)
