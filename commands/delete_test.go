@@ -104,13 +104,14 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 		Run().
 		Return(nil)
 
-	// Set up expectations for RelinkParentChildren
+	// Set up expectations for RelinkParentChildren - SetChildren call
+	// Since branchChildren is empty, the final children string will be empty after filtering
 	mockExecutor.EXPECT().
 		WithGit().
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--unset", "branch.feature-branch.parent"}).
+		WithArgs([]string{"config", "branch.main.children", ""}).
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
@@ -165,6 +166,7 @@ func TestDeleteCommand_RunE_ExecutorError(t *testing.T) {
 
 	expectedError := errors.New("git branch failed")
 
+	// Mock GetCurrentBranchName call
 	mockExecutor.EXPECT().
 		WithGit().
 		Return(mockExecutor)
@@ -177,12 +179,52 @@ func TestDeleteCommand_RunE_ExecutorError(t *testing.T) {
 		RunWithOutput().
 		Return(*bytes.NewBufferString("main\n"), nil)
 
+	// Mock GetParent call
 	mockExecutor.EXPECT().
 		WithGit().
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs(gomock.Any()).
+		WithArgs([]string{"config", "--get", "branch.feature-branch.parent"}).
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		RunWithOutput().
+		Return(*bytes.NewBufferString("main\n"), nil)
+
+	// Mock GetChildren call for parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--get", "branch.main.children"}).
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		RunWithOutput().
+		Return(*bytes.NewBufferString("feature-branch\n"), nil)
+
+	// Mock GetChildren call for branch
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--get", "branch.feature-branch.children"}).
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		RunWithOutput().
+		Return(*bytes.NewBufferString(""), nil)
+
+	// Mock the actual git branch -D command that should fail
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"branch", "-D", "feature-branch"}).
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().

@@ -106,4 +106,5 @@ mocks:
 	@echo "🔧 Generating mocks..."
 	@mkdir -p mocks
 	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "✅ Mocks generated successfully"

@@ -8,7 +8,8 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 )
 
-func IsGitRepository(exe executor.Executor) error {
+// IsGitRepository checks if the current directory is a git repository
+func (gh *GitHelperImpl) IsGitRepository(exe executor.Executor) error {
 	exeArgs := []string{"rev-parse", "--git-dir"}
 	_, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
@@ -17,7 +18,8 @@ func IsGitRepository(exe executor.Executor) error {
 	return nil
 }
 
-func GetGitRoot(exe executor.Executor) (string, error) {
+// GetGitRoot gets the root directory of the git repository
+func (gh *GitHelperImpl) GetGitRoot(exe executor.Executor) (string, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
@@ -26,8 +28,9 @@ func GetGitRoot(exe executor.Executor) (string, error) {
 	return strings.TrimSpace(output.String()), nil
 }
 
-func EnsureGitRepository(exe executor.Executor) error {
-	err := IsGitRepository(exe)
+// EnsureGitRepository ensures the current directory is a git repository
+func (gh *GitHelperImpl) EnsureGitRepository(exe executor.Executor) error {
+	err := gh.IsGitRepository(exe)
 	if err != nil {
 		currentDir, _ := os.Getwd()
 		return fmt.Errorf("❌ No git repository found\n\n"+
@@ -41,3 +44,4 @@ func EnsureGitRepository(exe executor.Executor) error {
 	}
 	return nil
 }
+
