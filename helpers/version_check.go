@@ -36,8 +36,11 @@ func CheckGTVersion(exe executor.Executor) {
 	}
 
 	storedVersion := config.Config.GlobalConfig.Version.LastVersion
-	if err := config.UpdateLastChecked(); err != nil {
-		return // Silently fail if we can't update last checked
+	// Only update the config if it exists (to avoid overwriting GitHub accounts)
+	if config.HasValidConfig() {
+		if err := config.UpdateLastChecked(); err != nil {
+			return // Silently fail if we can't update last checked
+		}
 	}
 
 	// If no version is stored, show notification to upgrade

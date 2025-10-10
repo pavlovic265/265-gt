@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/timeutils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -62,6 +62,17 @@ func InitConfig(exe executor.Executor) {
 		GlobalConfig: globalConfig,
 		LocalConfig:  localConfig,
 	}
+}
+
+// HasValidConfig returns true if the config was successfully loaded from disk
+func HasValidConfig() bool {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return false
+	}
+	configPath := filepath.Join(homeDir, FileName)
+	_, err = os.Stat(configPath)
+	return err == nil
 }
 
 func loadGlobalConfig() (GlobalConfigStruct, error) {
@@ -126,7 +137,7 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 	return lconf, nil
 }
 
-func saveGlobalConfig() error {
+func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -142,7 +153,8 @@ func saveGlobalConfig() error {
 	defer func() { _ = file.Close() }()
 
 	encoder := yaml.NewEncoder(file)
-	if err := encoder.Encode(Config.GlobalConfig); err != nil {
+	encoder.SetIndent(2)
+	if err := encoder.Encode(configToSave); err != nil {
 		_ = file.Close()
 		_ = os.Remove(tempPath)
 		return fmt.Errorf("failed to encode config file: %w", err)
@@ -158,16 +170,14 @@ func saveGlobalConfig() error {
 }
 
 func UpdateLastChecked() error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).
-		Format("2006-01-02T15:04:05.000000Z")
+	Config.GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 
-	return saveGlobalConfig()
+	return saveGlobalConfig(Config.GlobalConfig)
 }
 
 func UpdateVersion(version string) error {
-	Config.GlobalConfig.Version.LastChecked = time.Now().UTC().Truncate(time.Microsecond).
-		Format("2006-01-02T15:04:05.000000Z")
+	Config.GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 	Config.GlobalConfig.Version.LastVersion = version
 
-	return saveGlobalConfig()
+	return saveGlobalConfig(Config.GlobalConfig)
 }
