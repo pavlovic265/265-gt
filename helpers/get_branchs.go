@@ -6,7 +6,8 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 )
 
-func GetCurrentBranchName(exe executor.Executor) (*string, error) {
+// GetCurrentBranchName gets the current branch name
+func (gh *GitHelperImpl) GetCurrentBranchName(exe executor.Executor) (*string, error) {
 	exeArgs := []string{"rev-parse", "--abbrev-ref", "HEAD"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
@@ -18,7 +19,8 @@ func GetCurrentBranchName(exe executor.Executor) (*string, error) {
 	return &currentBranch, nil
 }
 
-func GetBranches(exe executor.Executor) ([]string, error) {
+// GetBranches gets all local branches
+func (gh *GitHelperImpl) GetBranches(exe executor.Executor) ([]string, error) {
 	exeArgs := []string{"branch", "--list"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {

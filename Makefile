@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run lint lint-fix release patch minor major
+.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks
 
 # Default target, builds the application
 all: build
@@ -50,6 +50,18 @@ lint-fix:
 	@echo "Running golangci-lint with auto-fix..."
 	golangci-lint run --fix
 	@echo "Linting with auto-fix complete."
+
+# Run all tests
+test:
+	@echo "Running all tests..."
+	go test ./...
+	@echo "Tests complete."
+
+# Run all tests with verbose output
+test-verbose:
+	@echo "Running all tests with verbose output..."
+	go test -v ./...
+	@echo "Tests complete."
 
 release: build
 	@echo "🔍 Fetching latest version from repository..."
@@ -100,3 +112,11 @@ minor:
 
 major:
 	@$(MAKE) release bump=major
+
+# Generate mocks for all interfaces
+mocks:
+	@echo "🔧 Generating mocks..."
+	@mkdir -p mocks
+	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@echo "✅ Mocks generated successfully"

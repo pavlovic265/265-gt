@@ -14,14 +14,17 @@ import (
 )
 
 type deleteCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewDeleteCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) deleteCommand {
 	return deleteCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -32,7 +35,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 		Short:              "delete branch",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
@@ -46,13 +49,13 @@ func (svc deleteCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := helpers.GetBranches(svc.exe)
+				branches, err := svc.gitHelper.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != pointer.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
+					if branch != pointer.Deref(currentBranch) && !svc.gitHelper.IsProtectedBranch(branch) {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}
@@ -66,9 +69,9 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
-	parent := helpers.GetParent(svc.exe, branch)
-	parentChildren := helpers.GetChildren(svc.exe, parent)
-	branchChildren := helpers.GetChildren(svc.exe, branch)
+	parent := svc.gitHelper.GetParent(svc.exe, branch)
+	parentChildren := svc.gitHelper.GetChildren(svc.exe, parent)
+	branchChildren := svc.gitHelper.GetChildren(svc.exe, branch)
 
 	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
@@ -76,7 +79,7 @@ func (svc deleteCommand) deleteBranch(
 		return err
 	}
 
-	err = helpers.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+	err = svc.gitHelper.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
 	if err != nil {
 		return err
 	}

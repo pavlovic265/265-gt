@@ -12,11 +12,15 @@ import (
 )
 
 type gitHubCli struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewGitHubCli(exe executor.Executor) CliClient {
-	return &gitHubCli{exe: exe}
+	return &gitHubCli{
+		exe:       exe,
+		gitHelper: helpers.NewGitHelper(),
+	}
 }
 
 func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
@@ -43,8 +47,8 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 				}
 			}
 
-			accoutns := config.Config.GlobalConfig.GitHub.Accounts
-			for _, acc := range accoutns {
+			accounts := config.Config.GlobalConfig.GitHub.Accounts
+			for _, acc := range accounts {
 				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
 				}
@@ -66,9 +70,9 @@ func (svc gitHubCli) AuthStatus() error {
 }
 
 func (svc gitHubCli) AuthLogin(user string) error {
-	accoutns := config.Config.GlobalConfig.GitHub.Accounts
+	accounts := config.Config.GlobalConfig.GitHub.Accounts
 	var token string
-	for _, acc := range accoutns {
+	for _, acc := range accounts {
 		if acc.User == user {
 			token = acc.Token
 			break
@@ -86,9 +90,9 @@ func (svc gitHubCli) AuthLogin(user string) error {
 }
 
 func (svc gitHubCli) AuthLogout(user string) error {
-	accoutns := config.Config.GlobalConfig.GitHub.Accounts
+	accounts := config.Config.GlobalConfig.GitHub.Accounts
 	foundUser := false
-	for _, acc := range accoutns {
+	for _, acc := range accounts {
 		if acc.User == user {
 			foundUser = true
 			break
@@ -114,11 +118,11 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	branch, err := helpers.GetCurrentBranchName(svc.exe)
+	branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 	if err != nil {
 		return err
 	}
-	parent := helpers.GetParent(svc.exe, pointer.Deref(branch))
+	parent := svc.gitHelper.GetParent(svc.exe, pointer.Deref(branch))
 
 	exeArgs := []string{
 		"pr",

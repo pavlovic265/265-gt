@@ -13,14 +13,17 @@ import (
 )
 
 type upCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewUpCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) upCommand {
 	return upCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -29,12 +32,12 @@ func (svc upCommand) Command() *cobra.Command {
 		Use:   "up",
 		Short: "move to brunch up in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := helpers.GetCurrentBranchName(svc.exe)
+			branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
-			childrenStr := helpers.GetChildren(svc.exe, pointer.Deref(branch))
-			children := helpers.UnmarshalChildren(childrenStr)
+			childrenStr := svc.gitHelper.GetChildren(svc.exe, pointer.Deref(branch))
+			children := svc.gitHelper.UnmarshalChildren(childrenStr)
 
 			if len(children) == 1 {
 				err := svc.checkoutBranch(children[0])

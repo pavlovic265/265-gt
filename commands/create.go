@@ -12,14 +12,17 @@ import (
 )
 
 type createCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewCreateCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) createCommand {
 	return createCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -33,7 +36,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return fmt.Errorf("missing branch name")
 			}
 			branch := args[0]
-			parent, err := helpers.GetCurrentBranchName(svc.exe)
+			parent, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
@@ -44,7 +47,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return err
 			}
 
-			if err := helpers.SetParent(svc.exe, pointer.Deref(parent), branch); err != nil {
+			if err := svc.gitHelper.SetParent(svc.exe, pointer.Deref(parent), branch); err != nil {
 				return err
 			}
 
@@ -59,13 +62,13 @@ func (svc createCommand) Command() *cobra.Command {
 }
 
 func (svc createCommand) setChildrenBranch(parent, child string) error {
-	children := helpers.GetChildren(svc.exe, parent)
+	children := svc.gitHelper.GetChildren(svc.exe, parent)
 
 	splitedChildren := strings.Split(children, " ")
 	splitedChildren = append(splitedChildren, child)
 	joinedChildren := strings.TrimSpace(strings.Join(splitedChildren, " "))
 
-	if err := helpers.SetChildren(svc.exe, parent, joinedChildren); err != nil {
+	if err := svc.gitHelper.SetChildren(svc.exe, parent, joinedChildren); err != nil {
 		return err
 	}
 

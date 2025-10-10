@@ -11,14 +11,17 @@ import (
 )
 
 type pullCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewPullCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) pullCommand {
 	return pullCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -28,7 +31,7 @@ func (svc pullCommand) Command() *cobra.Command {
 		Aliases: []string{"pl"},
 		Short:   "pull branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
