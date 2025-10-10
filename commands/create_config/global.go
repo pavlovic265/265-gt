@@ -1,11 +1,12 @@
 package createconfig
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -20,23 +21,25 @@ type globalCommand struct {
 }
 
 func (gc globalCommand) getLatestVersion() (string, error) {
-	output, err := gc.exe.WithName("gt").WithArgs([]string{"version", "-l"}).RunWithOutput()
+	// Try to get latest version directly from GitHub API instead of calling gt version -l
+	// This avoids circular dependency issues during fresh installs
+	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
+
+	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 
-	// Parse the output to extract just the version
-	lines := strings.Split(strings.TrimSpace(output.String()), "\n")
-	for _, line := range lines {
-		if strings.Contains(line, "Latest version:") {
-			parts := strings.Split(line, ":")
-			if len(parts) >= 2 {
-				return strings.TrimSpace(parts[1]), nil
-			}
-		}
+	var result struct {
+		TagName string `json:"tag_name"`
 	}
 
-	return "", fmt.Errorf("could not parse version from output")
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	return result.TagName, nil
 }
 
 func NewGlobalCommand(

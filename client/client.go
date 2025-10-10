@@ -2,11 +2,9 @@ package client
 
 import (
 	"bytes"
-	"fmt"
 	"os/exec"
 	"strings"
 
-	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 )
 
@@ -21,9 +19,20 @@ type CliClient interface {
 var GlobalClient CliClient
 
 func InitCliClient(exe executor.Executor) {
+	InitCliClientWithGit(exe, true)
+}
+
+func InitCliClientWithGit(exe executor.Executor, requireGit bool) {
+	if !requireGit {
+		// For commands that don't need git (like version), skip client initialization
+		return
+	}
+
 	remoteOrigin, err := getGitRemoteOrigin()
 	if err != nil {
-		fmt.Println(config.WarningStyle.Render("! Warning: No remote origin found. Some features may be limited."))
+		// For auth commands, we still want to initialize a client even without git
+		// Default to GitHub client for auth operations
+		GlobalClient = NewGitHubCli(exe)
 		return
 	}
 

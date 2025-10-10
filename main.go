@@ -33,9 +33,15 @@ var rootCmd = &cobra.Command{
 		isVersion := cmd.Name() == "version"
 		isCompletion := cmd.Name() == "completion"
 
-		if isVersion || isCompletion || isConfig || isAuth {
-			config.InitConfig(exe)
-			client.InitCliClient(exe)
+		if isVersion || isCompletion || isConfig {
+			config.InitConfigWithLocal(exe, false)  // Don't load local config for these commands
+			client.InitCliClientWithGit(exe, false) // Don't require git for these commands
+			return
+		}
+
+		if isAuth {
+			config.InitConfigWithLocal(exe, false) // Don't load local config for auth commands
+			client.InitCliClientWithGit(exe, true) // Auth commands need client but can work without git
 			return
 		}
 

@@ -48,16 +48,27 @@ type ConfigStruct struct {
 var Config ConfigStruct
 
 func InitConfig(exe executor.Executor) {
+	InitConfigWithLocal(exe, true)
+}
+
+func InitConfigWithLocal(exe executor.Executor, loadLocal bool) {
 	globalConfig, err := loadGlobalConfig()
 	if err != nil {
-		fmt.Println("globalConfig", err)
+		fmt.Printf("Warning: Failed to load global config: %v\n", err)
+		// Use empty config as fallback, but don't overwrite existing config
 		globalConfig = GlobalConfigStruct{}
 	}
-	localConfig, err := loadLocalConfig(exe)
-	if err != nil {
-		fmt.Println("localConfig", err)
-		localConfig = LocalConfigStruct{}
+
+	var localConfig LocalConfigStruct
+	if loadLocal {
+		var err error
+		localConfig, err = loadLocalConfig(exe)
+		if err != nil {
+			fmt.Printf("Warning: Failed to load local config: %v\n", err)
+			localConfig = LocalConfigStruct{}
+		}
 	}
+
 	Config = ConfigStruct{
 		GlobalConfig: globalConfig,
 		LocalConfig:  localConfig,
@@ -80,7 +91,7 @@ func loadGlobalConfig() (GlobalConfigStruct, error) {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return gconf, err
+		return gconf, fmt.Errorf("failed to get home directory: %w", err)
 	}
 
 	configPath := filepath.Join(homeDir, FileName)
@@ -88,11 +99,16 @@ func loadGlobalConfig() (GlobalConfigStruct, error) {
 	if errors.Is(err, os.ErrNotExist) {
 		return gconf, nil
 	}
+	if err != nil {
+		return gconf, fmt.Errorf("failed to stat config file: %w", err)
+	}
+
 	file, err := os.Open(configPath)
 	if err != nil {
 		return gconf, fmt.Errorf("failed to open config file: %w", err)
 	}
 	defer func() { _ = file.Close() }()
+
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&gconf); err != nil {
 		return gconf, fmt.Errorf("failed to decode config file: %w", err)
@@ -145,9 +161,22 @@ func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 
 	configPath := filepath.Join(homeDir, FileName)
 	tempPath := configPath + ".tmp"
+	backupPath := configPath + ".backup"
+
+	// Create backup of existing config if it exists
+	if _, err := os.Stat(configPath); err == nil {
+		if err := os.Rename(configPath, backupPath); err != nil {
+			// If backup fails, continue anyway - not critical
+			fmt.Printf("Warning: Failed to create backup: %v\n", err)
+		}
+	}
 
 	file, err := os.Create(tempPath)
 	if err != nil {
+		// Restore backup if temp file creation fails
+		if _, statErr := os.Stat(backupPath); statErr == nil {
+			os.Rename(backupPath, configPath)
+		}
 		return fmt.Errorf("failed to create temp config file: %w", err)
 	}
 	defer func() { _ = file.Close() }()
@@ -157,14 +186,25 @@ func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 	if err := encoder.Encode(configToSave); err != nil {
 		_ = file.Close()
 		_ = os.Remove(tempPath)
+		// Restore backup if encoding fails
+		if _, statErr := os.Stat(backupPath); statErr == nil {
+			os.Rename(backupPath, configPath)
+		}
 		return fmt.Errorf("failed to encode config file: %w", err)
 	}
 	_ = file.Close()
 
 	if err := os.Rename(tempPath, configPath); err != nil {
 		_ = os.Remove(tempPath)
+		// Restore backup if rename fails
+		if _, statErr := os.Stat(backupPath); statErr == nil {
+			os.Rename(backupPath, configPath)
+		}
 		return fmt.Errorf("failed to save config file: %w", err)
 	}
+
+	// Remove backup after successful save
+	os.Remove(backupPath)
 
 	return nil
 }
