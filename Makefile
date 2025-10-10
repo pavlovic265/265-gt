@@ -65,7 +65,7 @@ test-verbose:
 
 release: build
 	@echo "🔍 Fetching latest version from repository..."
-	@LATEST_TAG=$$(./$(BUILD_DIR)/$(BINARY_NAME) version -l 2>/dev/null || echo "v0.0.0"); \
+	@LATEST_TAG=$$(./$(BUILD_DIR)/$(BINARY_NAME) version -l 2>/dev/null | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+' || echo "v0.0.0"); \
 	echo "📋 Current version: $$LATEST_TAG"; \
 	VERSION=$$(echo $$LATEST_TAG | sed 's/v//'); \
 	MAJOR=$$(echo $$VERSION | cut -d. -f1); \
