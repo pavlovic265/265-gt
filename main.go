@@ -28,20 +28,16 @@ const UNKNOWN_COMMAND_ERROR = "unknown command"
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		client.InitCliClient(exe)
+
 		isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
 		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
 		isVersion := cmd.Name() == "version"
 		isCompletion := cmd.Name() == "completion"
 
-		if isVersion || isCompletion || isConfig {
-			config.InitConfigWithLocal(exe, false)  // Don't load local config for these commands
-			client.InitCliClientWithGit(exe, false) // Don't require git for these commands
-			return
-		}
-
-		if isAuth {
-			config.InitConfigWithLocal(exe, false) // Don't load local config for auth commands
-			client.InitCliClientWithGit(exe, true) // Auth commands need client but can work without git
+		loadLocalConfig := false
+		if isVersion || isCompletion || isConfig || isAuth {
+			config.InitConfig(exe, loadLocalConfig) // Don't load local config for these commands
 			return
 		}
 
@@ -50,9 +46,9 @@ var rootCmd = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		loadLocalConfig = true
 
-		config.InitConfig(exe)
-		client.InitCliClient(exe)
+		config.InitConfig(exe, loadLocalConfig) // Load local config for these commands
 
 		helpers.CheckGTVersion(exe)
 	},

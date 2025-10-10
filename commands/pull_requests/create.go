@@ -32,7 +32,12 @@ func (svc createCommand) Command() *cobra.Command {
 			if draft {
 				args = append([]string{"--draft"}, args...)
 			}
-			err := client.GlobalClient.CreatePullRequest(args)
+			account := config.GetActiveAccount()
+			if account == nil {
+				return fmt.Errorf("no active account found")
+			}
+
+			err := client.Client[account.Platform].CreatePullRequest(args)
 			if err != nil {
 				return err
 			}

@@ -7,6 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -43,28 +44,34 @@ func (svc switchCommand) Command() *cobra.Command {
 }
 
 func (svc switchCommand) switchUser(user string) error {
-	var existUser bool
-	accounts := config.Config.GlobalConfig.GitHub.Accounts
+	accounts := config.GlobalConfig.Accounts
+	var account *config.Account
 	for _, acc := range accounts {
 		if user == acc.User {
-			existUser = true
+			account = pointer.From(acc)
 			break
 		}
 	}
-	if !existUser {
+	if account == nil {
 		return fmt.Errorf("user (%s) does not exits in config", user)
 	}
 
-	exeArgs := []string{"auth", "switch", "--user", user}
+	exeArgs := []string{"auth", "switch", "--user", account.User}
 	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
+
+	err = config.SetActiveAccount(pointer.Deref(account))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (svc switchCommand) selectAndswitchUser() error {
-	accounts := config.Config.GlobalConfig.GitHub.Accounts
+	accounts := config.GlobalConfig.Accounts
 	var users []string
 	for _, acc := range accounts {
 		users = append(users, acc.User)

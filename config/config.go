@@ -8,17 +8,15 @@ import (
 	"strings"
 
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
 	"gopkg.in/yaml.v3"
 )
 
 type Account struct {
-	User  string `yaml:"user"`
-	Token string `yaml:"token"`
-}
-
-type GitHub struct {
-	Accounts []Account `yaml:"accounts"`
+	User     string   `yaml:"user"`
+	Token    string   `yaml:"token"`
+	Platform Platform `yaml:"platform"`
 }
 
 type Version struct {
@@ -31,27 +29,22 @@ type Theme struct {
 }
 
 type GlobalConfigStruct struct {
-	GitHub  GitHub  `yaml:"github"`
-	Version Version `yaml:"version"`
-	Theme   Theme   `yaml:"theme"`
+	Accounts      []Account `yaml:"accounts"`
+	ActiveAccount *Account  `yaml:"active_account,omitempty"`
+	Version       Version   `yaml:"version"`
+	Theme         Theme     `yaml:"theme"`
 }
 
 type LocalConfigStruct struct {
 	Protected []string `yaml:"protected"`
 }
 
-type ConfigStruct struct {
+var (
 	LocalConfig  LocalConfigStruct
 	GlobalConfig GlobalConfigStruct
-}
+)
 
-var Config ConfigStruct
-
-func InitConfig(exe executor.Executor) {
-	InitConfigWithLocal(exe, true)
-}
-
-func InitConfigWithLocal(exe executor.Executor, loadLocal bool) {
+func InitConfig(exe executor.Executor, loadLocal bool) {
 	globalConfig, err := loadGlobalConfig()
 	if err != nil {
 		fmt.Printf("Warning: Failed to load global config: %v\n", err)
@@ -69,62 +62,129 @@ func InitConfigWithLocal(exe executor.Executor, loadLocal bool) {
 		}
 	}
 
-	Config = ConfigStruct{
-		GlobalConfig: globalConfig,
-		LocalConfig:  localConfig,
-	}
-}
-
-// HasValidConfig returns true if the config was successfully loaded from disk
-func HasValidConfig() bool {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return false
-	}
-	configPath := filepath.Join(homeDir, FileName)
-	_, err = os.Stat(configPath)
-	return err == nil
+	GlobalConfig = globalConfig
+	LocalConfig = localConfig
 }
 
 func loadGlobalConfig() (GlobalConfigStruct, error) {
-	gconf := GlobalConfigStruct{}
+	configPath, err := GetGlobalConfigPath()
+	if err != nil {
+		return GlobalConfigStruct{}, err
+	}
+	gconf, err := readConfig[GlobalConfigStruct](configPath)
+	if err != nil {
+		return GlobalConfigStruct{}, err
+	}
 
+	return pointer.Deref(gconf), nil
+}
+
+func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
+
+	configPath, err := getLocalConfigPath(exe)
+	if err != nil {
+		return LocalConfigStruct{}, err
+	}
+
+	lconf, err := readConfig[LocalConfigStruct](configPath)
+	if err != nil {
+		return LocalConfigStruct{}, err
+	}
+
+	return pointer.Deref(lconf), nil
+}
+
+func SaveConfig[T any](configPath string, configToSave T) error {
+	err := writeConfig(configPath, &configToSave)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateLastChecked() error {
+	configPath, err := GetGlobalConfigPath()
+	if err != nil {
+		return err
+	}
+
+	GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+
+	return SaveConfig(configPath, GlobalConfig)
+}
+
+func UpdateVersion(version string) error {
+	configPath, err := GetGlobalConfigPath()
+	if err != nil {
+		return err
+	}
+
+	GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+	GlobalConfig.Version.LastVersion = version
+
+	return SaveConfig(configPath, GlobalConfig)
+}
+
+func UpdateActiveAccount(account Account) error {
+	configPath, err := GetGlobalConfigPath()
+	if err != nil {
+		return err
+	}
+
+	GlobalConfig.ActiveAccount = &account
+
+	return SaveConfig(configPath, GlobalConfig)
+}
+
+func readConfig[T any](filename string) (*T, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	var cfg T
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal YAML: %w", err)
+	}
+
+	return &cfg, nil
+}
+
+func writeConfig[T any](filename string, cfg *T) error {
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to marshal YAML: %w", err)
+	}
+
+	// Secure file writing — ensure permissions are restrictive (rw for owner only)
+	return os.WriteFile(filename, data, 0600)
+}
+
+func GetGlobalConfigPath() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return gconf, fmt.Errorf("failed to get home directory: %w", err)
+		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 
 	configPath := filepath.Join(homeDir, FileName)
 	_, err = os.Stat(configPath)
 	if errors.Is(err, os.ErrNotExist) {
-		return gconf, nil
+		return "", fmt.Errorf("config file does not exist: %w", err)
 	}
 	if err != nil {
-		return gconf, fmt.Errorf("failed to stat config file: %w", err)
+		return "", fmt.Errorf("failed to stat config file: %w", err)
 	}
-
-	file, err := os.Open(configPath)
-	if err != nil {
-		return gconf, fmt.Errorf("failed to open config file: %w", err)
-	}
-	defer func() { _ = file.Close() }()
-
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&gconf); err != nil {
-		return gconf, fmt.Errorf("failed to decode config file: %w", err)
-	}
-
-	return gconf, nil
+	return configPath, nil
 }
 
-func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
-	lconf := LocalConfigStruct{}
+func getLocalConfigPath(exe executor.Executor) (string, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		// This should not happen since we already checked for git repository in main.go
 		// But handle gracefully just in case
-		return lconf, nil
+		return "", nil
 	}
 
 	localConfig := strings.TrimSpace(output.String())
@@ -133,100 +193,36 @@ func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
 
 	_, err = os.Stat(configPath)
 	if errors.Is(err, os.ErrNotExist) {
-		return lconf, nil
+		return "", nil
 	}
 
-	file, err := os.Open(configPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return lconf, nil
-		}
-		return lconf, err
-	}
-	defer func() { _ = file.Close() }()
-
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&lconf); err != nil {
-		return lconf, fmt.Errorf("failed to decode config file: %w", err)
-	}
-
-	return lconf, nil
+	return configPath, nil
 }
 
-func saveGlobalConfig(configToSave GlobalConfigStruct) error {
-	homeDir, err := os.UserHomeDir()
+func SetActiveAccount(account Account) error {
+	configPath, err := GetGlobalConfigPath()
 	if err != nil {
 		return err
 	}
 
-	configPath := filepath.Join(homeDir, FileName)
-	tempPath := configPath + ".tmp"
-	backupPath := configPath + ".backup"
+	GlobalConfig.ActiveAccount = &account
+	return SaveConfig(configPath, GlobalConfig)
+}
 
-	// Create backup of existing config if it exists
-	if _, err := os.Stat(configPath); err == nil {
-		if err := os.Rename(configPath, backupPath); err != nil {
-			// If backup fails, continue anyway - not critical
-			fmt.Printf("Warning: Failed to create backup: %v\n", err)
-		}
-	}
+func GetActiveAccount() *Account {
+	return GlobalConfig.ActiveAccount
+}
 
-	file, err := os.Create(tempPath)
+func ClearActiveAccount() error {
+	configPath, err := GetGlobalConfigPath()
 	if err != nil {
-		// Restore backup if temp file creation fails
-		if _, statErr := os.Stat(backupPath); statErr == nil {
-			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
-				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
-			}
-		}
-		return fmt.Errorf("failed to create temp config file: %w", err)
-	}
-	defer func() { _ = file.Close() }()
-
-	encoder := yaml.NewEncoder(file)
-	encoder.SetIndent(2)
-	if err := encoder.Encode(configToSave); err != nil {
-		_ = file.Close()
-		_ = os.Remove(tempPath)
-		// Restore backup if encoding fails
-		if _, statErr := os.Stat(backupPath); statErr == nil {
-			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
-				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
-			}
-		}
-		return fmt.Errorf("failed to encode config file: %w", err)
-	}
-	_ = file.Close()
-
-	if err := os.Rename(tempPath, configPath); err != nil {
-		_ = os.Remove(tempPath)
-		// Restore backup if rename fails
-		if _, statErr := os.Stat(backupPath); statErr == nil {
-			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
-				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
-			}
-		}
-		return fmt.Errorf("failed to save config file: %w", err)
+		return err
 	}
 
-	// Remove backup after successful save
-	if err := os.Remove(backupPath); err != nil {
-		// Not critical if backup removal fails
-		fmt.Printf("Warning: Failed to remove backup file: %v\n", err)
-	}
-
-	return nil
+	GlobalConfig.ActiveAccount = nil
+	return SaveConfig(configPath, GlobalConfig)
 }
 
-func UpdateLastChecked() error {
-	Config.GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-
-	return saveGlobalConfig(Config.GlobalConfig)
-}
-
-func UpdateVersion(version string) error {
-	Config.GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-	Config.GlobalConfig.Version.LastVersion = version
-
-	return saveGlobalConfig(Config.GlobalConfig)
+func HasActiveAccount() bool {
+	return GlobalConfig.ActiveAccount != nil
 }

@@ -177,11 +177,30 @@ The issue occurs because vim changes terminal settings during the rebase process
 gt config global
 ```
 This will guide you through setting up:
-- Default Git platform (GitHub/GitLab)
-- API tokens
+- Multiple Git platform accounts (GitHub/GitLab)
+- API tokens for each account
+- Active account selection
 - Default branch naming conventions
 - Protected branches
 - Theme preferences (dark/light)
+
+The configuration supports multiple accounts with automatic active account management:
+```yaml
+# ~/.gtconfig.yaml
+accounts:
+  - user: "username1"
+    token: "ghp_..."
+    platform: "GitHub"
+  - user: "username2" 
+    token: "glpat-..."
+    platform: "GitLab"
+active_account:  # Automatically managed
+  user: "username1"
+  token: "ghp_..."
+  platform: "GitHub"
+theme:
+  type: "dark"
+```
 
 ### Local Configuration
 ```bash
@@ -202,11 +221,12 @@ theme:
 ```
 
 **Panda Syntax Colors:**
-- 🟢 **Success**: `#A9DC52` (Green)
-- 🔴 **Error**: `#FF6188` (Red)
-- 🟡 **Warning**: `#FFD866` (Yellow)
-- 🔵 **Info**: `#78DCE8` (Blue)
-- 🟣 **Debug**: `#AB9DF2` (Purple)
+- 🟢 **Success**: `#A9DC52` (Green) / `#2D5016` (Dark Green - Light Theme)
+- 🔴 **Error**: `#FF6188` (Red) / `#8B1538` (Dark Red - Light Theme)
+- 🟡 **Warning**: `#FFD866` (Yellow) / `#B8860B` (Dark Orange - Light Theme)
+- 🔵 **Info**: `#78DCE8` (Blue) / `#1E3A8A` (Dark Blue - Light Theme)
+- 🟣 **Debug**: `#AB9DF2` (Purple) / `#6B46C1` (Dark Purple - Light Theme)
+- 🟡 **Highlight**: `#FFD866` (Yellow) / `#B8860B` (Dark Yellow - Light Theme)
 
 ## 🎨 Usage Examples
 
@@ -303,6 +323,10 @@ gt auth switch
 
 # Check current auth status
 gt auth status
+
+# The tool automatically manages an active account
+# When you switch accounts, the active account is updated
+# All operations use the currently active account
 ```
 
 ## 🚧 Planned Features

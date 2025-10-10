@@ -10,9 +10,9 @@ import (
 
 func TestShouldCheckVersion(t *testing.T) {
 	// Save original config
-	originalConfig := config.Config
+	originalGlobalConfig := config.GlobalConfig
 	defer func() {
-		config.Config = originalConfig
+		config.GlobalConfig = originalGlobalConfig
 	}()
 
 	tests := []struct {
@@ -56,11 +56,9 @@ func TestShouldCheckVersion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set up test config
-			config.Config = config.ConfigStruct{
-				GlobalConfig: config.GlobalConfigStruct{
-					Version: config.Version{
-						LastChecked: tt.lastChecked,
-					},
+			config.GlobalConfig = config.GlobalConfigStruct{
+				Version: config.Version{
+					LastChecked: tt.lastChecked,
 				},
 			}
 

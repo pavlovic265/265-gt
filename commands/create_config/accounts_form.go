@@ -19,9 +19,11 @@ var (
 )
 
 type accountsModel struct {
-	focusIndex int
-	inputs     []textinput.Model
-	accounts   []config.Account
+	focusIndex    int
+	inputs        []textinput.Model
+	accounts      []config.Account
+	platform      config.Platform
+	platformIndex int
 }
 
 func newAccountsModel() accountsModel {
@@ -32,6 +34,8 @@ func newAccountsModel() accountsModel {
 	accountsModel.inputs[0] = buildUserInput()
 	accountsModel.inputs[1] = buildTokenInput()
 	accountsModel.focusIndex = 0
+	accountsModel.platform = config.GitHubPlatform // Default to GitHub
+	accountsModel.platformIndex = 0                // Default to first platform (GitHub)
 
 	return accountsModel
 }
@@ -62,6 +66,11 @@ func buildTokenInput() textinput.Model {
 	return t
 }
 
+var platformOptions = []config.Platform{
+	config.GitHubPlatform,
+	config.GitLabPlatform,
+}
+
 func (am accountsModel) Init() tea.Cmd {
 	return textinput.Blink
 }
@@ -82,15 +91,26 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// Handle Enter key separately for buttons.
 			if key == tea.KeyEnter.String() {
 				// If focus is on Done button.
-				if am.focusIndex == len(am.inputs) {
+				if am.focusIndex == len(am.inputs)+1 {
 					return am.handleDone()
 					// If focus is on Add button.
-				} else if am.focusIndex == len(am.inputs)+1 {
+				} else if am.focusIndex == len(am.inputs)+2 {
 					return am.handleAdd()
 				}
 			}
 
-			// Cycle indexes
+			// Handle platform selection with Tab
+			if am.focusIndex == len(am.inputs) { // Platform selection area
+				if key == tea.KeyTab.String() {
+					return am.handlePlatformSelection(key)
+				}
+			}
+
+			// Cycle indexes (but skip Tab when in platform selection)
+			if am.focusIndex == len(am.inputs) && key == tea.KeyTab.String() {
+				// Don't cycle, let platform selection handle it
+				return am, nil
+			}
 			return am.handleCycle(key)
 		}
 	}
@@ -116,15 +136,37 @@ func (am accountsModel) View() string {
 		}
 	}
 
+	// Add platform selection
+	b.WriteString("\nPlatform: ")
+	for i, platform := range platformOptions {
+		platformStr := platform.String()
+		if i == am.platformIndex {
+			if am.focusIndex == len(am.inputs) {
+				b.WriteString(config.GetSuccessStyle().Render("(•) " + platformStr))
+			} else {
+				b.WriteString("(•) " + platformStr)
+			}
+		} else {
+			if am.focusIndex == len(am.inputs) {
+				b.WriteString("( ) " + platformStr)
+			} else {
+				b.WriteString("( ) " + platformStr)
+			}
+		}
+		if i < len(platformOptions)-1 {
+			b.WriteString("  ")
+		}
+	}
+
 	var doneButton string
-	if am.focusIndex == len(am.inputs) {
+	if am.focusIndex == len(am.inputs)+1 {
 		doneButton = config.GetSuccessStyle().Render(DoneButtonFocus)
 	} else {
 		doneButton = config.GetDebugStyle().Render(DoneButtonBlur)
 	}
 
 	var addButton string
-	if am.focusIndex == len(am.inputs)+1 {
+	if am.focusIndex == len(am.inputs)+2 {
 		addButton = config.GetSuccessStyle().Render(AddButtonFocus)
 	} else {
 		addButton = config.GetDebugStyle().Render(AddButtonBlur)
@@ -137,13 +179,23 @@ func (am accountsModel) View() string {
 
 func (am accountsModel) handleDone() (tea.Model, tea.Cmd) {
 	if am.inputs[0].Value() != "" && am.inputs[1].Value() != "" {
-		am.accounts = append(am.accounts, config.Account{User: am.inputs[0].Value(), Token: am.inputs[1].Value()})
+		platform := platformOptions[am.platformIndex]
+		am.accounts = append(am.accounts, config.Account{
+			User:     am.inputs[0].Value(),
+			Token:    am.inputs[1].Value(),
+			Platform: platform,
+		})
 	}
 	return am, tea.Quit
 }
 
 func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
-	am.accounts = append(am.accounts, config.Account{User: am.inputs[0].Value(), Token: am.inputs[1].Value()})
+	platform := platformOptions[am.platformIndex]
+	am.accounts = append(am.accounts, config.Account{
+		User:     am.inputs[0].Value(),
+		Token:    am.inputs[1].Value(),
+		Platform: platform,
+	})
 
 	am.inputs[0] = buildUserInput()
 	am.inputs[1] = buildTokenInput()
@@ -153,6 +205,16 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 	return am, tea.Batch(cmds...)
 }
 
+func (am accountsModel) handlePlatformSelection(key string) (tea.Model, tea.Cmd) {
+	// Cycle through platform options with Tab
+	am.platformIndex++
+	if am.platformIndex >= len(platformOptions) {
+		am.platformIndex = 0
+	}
+	am.platform = platformOptions[am.platformIndex]
+	return am, nil
+}
+
 func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() {
 		am.focusIndex--
@@ -160,11 +222,11 @@ func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 		am.focusIndex++
 	}
 
-	// Wrap focusIndex to range [0, len(am.inputs)+1].
-	if am.focusIndex > len(am.inputs)+1 {
+	// Wrap focusIndex to range [0, len(am.inputs)+2] (inputs + platform + buttons).
+	if am.focusIndex > len(am.inputs)+2 {
 		am.focusIndex = 0
 	} else if am.focusIndex < 0 {
-		am.focusIndex = len(am.inputs) + 1
+		am.focusIndex = len(am.inputs) + 2
 	}
 
 	cmds := make([]tea.Cmd, len(am.inputs))

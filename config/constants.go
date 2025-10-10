@@ -2,14 +2,14 @@ package config
 
 var FileName = ".gtconfig.yaml"
 
-type platform string
+type Platform string
 
 var (
-	GitHubPlatform platform = "GitHub"
-	GitLabPlatform platform = "GitLab"
+	GitHubPlatform Platform = "GitHub"
+	GitLabPlatform Platform = "GitLab"
 )
 
-func (p platform) String() string {
+func (p Platform) String() string {
 	switch p {
 	case GitHubPlatform:
 		return "GitHub"

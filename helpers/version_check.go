@@ -34,12 +34,10 @@ func CheckGTVersion(exe executor.Executor) {
 		return // Silently fail if we can't get latest version
 	}
 
-	storedVersion := config.Config.GlobalConfig.Version.LastVersion
+	storedVersion := config.GlobalConfig.Version.LastVersion
 	// Only update the config if it exists (to avoid overwriting GitHub accounts)
-	if config.HasValidConfig() {
-		if err := config.UpdateLastChecked(); err != nil {
-			return // Silently fail if we can't update last checked
-		}
+	if err := config.UpdateLastChecked(); err != nil {
+		return // Silently fail if we can't update last checked
 	}
 
 	// If no version is stored, show notification to upgrade
@@ -57,7 +55,7 @@ func CheckGTVersion(exe executor.Executor) {
 }
 
 func shouldCheckVersion() bool {
-	version := config.Config.GlobalConfig.Version
+	version := config.GlobalConfig.Version
 
 	// If no last checked time, should check
 	if version.LastChecked == "" {

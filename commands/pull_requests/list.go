@@ -33,7 +33,12 @@ func (svc listCommand) Command() *cobra.Command {
 		Short:   "show list of pull request",
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			prs, err := client.GlobalClient.ListPullRequests(args)
+			account := config.GetActiveAccount()
+			if account == nil {
+				return fmt.Errorf("no active account found")
+			}
+
+			prs, err := client.Client[account.Platform].ListPullRequests(args)
 			if err != nil {
 				return err
 			}

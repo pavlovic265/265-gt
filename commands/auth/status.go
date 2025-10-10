@@ -29,8 +29,13 @@ func (svc statusCommand) Command() *cobra.Command {
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Checking status...")
+			account := config.GetActiveAccount()
+			if account == nil {
+				fmt.Println(config.ErrorIndicator("No active account found"))
+				return nil
+			}
 
-			err := client.GlobalClient.AuthStatus()
+			err := client.Client[account.Platform].AuthStatus()
 			if err != nil {
 				fmt.Println(config.ErrorIndicator("Authentication failed"))
 				return err

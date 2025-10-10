@@ -47,7 +47,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 				}
 			}
 
-			accounts := config.Config.GlobalConfig.GitHub.Accounts
+			accounts := config.GlobalConfig.Accounts
 			for _, acc := range accounts {
 				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
@@ -70,18 +70,22 @@ func (svc gitHubCli) AuthStatus() error {
 }
 
 func (svc gitHubCli) AuthLogin(user string) error {
-	accounts := config.Config.GlobalConfig.GitHub.Accounts
-	var token string
+	accounts := config.GlobalConfig.Accounts
+	var account config.Account
 	for _, acc := range accounts {
 		if acc.User == user {
-			token = acc.Token
+			account = acc
 			break
 		}
 	}
 
-	//
 	exeArgs := []string{"auth", "login", "--with-token"}
-	err := svc.exe.WithGh().WithArgs(exeArgs).WithStdin(token).Run()
+	err := svc.exe.WithGh().WithArgs(exeArgs).WithStdin(account.Token).Run()
+	if err != nil {
+		return err
+	}
+
+	err = config.SetActiveAccount(account)
 	if err != nil {
 		return err
 	}
@@ -90,20 +94,17 @@ func (svc gitHubCli) AuthLogin(user string) error {
 }
 
 func (svc gitHubCli) AuthLogout(user string) error {
-	accounts := config.Config.GlobalConfig.GitHub.Accounts
-	foundUser := false
-	for _, acc := range accounts {
-		if acc.User == user {
-			foundUser = true
-			break
-		}
-	}
-	if !foundUser {
-		return fmt.Errorf("can't find user in config")
+	if !config.HasActiveAccount() {
+		return fmt.Errorf("no active account found")
 	}
 
 	exeArgs := []string{"auth", "logout", "-u", user}
 	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+
+	err = config.ClearActiveAccount()
 	if err != nil {
 		return err
 	}

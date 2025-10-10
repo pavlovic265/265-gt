@@ -216,7 +216,7 @@ func GetStatusStyle() lipgloss.Style {
 // Theme detection based on config
 func isLightTheme() bool {
 	// Check if config is initialized and theme is set to light
-	if Config.GlobalConfig.Theme.Type == "light" {
+	if GlobalConfig.Theme.Type == "light" {
 		return true
 	}
 	// Default to dark theme

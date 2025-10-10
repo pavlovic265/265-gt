@@ -3,9 +3,7 @@ package auth
 import (
 	"fmt"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/client"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
@@ -30,34 +28,19 @@ func (svc logoutCommand) Command() *cobra.Command {
 		Short:              "logout user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accounts := config.Config.GlobalConfig.GitHub.Accounts
-
-			var users []string
-			for _, acc := range accounts {
-				users = append(users, acc.User)
+			account := config.GetActiveAccount()
+			if account == nil {
+				return fmt.Errorf("no active account found")
 			}
 
-			initialModel := components.ListModel{
-				AllChoices: users,
-				Choices:    users,
-				Cursor:     0,
-				Query:      "",
-			}
+			fmt.Println("Unauthentication started for", account.User)
 
-			program := tea.NewProgram(initialModel)
-
-			if finalModel, err := program.Run(); err == nil {
-				if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-					fmt.Println("Authentication started for", m.Selected)
-					if err := client.GlobalClient.AuthLogout(m.Selected); err != nil {
-						return err
-					}
-
-					fmt.Println("Successfully authenticated with", m.Selected)
-				}
-			} else {
+			if err := client.Client[account.Platform].AuthLogout(account.User); err != nil {
 				return err
 			}
+
+			fmt.Println("Successfully unauthenticated with", account.User)
+
 			return nil
 		},
 	}

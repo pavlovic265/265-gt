@@ -10,15 +10,13 @@ func TestIsProtectedBranch(t *testing.T) {
 	gitHelper := &GitHelperImpl{}
 
 	// Set up test config
-	originalConfig := config.Config
+	originalLocalConfig := config.LocalConfig
 	defer func() {
-		config.Config = originalConfig
+		config.LocalConfig = originalLocalConfig
 	}()
 
-	config.Config = config.ConfigStruct{
-		LocalConfig: config.LocalConfigStruct{
-			Protected: []string{"main", "develop", "master"},
-		},
+	config.LocalConfig = config.LocalConfigStruct{
+		Protected: []string{"main", "develop", "master"},
 	}
 
 	tests := []struct {
@@ -77,15 +75,13 @@ func TestIsProtectedBranch_EmptyProtectedList(t *testing.T) {
 	gitHelper := &GitHelperImpl{}
 
 	// Set up test config with empty protected list
-	originalConfig := config.Config
+	originalLocalConfig := config.LocalConfig
 	defer func() {
-		config.Config = originalConfig
+		config.LocalConfig = originalLocalConfig
 	}()
 
-	config.Config = config.ConfigStruct{
-		LocalConfig: config.LocalConfigStruct{
-			Protected: []string{},
-		},
+	config.LocalConfig = config.LocalConfigStruct{
+		Protected: []string{},
 	}
 
 	tests := []struct {
@@ -119,15 +115,13 @@ func TestIsProtectedBranch_CaseSensitive(t *testing.T) {
 	gitHelper := &GitHelperImpl{}
 
 	// Set up test config
-	originalConfig := config.Config
+	originalLocalConfig := config.LocalConfig
 	defer func() {
-		config.Config = originalConfig
+		config.LocalConfig = originalLocalConfig
 	}()
 
-	config.Config = config.ConfigStruct{
-		LocalConfig: config.LocalConfigStruct{
-			Protected: []string{"main", "MAIN", "Main"},
-		},
+	config.LocalConfig = config.LocalConfigStruct{
+		Protected: []string{"main", "MAIN", "Main"},
 	}
 
 	tests := []struct {

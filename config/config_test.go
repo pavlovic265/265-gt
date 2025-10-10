@@ -24,11 +24,9 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 
 	// Create initial config with GitHub accounts
 	initialConfig := GlobalConfigStruct{
-		GitHub: GitHub{
-			Accounts: []Account{
-				{User: "user1", Token: "token1"},
-				{User: "user2", Token: "token2"},
-			},
+		Accounts: []Account{
+			{User: "user1", Token: "token1", Platform: "GitHub"},
+			{User: "user2", Token: "token2", Platform: "GitHub"},
 		},
 		Version: Version{
 			LastChecked: "2023-01-01T00:00:00.000000Z",
@@ -48,9 +46,7 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 	encoder.Close()
 
 	// Initialize config (this loads from file)
-	Config = ConfigStruct{
-		GlobalConfig: initialConfig,
-	}
+	GlobalConfig = initialConfig
 
 	// Call UpdateLastChecked
 	err = UpdateLastChecked()
@@ -60,12 +56,12 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 	reloadedConfig, err := loadGlobalConfig()
 	require.NoError(t, err)
 
-	// Verify GitHub accounts are preserved
-	assert.Equal(t, 2, len(reloadedConfig.GitHub.Accounts))
-	assert.Equal(t, "user1", reloadedConfig.GitHub.Accounts[0].User)
-	assert.Equal(t, "token1", reloadedConfig.GitHub.Accounts[0].Token)
-	assert.Equal(t, "user2", reloadedConfig.GitHub.Accounts[1].User)
-	assert.Equal(t, "token2", reloadedConfig.GitHub.Accounts[1].Token)
+	// Verify accounts are preserved
+	assert.Equal(t, 2, len(reloadedConfig.Accounts))
+	assert.Equal(t, "user1", reloadedConfig.Accounts[0].User)
+	assert.Equal(t, "token1", reloadedConfig.Accounts[0].Token)
+	assert.Equal(t, "user2", reloadedConfig.Accounts[1].User)
+	assert.Equal(t, "token2", reloadedConfig.Accounts[1].Token)
 
 	// Verify timestamp was updated
 	assert.NotEqual(t, "2023-01-01T00:00:00.000000Z", reloadedConfig.Version.LastChecked)
@@ -89,11 +85,9 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 
 	// Create initial config with GitHub accounts
 	initialConfig := GlobalConfigStruct{
-		GitHub: GitHub{
-			Accounts: []Account{
-				{User: "user1", Token: "token1"},
-				{User: "user2", Token: "token2"},
-			},
+		Accounts: []Account{
+			{User: "user1", Token: "token1", Platform: "GitHub"},
+			{User: "user2", Token: "token2", Platform: "GitHub"},
 		},
 		Version: Version{
 			LastChecked: "2023-01-01T00:00:00.000000Z",
@@ -113,9 +107,7 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 	encoder.Close()
 
 	// Initialize config (this loads from file)
-	Config = ConfigStruct{
-		GlobalConfig: initialConfig,
-	}
+	GlobalConfig = initialConfig
 
 	// Call UpdateVersion
 	err = UpdateVersion("2.0.0")
@@ -125,12 +117,12 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 	reloadedConfig, err := loadGlobalConfig()
 	require.NoError(t, err)
 
-	// Verify GitHub accounts are preserved
-	assert.Equal(t, 2, len(reloadedConfig.GitHub.Accounts))
-	assert.Equal(t, "user1", reloadedConfig.GitHub.Accounts[0].User)
-	assert.Equal(t, "token1", reloadedConfig.GitHub.Accounts[0].Token)
-	assert.Equal(t, "user2", reloadedConfig.GitHub.Accounts[1].User)
-	assert.Equal(t, "token2", reloadedConfig.GitHub.Accounts[1].Token)
+	// Verify accounts are preserved
+	assert.Equal(t, 2, len(reloadedConfig.Accounts))
+	assert.Equal(t, "user1", reloadedConfig.Accounts[0].User)
+	assert.Equal(t, "token1", reloadedConfig.Accounts[0].Token)
+	assert.Equal(t, "user2", reloadedConfig.Accounts[1].User)
+	assert.Equal(t, "token2", reloadedConfig.Accounts[1].Token)
 
 	// Verify version was updated
 	assert.Equal(t, "2.0.0", reloadedConfig.Version.LastVersion)

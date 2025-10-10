@@ -1,12 +1,11 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +43,7 @@ func (svc versionCommand) Command() *cobra.Command {
 
 func (svc versionCommand) getCurrentVersion() error {
 	// Read version from config
-	version := config.Config.GlobalConfig.Version.LastVersion
+	version := config.GlobalConfig.Version.LastVersion
 	if version == "" {
 		version = "unknown"
 	}
@@ -56,24 +55,13 @@ func (svc versionCommand) getCurrentVersion() error {
 }
 
 func (svc versionCommand) getLatestVersion() error {
-	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
-
-	resp, err := http.Get(url)
+	version, err := helpers.GetLatestVersion()
 	if err != nil {
-		return err
-	}
-	defer func() { _ = resp.Body.Close() }()
-
-	var result struct {
-		TagName string `json:"tag_name"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return err
 	}
 
 	fmt.Printf("%s %s\n",
 		config.GetInfoStyle().Render("Latest version:"),
-		config.GetCommandStyle().Render(result.TagName))
+		config.GetCommandStyle().Render(version))
 	return nil
 }

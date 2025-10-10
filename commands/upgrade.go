@@ -7,6 +7,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -27,16 +28,25 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 		Use:   "upgrade",
 		Short: "upgrade of current build",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			version, isLatest, err := svc.isLatestVersion()
+			if err != nil {
+				return err
+			}
+			if isLatest {
+				fmt.Printf("You are already on the latest version: %s\n", pointer.Deref(version))
+				return nil // silently fail if version is not found
+			}
+
 			installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
 			exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
-			err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
+			err = svc.exe.WithName("bash").WithArgs(exeArgs).Run()
 			if err != nil {
 				return err
 			}
 
-			// Update version in config after successful upgrade
-			if err := svc.updateVersionInConfig(); err != nil {
+			if err := config.UpdateVersion(pointer.Deref(version)); err != nil {
 				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
+				return err
 			}
 
 			fmt.Printf("%s %s\n",
@@ -47,12 +57,12 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc UpgradeCommand) updateVersionInConfig() error {
+func (svc UpgradeCommand) isLatestVersion() (*string, bool, error) {
 	// Get latest version from GitHub API
 	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return nil, false, err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
@@ -61,13 +71,13 @@ func (svc UpgradeCommand) updateVersionInConfig() error {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return err
+		return nil, false, err
 	}
 
-	// Save the updated config
-	if err := config.UpdateVersion(result.TagName); err != nil {
-		return err
+	currentVersion := config.GlobalConfig.Version.LastVersion
+	if currentVersion == result.TagName {
+		return pointer.From(result.TagName), true, nil
 	}
 
-	return nil
+	return pointer.From(result.TagName), false, nil
 }
