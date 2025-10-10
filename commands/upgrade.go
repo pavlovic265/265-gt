@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -28,13 +27,7 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 		Use:   "upgrade",
 		Short: "upgrade of current build",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Get repository from environment variable
-			repository := os.Getenv("GT_REPOSITORY")
-			if repository == "" {
-				return fmt.Errorf("GT_REPOSITORY environment variable not set")
-			}
-
-			installURL := fmt.Sprintf("https://raw.githubusercontent.com/%s/main/scripts/install.sh", repository)
+			installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
 			exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
 			err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
 			if err != nil {
@@ -42,7 +35,7 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 			}
 
 			// Update version in config after successful upgrade
-			if err := svc.updateVersionInConfig(repository); err != nil {
+			if err := svc.updateVersionInConfig(); err != nil {
 				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
 			}
 
@@ -54,9 +47,9 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc UpgradeCommand) updateVersionInConfig(repository string) error {
+func (svc UpgradeCommand) updateVersionInConfig() error {
 	// Get latest version from GitHub API
-	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repository)
+	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 	resp, err := http.Get(url)
 	if err != nil {
 		return err

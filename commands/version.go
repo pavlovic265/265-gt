@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -57,12 +56,7 @@ func (svc versionCommand) getCurrentVersion() error {
 }
 
 func (svc versionCommand) getLatestVersion() error {
-	repository := os.Getenv("GT_REPOSITORY")
-	if repository == "" {
-		return fmt.Errorf("GT_REPOSITORY environment variable not set")
-	}
-
-	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repository)
+	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 
 	resp, err := http.Get(url)
 	if err != nil {

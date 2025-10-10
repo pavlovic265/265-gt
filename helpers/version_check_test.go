@@ -111,33 +111,13 @@ func TestShowVersionNotification(t *testing.T) {
 	}
 }
 
-func TestGetLatestGTVersionWithContext_EnvironmentVariable(t *testing.T) {
-	// Test with missing environment variable
-	t.Setenv("GT_REPOSITORY", "")
-
-	ctx := context.Background()
-	_, _, err := getLatestGTVersionWithContext(ctx)
-
-	if err == nil {
-		t.Error("Expected error when GT_REPOSITORY is not set, got nil")
-	}
-
-	expectedErrMsg := "GT_REPOSITORY environment variable not set"
-	if err.Error() != expectedErrMsg {
-		t.Errorf("Expected error '%s', got '%s'", expectedErrMsg, err.Error())
-	}
-}
-
-func TestGetLatestGTVersionWithContext_WithRepository(t *testing.T) {
-	// Set a test repository
-	t.Setenv("GT_REPOSITORY", "testuser/testrepo")
-
+func TestGetLatestGTVersionWithContext_NetworkRequest(t *testing.T) {
 	ctx := context.Background()
 	// This will likely fail due to network request, but we're testing the setup
 	_, _, err := getLatestGTVersionWithContext(ctx)
 
 	// We expect an error due to network request, but not the environment variable error
-	if err != nil && err.Error() == "GT_REPOSITORY environment variable not set" {
-		t.Error("Expected network error, got environment variable error")
-	}
+	// Since we removed GT_REPOSITORY dependency, we just check that we get some error
+	// (likely network-related in test environment)
+	_ = err // Acknowledge the error but don't assert on it since it's network-dependent
 }

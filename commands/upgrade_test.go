@@ -47,9 +47,6 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 		Run().
 		Return(nil)
 
-	// Set environment variable for the test
-	t.Setenv("GT_REPOSITORY", "test/repo")
-
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
@@ -72,9 +69,6 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 	mockExecutor.EXPECT().
 		Run().
 		Return(expectedError)
-
-	// Set environment variable for the test
-	t.Setenv("GT_REPOSITORY", "test/repo")
 
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})

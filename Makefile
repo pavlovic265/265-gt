@@ -19,13 +19,7 @@ all: build
 build:
 	@echo "Building $(BINARY_NAME)..."
 	mkdir -p $(BUILD_DIR)
-	@if [ -n "$(GT_REPOSITORY)" ]; then \
-		echo "Building with repository: $(GT_REPOSITORY)"; \
-		GT_REPOSITORY=$(GT_REPOSITORY) go build -o $(BUILD_DIR)/$(BINARY_NAME) .; \
-	else \
-		echo "Building with default repository"; \
-		go build -o $(BUILD_DIR)/$(BINARY_NAME) .; \
-	fi
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
 	@echo "Build complete."
 
 # Run the built binary
@@ -54,13 +48,13 @@ lint-fix:
 # Run all tests
 test:
 	@echo "Running all tests..."
-	go test ./...
+	go test -timeout 60s ./...
 	@echo "Tests complete."
 
 # Run all tests with verbose output
 test-verbose:
 	@echo "Running all tests with verbose output..."
-	go test -v ./...
+	go test -v -timeout 60s ./...
 	@echo "Tests complete."
 
 release: build

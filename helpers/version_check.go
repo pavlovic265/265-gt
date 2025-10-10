@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -81,13 +80,7 @@ func shouldCheckVersion() bool {
 }
 
 func getLatestGTVersionWithContext(ctx context.Context) (string, string, error) {
-	// Get repository from environment variable
-	repository := os.Getenv("GT_REPOSITORY")
-	if repository == "" {
-		return "", "", fmt.Errorf("GT_REPOSITORY environment variable not set")
-	}
-
-	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repository)
+	apiURL := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 
 	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
