@@ -11,14 +11,17 @@ import (
 )
 
 type downCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewDownCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) downCommand {
 	return downCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -27,11 +30,11 @@ func (svc downCommand) Command() *cobra.Command {
 		Use:   "down",
 		Short: "move to brunch down in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := helpers.GetCurrentBranchName(svc.exe)
+			branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
-			parent := helpers.GetParent(svc.exe, pointer.Deref(branch))
+			parent := svc.gitHelper.GetParent(svc.exe, pointer.Deref(branch))
 
 			exeArgs := []string{"checkout", parent}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()

@@ -191,6 +191,20 @@ func (mr *MockGitHelperMockRecorder) IsProtectedBranch(branch interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsProtectedBranch", reflect.TypeOf((*MockGitHelper)(nil).IsProtectedBranch), branch)
 }
 
+// RelinkParentChildren mocks base method.
+func (m *MockGitHelper) RelinkParentChildren(exe executor.Executor, parent, parentChildren, branch, branchChildren string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RelinkParentChildren", exe, parent, parentChildren, branch, branchChildren)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RelinkParentChildren indicates an expected call of RelinkParentChildren.
+func (mr *MockGitHelperMockRecorder) RelinkParentChildren(exe, parent, parentChildren, branch, branchChildren interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RelinkParentChildren", reflect.TypeOf((*MockGitHelper)(nil).RelinkParentChildren), exe, parent, parentChildren, branch, branchChildren)
+}
+
 // SetChildren mocks base method.
 func (m *MockGitHelper) SetChildren(exe executor.Executor, parent, children string) error {
 	m.ctrl.T.Helper()
@@ -217,4 +231,18 @@ func (m *MockGitHelper) SetParent(exe executor.Executor, parent, child string) e
 func (mr *MockGitHelperMockRecorder) SetParent(exe, parent, child interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetParent", reflect.TypeOf((*MockGitHelper)(nil).SetParent), exe, parent, child)
+}
+
+// UnmarshalChildren mocks base method.
+func (m *MockGitHelper) UnmarshalChildren(children string) []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnmarshalChildren", children)
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// UnmarshalChildren indicates an expected call of UnmarshalChildren.
+func (mr *MockGitHelperMockRecorder) UnmarshalChildren(children interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmarshalChildren", reflect.TypeOf((*MockGitHelper)(nil).UnmarshalChildren), children)
 }

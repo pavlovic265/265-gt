@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"errors"
 	"testing"
 
@@ -13,17 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create an up command with mock executor
-func createUpCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create an up command with mock executor and git helper
+func createUpCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	upCmd := commands.NewUpCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
 	cmd := upCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestUpCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createUpCommandWithMock(t)
+	_, _, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -32,34 +32,24 @@ func TestUpCommand_Command(t *testing.T) {
 }
 
 func TestUpCommand_RunE_Success(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUpCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
+	mockGitHelper.EXPECT().
+		GetChildren(mockExecutor, "main").
+		Return("feature-branch")
 
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.main.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("feature-branch\n"), nil)
+	// Set up expectations for UnmarshalChildren
+	mockGitHelper.EXPECT().
+		UnmarshalChildren("feature-branch").
+		Return([]string{"feature-branch"})
 
 	// Set up expectations for git checkout
 	expectedArgs := []string{"checkout", "feature-branch"}
@@ -82,34 +72,24 @@ func TestUpCommand_RunE_Success(t *testing.T) {
 }
 
 func TestUpCommand_RunE_NoChildren(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUpCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren (no children)
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
+	mockGitHelper.EXPECT().
+		GetChildren(mockExecutor, "main").
+		Return("")
 
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.main.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString(""), nil)
+	// Set up expectations for UnmarshalChildren
+	mockGitHelper.EXPECT().
+		UnmarshalChildren("").
+		Return([]string{})
 
 	// Execute the command - should return error about TTY (interactive interface)
 	err := cmd.RunE(cmd, []string{})
@@ -118,36 +98,26 @@ func TestUpCommand_RunE_NoChildren(t *testing.T) {
 }
 
 func TestUpCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUpCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git checkout failed")
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
+	mockGitHelper.EXPECT().
+		GetChildren(mockExecutor, "main").
+		Return("feature-branch")
 
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.main.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("feature-branch\n"), nil)
+	// Set up expectations for UnmarshalChildren
+	mockGitHelper.EXPECT().
+		UnmarshalChildren("feature-branch").
+		Return([]string{"feature-branch"})
 
 	mockExecutor.EXPECT().
 		WithGit().
@@ -172,9 +142,10 @@ func TestNewUpCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	// Test that NewUpCommand creates a command with the correct executor
-	upCmd := commands.NewUpCommand(mockExecutor)
+	// Test that NewUpCommand creates a command with the correct executor and git helper
+	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := upCmd.Command()

@@ -26,6 +26,10 @@ type GitHelper interface {
 
 	// Branch protection
 	IsProtectedBranch(branch string) bool
+
+	// Utility functions
+	RelinkParentChildren(exe executor.Executor, parent string, parentChildren string, branch string, branchChildren string) error
+	UnmarshalChildren(children string) []string
 }
 
 type GitHelperImpl struct{}

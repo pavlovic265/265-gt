@@ -12,14 +12,17 @@ import (
 )
 
 type checkoutCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewCheckoutCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) checkoutCommand {
 	return checkoutCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -35,7 +38,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := helpers.GetBranches(svc.exe)
+				branches, err := svc.gitHelper.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}

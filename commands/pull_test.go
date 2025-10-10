@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"errors"
 	"testing"
 
@@ -13,17 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a pull command with mock executor
-func createPullCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create a pull command with mock executor and git helper
+func createPullCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	pullCmd := commands.NewPullCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
 	cmd := pullCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestPullCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createPullCommandWithMock(t)
+	_, _, ctrl, cmd := createPullCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -34,21 +34,14 @@ func TestPullCommand_Command(t *testing.T) {
 }
 
 func TestPullCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPullCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git pull
 	expectedArgs := []string{"pull", "origin", "main"}
@@ -71,21 +64,14 @@ func TestPullCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestPullCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPullCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git pull (ignores arguments, always pulls origin <current-branch>)
 	expectedArgs := []string{"pull", "origin", "main"}
@@ -108,23 +94,16 @@ func TestPullCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestPullCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPullCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git pull failed")
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git pull that will fail
 	mockExecutor.EXPECT().
@@ -150,9 +129,10 @@ func TestNewPullCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	// Test that NewPullCommand creates a command with the correct executor
-	pullCmd := commands.NewPullCommand(mockExecutor)
+	// Test that NewPullCommand creates a command with the correct executor and git helper
+	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := pullCmd.Command()

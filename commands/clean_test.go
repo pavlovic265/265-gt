@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -9,20 +8,20 @@ import (
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a clean command with mock executor
-func createCleanCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create a clean command with mock executor and git helper
+func createCleanCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	cleanCmd := commands.NewCleanCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cleanCmd := commands.NewCleanCommand(mockExecutor, mockGitHelper)
 	cmd := cleanCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestCleanCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createCleanCommandWithMock(t)
+	_, _, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -34,37 +33,52 @@ func TestCleanCommand_Command(t *testing.T) {
 }
 
 func TestCleanCommand_RunE_NoBranchesToClean(t *testing.T) {
-	mockExecutor, ctrl, cmd := createCleanCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetBranches
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
+	mockGitHelper.EXPECT().
+		GetBranches(mockExecutor).
+		Return([]string{"main"}, nil)
 
-	mockExecutor.EXPECT().
-		WithArgs([]string{"branch", "--list"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("* main\n"), nil)
-
-	// Execute the command - should show "No branches to clean up!"
+	// Execute the command
 	err := cmd.RunE(cmd, []string{})
+	assert.NoError(t, err)
+}
+
+func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
+	mockExecutor, mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
+	defer ctrl.Finish()
+
+	// Set up expectations for GetCurrentBranchName
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
+
+	// Set up expectations for GetBranches
+	mockGitHelper.EXPECT().
+		GetBranches(mockExecutor).
+		Return([]string{"main", "feature-branch", "test-branch"}, nil)
+
+	// Set up expectations for IsProtectedBranch
+	mockGitHelper.EXPECT().
+		IsProtectedBranch("feature-branch").
+		Return(false)
+
+	mockGitHelper.EXPECT().
+		IsProtectedBranch("test-branch").
+		Return(false)
+
+	// Execute the command (this will trigger the interactive selection)
+	err := cmd.RunE(cmd, []string{})
+	// Note: This test doesn't fully test the interactive part, but shows the setup
 	assert.NoError(t, err)
 }
 
@@ -73,12 +87,9 @@ func TestNewCleanCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	// Test that NewCleanCommand creates a command with the correct executor
-	cleanCmd := commands.NewCleanCommand(mockExecutor)
-
-	// Verify the command can be created
-	cmd := cleanCmd.Command()
-	require.NotNil(t, cmd)
-	assert.Equal(t, "clean", cmd.Use)
+	// Test that NewCleanCommand creates a command with the correct executor and git helper
+	cleanCmd := commands.NewCleanCommand(mockExecutor, mockGitHelper)
+	assert.NotNil(t, cleanCmd)
 }

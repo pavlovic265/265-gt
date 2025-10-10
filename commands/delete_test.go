@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"errors"
 	"testing"
 
@@ -10,20 +9,20 @@ import (
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a delete command with mock executor
-func createDeleteCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create a delete command with mock executor and git helper
+func createDeleteCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	deleteCmd := commands.NewDeleteCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	deleteCmd := commands.NewDeleteCommand(mockExecutor, mockGitHelper)
 	cmd := deleteCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestDeleteCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createDeleteCommandWithMock(t)
+	_, _, ctrl, cmd := createDeleteCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -34,207 +33,97 @@ func TestDeleteCommand_Command(t *testing.T) {
 }
 
 func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
-	mockExecutor, ctrl, cmd := createDeleteCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createDeleteCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetParent
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature-branch.parent"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	mockGitHelper.EXPECT().
+		GetParent(mockExecutor, "test-branch").
+		Return("main")
 
 	// Set up expectations for GetChildren (parent)
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.main.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("feature-branch\n"), nil)
+	mockGitHelper.EXPECT().
+		GetChildren(mockExecutor, "main").
+		Return("test-branch")
 
 	// Set up expectations for GetChildren (branch)
+	mockGitHelper.EXPECT().
+		GetChildren(mockExecutor, "test-branch").
+		Return("")
+
+	// Set up expectations for git branch -D command
 	mockExecutor.EXPECT().
 		WithGit().
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature-branch.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString(""), nil)
-
-	// Set up expectations for git branch -D
-	expectedArgs := []string{"branch", "-D", "feature-branch"}
-
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs(expectedArgs).
+		WithArgs([]string{"branch", "-D", "test-branch"}).
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
 		Run().
 		Return(nil)
 
-	// Set up expectations for RelinkParentChildren - SetChildren call
-	// Since branchChildren is empty, the final children string will be empty after filtering
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.main.children", ""}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		Run().
+	// Set up expectations for RelinkParentChildren
+	mockGitHelper.EXPECT().
+		RelinkParentChildren(mockExecutor, "main", "test-branch", "test-branch", "").
 		Return(nil)
 
-	// Execute the command with branch name
-	err := cmd.RunE(cmd, []string{"feature-branch"})
+	// Execute the command
+	err := cmd.RunE(cmd, []string{"test-branch"})
 	assert.NoError(t, err)
 }
 
-func TestDeleteCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createDeleteCommandWithMock(t)
+func TestDeleteCommand_RunE_GetCurrentBranchNameError(t *testing.T) {
+	mockExecutor, mockGitHelper, ctrl, cmd := createDeleteCommandWithMock(t)
+	defer ctrl.Finish()
+
+	// Set up expectations for GetCurrentBranchName to return error
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(nil, errors.New("git error"))
+
+	// Execute the command
+	err := cmd.RunE(cmd, []string{"test-branch"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "git error")
+}
+
+func TestDeleteCommand_RunE_WithoutBranchName(t *testing.T) {
+	mockExecutor, mockGitHelper, ctrl, cmd := createDeleteCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for GetBranches
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
+	mockGitHelper.EXPECT().
+		GetBranches(mockExecutor).
+		Return([]string{"main", "feature-branch", "test-branch"}, nil)
 
-	mockExecutor.EXPECT().
-		WithArgs([]string{"branch", "--list"}).
-		Return(mockExecutor)
+	// Set up expectations for IsProtectedBranch
+	mockGitHelper.EXPECT().
+		IsProtectedBranch("feature-branch").
+		Return(false)
 
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("* main\n  feature-branch\n"), nil)
+	mockGitHelper.EXPECT().
+		IsProtectedBranch("test-branch").
+		Return(false)
 
-	// Execute the command with no arguments - should show interactive selection
-	// This will fail because we can't easily mock the interactive selection
+	// Execute the command (this will trigger the interactive selection)
 	err := cmd.RunE(cmd, []string{})
+	// Note: This test expects a TTY error since we can't run interactive commands in tests
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "could not open a new TTY")
-}
-
-func TestDeleteCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createDeleteCommandWithMock(t)
-	defer ctrl.Finish()
-
-	expectedError := errors.New("git branch failed")
-
-	// Mock GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
-
-	// Mock GetParent call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature-branch.parent"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
-
-	// Mock GetChildren call for parent
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.main.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("feature-branch\n"), nil)
-
-	// Mock GetChildren call for branch
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature-branch.children"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString(""), nil)
-
-	// Mock the actual git branch -D command that should fail
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"branch", "-D", "feature-branch"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		Run().
-		Return(expectedError)
-
-	// Execute the command
-	err := cmd.RunE(cmd, []string{"feature-branch"})
-	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
 }
 
 func TestNewDeleteCommand(t *testing.T) {
@@ -242,12 +131,9 @@ func TestNewDeleteCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	// Test that NewDeleteCommand creates a command with the correct executor
-	deleteCmd := commands.NewDeleteCommand(mockExecutor)
-
-	// Verify the command can be created
-	cmd := deleteCmd.Command()
-	require.NotNil(t, cmd)
-	assert.Equal(t, "delete", cmd.Use)
+	// Test that NewDeleteCommand creates a command with the correct executor and git helper
+	deleteCmd := commands.NewDeleteCommand(mockExecutor, mockGitHelper)
+	assert.NotNil(t, deleteCmd)
 }

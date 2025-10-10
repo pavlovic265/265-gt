@@ -14,14 +14,17 @@ import (
 )
 
 type cleanCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewCleanCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) cleanCommand {
 	return cleanCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -38,12 +41,12 @@ func (svc cleanCommand) Command() *cobra.Command {
 }
 
 func (svc cleanCommand) cleanBranches() error {
-	currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
+	currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 	if err != nil {
 		return fmt.Errorf("failed to get current branch: %w", err)
 	}
 
-	branches, err := helpers.GetBranches(svc.exe)
+	branches, err := svc.gitHelper.GetBranches(svc.exe)
 	if err != nil {
 		return fmt.Errorf("failed to get branches: %w", err)
 	}
@@ -53,7 +56,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	cleanableCount := 0
 	for _, branch := range branches {
-		if branch != pointer.Deref(currentBranch) && !helpers.IsProtectedBranch(branch) {
+		if branch != pointer.Deref(currentBranch) && !svc.gitHelper.IsProtectedBranch(branch) {
 			cleanableCount++
 		}
 	}
@@ -70,7 +73,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	deletedCount := 0
 	for _, branch := range branches {
-		if branch == pointer.Deref(currentBranch) || helpers.IsProtectedBranch(branch) {
+		if branch == pointer.Deref(currentBranch) || svc.gitHelper.IsProtectedBranch(branch) {
 			continue
 		}
 
@@ -92,7 +95,7 @@ func (svc cleanCommand) cleanBranches() error {
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
-	parent := helpers.GetParent(svc.exe, branch)
+	parent := svc.gitHelper.GetParent(svc.exe, branch)
 
 	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", config.InfoStyle.Render(branch))
 	if parent != "" {
@@ -113,8 +116,8 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 		}
 
 		if model.IsYes() {
-			parentChildren := helpers.GetChildren(svc.exe, parent)
-			branchChildren := helpers.GetChildren(svc.exe, branch)
+			parentChildren := svc.gitHelper.GetChildren(svc.exe, parent)
+			branchChildren := svc.gitHelper.GetChildren(svc.exe, branch)
 
 			exeArgs := []string{"branch", "-D", branch}
 			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
@@ -122,7 +125,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 				return false, err
 			}
 
-			err = helpers.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+			err = svc.gitHelper.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
 			if err != nil {
 				return false, err
 			}

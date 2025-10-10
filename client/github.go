@@ -12,11 +12,15 @@ import (
 )
 
 type gitHubCli struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewGitHubCli(exe executor.Executor) CliClient {
-	return &gitHubCli{exe: exe}
+	return &gitHubCli{
+		exe:       exe,
+		gitHelper: helpers.NewGitHelper(),
+	}
 }
 
 func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
@@ -114,11 +118,11 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	branch, err := helpers.GetCurrentBranchName(svc.exe)
+	branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 	if err != nil {
 		return err
 	}
-	parent := helpers.GetParent(svc.exe, pointer.Deref(branch))
+	parent := svc.gitHelper.GetParent(svc.exe, pointer.Deref(branch))
 
 	exeArgs := []string{
 		"pr",

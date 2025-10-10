@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"errors"
 	"testing"
 
@@ -13,17 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a push command with mock executor
-func createPushCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create a push command with mock executor and git helper
+func createPushCommandWithMock(t *testing.T) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	pushCmd := commands.NewPushCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
 	cmd := pushCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestPushCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createPushCommandWithMock(t)
+	_, _, ctrl, cmd := createPushCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -34,21 +34,14 @@ func TestPushCommand_Command(t *testing.T) {
 }
 
 func TestPushCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPushCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git push (ignores arguments, always pushes --force origin <current-branch>)
 	expectedArgs := []string{"push", "--force", "origin", "main"}
@@ -71,21 +64,14 @@ func TestPushCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestPushCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPushCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git push (ignores arguments, always pushes --force origin <current-branch>)
 	expectedArgs := []string{"push", "--force", "origin", "main"}
@@ -108,23 +94,16 @@ func TestPushCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestPushCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createPushCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git push failed")
 
 	// Set up expectations for GetCurrentBranchName call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"rev-parse", "--abbrev-ref", "HEAD"}).
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		RunWithOutput().
-		Return(*bytes.NewBufferString("main\n"), nil)
+	branchName := "main"
+	mockGitHelper.EXPECT().
+		GetCurrentBranchName(mockExecutor).
+		Return(&branchName, nil)
 
 	// Set up expectations for git push that will fail
 	mockExecutor.EXPECT().
@@ -150,9 +129,10 @@ func TestNewPushCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	// Test that NewPushCommand creates a command with the correct executor
-	pushCmd := commands.NewPushCommand(mockExecutor)
+	// Test that NewPushCommand creates a command with the correct executor and git helper
+	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := pushCmd.Command()

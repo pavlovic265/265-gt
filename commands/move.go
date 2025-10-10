@@ -14,14 +14,17 @@ import (
 )
 
 type moveCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewMoveCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) moveCommand {
 	return moveCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -31,7 +34,7 @@ func (svc moveCommand) Command() *cobra.Command {
 		Aliases: []string{"mo"},
 		Short:   "rebase branch onto other branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := helpers.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
 			if err != nil {
 				return err
 			}
@@ -42,7 +45,7 @@ func (svc moveCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branchs, err := helpers.GetBranches(svc.exe)
+				branchs, err := svc.gitHelper.GetBranches(svc.exe)
 				if err != nil {
 					return err
 				}
@@ -68,7 +71,7 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	if err != nil {
 		return err
 	}
-	if err := helpers.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
+	if err := svc.gitHelper.SetParent(svc.exe, parentBranch, currentBranch); err != nil {
 		return err
 	}
 
@@ -81,7 +84,7 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 }
 
 func (svc moveCommand) setChildrenBranch(parent, child string) error {
-	parentChildren := helpers.GetChildren(svc.exe, parent)
+	parentChildren := svc.gitHelper.GetChildren(svc.exe, parent)
 
 	var children string
 	if len(parentChildren) > 0 {
@@ -93,7 +96,7 @@ func (svc moveCommand) setChildrenBranch(parent, child string) error {
 		children = child
 	}
 
-	if err := helpers.SetChildren(svc.exe, children, parent); err != nil {
+	if err := svc.gitHelper.SetChildren(svc.exe, children, parent); err != nil {
 		return err
 	}
 	return nil

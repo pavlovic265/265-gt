@@ -21,6 +21,7 @@ import (
 )
 
 var exe = executor.NewExe()
+var gitHelper = helpers.NewGitHelper()
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
 
@@ -39,7 +40,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// Check if we're in a git repository
-		if err := helpers.EnsureGitRepository(exe); err != nil {
+		if err := gitHelper.EnsureGitRepository(exe); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -75,18 +76,18 @@ func main() {
 	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewSwitchCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewPushCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewPullCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewCreateCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewPushCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewPullCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCreateCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewContCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewCheckoutCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewMoveCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewDeleteCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewCleanCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewCheckoutCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewMoveCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewDeleteCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCleanCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewVersionCommand(exe).Command())
 	rootCmd.AddCommand(commands.NewUpgradeCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewDownCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewUpCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
