@@ -175,7 +175,9 @@ func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 	if err != nil {
 		// Restore backup if temp file creation fails
 		if _, statErr := os.Stat(backupPath); statErr == nil {
-			os.Rename(backupPath, configPath)
+			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
+				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
+			}
 		}
 		return fmt.Errorf("failed to create temp config file: %w", err)
 	}
@@ -188,7 +190,9 @@ func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 		_ = os.Remove(tempPath)
 		// Restore backup if encoding fails
 		if _, statErr := os.Stat(backupPath); statErr == nil {
-			os.Rename(backupPath, configPath)
+			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
+				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
+			}
 		}
 		return fmt.Errorf("failed to encode config file: %w", err)
 	}
@@ -198,13 +202,18 @@ func saveGlobalConfig(configToSave GlobalConfigStruct) error {
 		_ = os.Remove(tempPath)
 		// Restore backup if rename fails
 		if _, statErr := os.Stat(backupPath); statErr == nil {
-			os.Rename(backupPath, configPath)
+			if renameErr := os.Rename(backupPath, configPath); renameErr != nil {
+				fmt.Printf("Warning: Failed to restore backup: %v\n", renameErr)
+			}
 		}
 		return fmt.Errorf("failed to save config file: %w", err)
 	}
 
 	// Remove backup after successful save
-	os.Remove(backupPath)
+	if err := os.Remove(backupPath); err != nil {
+		// Not critical if backup removal fails
+		fmt.Printf("Warning: Failed to remove backup file: %v\n", err)
+	}
 
 	return nil
 }
