@@ -61,10 +61,13 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 
 func (svc gitHubCli) AuthStatus() error {
 	exeArgs := []string{"auth", "status"}
-	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
+	output, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return err
 	}
+
+	// Format and display the output with beautiful UI
+	svc.displayAuthStatus(output.String())
 
 	return nil
 }
@@ -104,9 +107,21 @@ func (svc gitHubCli) AuthLogout(user string) error {
 		return err
 	}
 
-	err = config.ClearActiveAccount()
+	acc, err := svc.getActiveAccount()
 	if err != nil {
 		return err
+	}
+
+	if acc != nil {
+		err = config.SetActiveAccount(*acc)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = config.ClearActiveAccount()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -186,4 +201,58 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 		})
 	}
 	return prs, nil
+}
+
+func (svc gitHubCli) displayAuthStatus(output string) {
+	// Simple title with subtle color
+	fmt.Println(config.GetInfoStyle().Render("GitHub Authentication Status"))
+	fmt.Println()
+
+	lines := strings.Split(output, "\n")
+	var currentPlatform string
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
+		if line == "" {
+			continue
+		}
+
+		// Platform header (e.g., "github.com")
+		if !strings.HasPrefix(line, " ") && !strings.HasPrefix(line, "✓") && !strings.HasPrefix(line, "-") {
+			if currentPlatform != "" {
+				fmt.Println() // Add spacing between platforms
+			}
+			currentPlatform = line
+			fmt.Println(config.GetCommandStyle().Render("> " + currentPlatform))
+			continue
+		}
+
+		// Style the lines with subtle colors
+		if strings.HasPrefix(line, "✓") {
+			// Success lines (logged in accounts)
+			fmt.Println(config.GetSuccessStyle().Render(line))
+		} else if strings.HasPrefix(line, "-") {
+			// Detail lines
+			if strings.Contains(line, "Active account: true") {
+				fmt.Println(config.GetSuccessStyle().Render("  " + line))
+			} else if strings.Contains(line, "Active account: false") {
+				fmt.Println(config.GetDebugStyle().Render("  " + line))
+			} else if strings.Contains(line, "Token:") {
+				fmt.Println(config.GetWarningStyle().Render("  " + line))
+			} else {
+				fmt.Println(config.GetDebugStyle().Render("  " + line))
+			}
+		}
+	}
+
+	fmt.Println()
+
+	// Show active account from our config
+	activeAccount := config.GetActiveAccount()
+	if activeAccount != nil {
+		fmt.Println(config.GetSuccessStyle().Render("* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
+	} else {
+		fmt.Println(config.GetWarningStyle().Render("! No active account set in gt config"))
+	}
 }
