@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -44,7 +45,7 @@ func (svc globalCommand) Command() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("error checking file: %w", err)
 			}
-			fmt.Printf("File '%s' exists.\n", config.FileName)
+			fmt.Printf("File '%s' exists.\n", constants.FileName)
 
 			return nil
 		},

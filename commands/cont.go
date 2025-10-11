@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -38,7 +38,7 @@ func (svc contCommand) Command() *cobra.Command {
 			// Side effects: Resets any custom terminal settings to standard defaults
 			_ = exec.Command("stty", "sane").Run() // Ignore stty errors as they're not critical
 
-			fmt.Println(config.SuccessIndicator("Rebase continued successfully"))
+			fmt.Println(constants.SuccessIndicator("Rebase continued successfully"))
 			return nil
 		},
 	}

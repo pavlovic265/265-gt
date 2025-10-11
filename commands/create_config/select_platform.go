@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 type selectPlatformModel struct {
@@ -15,8 +15,8 @@ type selectPlatformModel struct {
 }
 
 var choices = []string{
-	config.GitHubPlatform.String(),
-	config.GitLabPlatform.String() + " (not implemented yet)",
+	constants.GitHubPlatform.String(),
+	constants.GitLabPlatform.String() + " (not implemented yet)",
 }
 
 func newSelectPlatformModel() selectPlatformModel {
@@ -60,22 +60,22 @@ func (sm selectPlatformModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (sm selectPlatformModel) View() string {
 	s := strings.Builder{}
-	s.WriteString(config.GetInfoStyle().Render("Choose platform?") + "\n\n")
+	s.WriteString(constants.GetInfoStyle().Render("Choose platform?") + "\n\n")
 
 	for i := 0; i < len(sm.choices); i++ {
 		if sm.cursor == i {
-			s.WriteString(config.GetSuccessStyle().Render("(•) "))
+			s.WriteString(constants.GetSuccessStyle().Render("(•) "))
 		} else {
 			s.WriteString("( ) ")
 		}
 		if sm.cursor == i {
-			s.WriteString(config.GetBranchStyle().Render(sm.choices[i]))
+			s.WriteString(constants.GetBranchStyle().Render(sm.choices[i]))
 		} else {
 			s.WriteString(sm.choices[i])
 		}
 		s.WriteString("\n")
 	}
-	s.WriteString("\n" + config.GetDebugStyle().Render("(press ctrl+q to quit)") + "\n")
+	s.WriteString("\n" + constants.GetDebugStyle().Render("(press ctrl+q to quit)") + "\n")
 
 	return s.String()
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 func HandleAddProtectedBranch() ([]string, error) {
@@ -43,9 +43,9 @@ func buildTextInput() textinput.Model {
 	pbm.Focus()
 	pbm.CharLimit = 256
 	pbm.Width = 20
-	pbm.Cursor.Style = config.GetSuccessStyle()
-	pbm.PromptStyle = config.GetSuccessStyle()
-	pbm.TextStyle = config.GetSuccessStyle()
+	pbm.Cursor.Style = constants.GetSuccessStyle()
+	pbm.PromptStyle = constants.GetSuccessStyle()
+	pbm.TextStyle = constants.GetSuccessStyle()
 
 	return pbm
 }
@@ -125,16 +125,16 @@ func (pbm protectedBranchModele) View() string {
 
 	var doneButton string
 	if pbm.focusIndex == 1 {
-		doneButton = config.GetSuccessStyle().Render("[ Done ]")
+		doneButton = constants.GetSuccessStyle().Render("[ Done ]")
 	} else {
-		doneButton = config.GetDebugStyle().Render("[ Done ]")
+		doneButton = constants.GetDebugStyle().Render("[ Done ]")
 	}
 
 	var addButton string
 	if pbm.focusIndex == 2 {
-		addButton = config.GetSuccessStyle().Render("[ Add ]")
+		addButton = constants.GetSuccessStyle().Render("[ Add ]")
 	} else {
-		addButton = config.GetDebugStyle().Render("[ Add ]")
+		addButton = constants.GetDebugStyle().Render("[ Add ]")
 	}
 
 	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton, addButton)

@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 var (
@@ -22,7 +23,7 @@ type accountsModel struct {
 	focusIndex    int
 	inputs        []textinput.Model
 	accounts      []config.Account
-	platform      config.Platform
+	platform      constants.Platform
 	platformIndex int
 }
 
@@ -34,8 +35,8 @@ func newAccountsModel() accountsModel {
 	accountsModel.inputs[0] = buildUserInput()
 	accountsModel.inputs[1] = buildTokenInput()
 	accountsModel.focusIndex = 0
-	accountsModel.platform = config.GitHubPlatform // Default to GitHub
-	accountsModel.platformIndex = 0                // Default to first platform (GitHub)
+	accountsModel.platform = constants.GitHubPlatform // Default to GitHub
+	accountsModel.platformIndex = 0                   // Default to first platform (GitHub)
 
 	return accountsModel
 }
@@ -43,32 +44,32 @@ func newAccountsModel() accountsModel {
 func buildUserInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = config.GetSuccessStyle()
+	t.Cursor.Style = constants.GetSuccessStyle()
 
 	t.Placeholder = "User"
 	t.Focus()
 	t.CharLimit = 32
-	t.PromptStyle = config.GetSuccessStyle()
+	t.PromptStyle = constants.GetSuccessStyle()
 
-	t.TextStyle = config.GetSuccessStyle()
+	t.TextStyle = constants.GetSuccessStyle()
 	return t
 }
 
 func buildTokenInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = config.GetSuccessStyle()
+	t.Cursor.Style = constants.GetSuccessStyle()
 
 	t.Placeholder = "Token"
 	t.CharLimit = 128
-	t.PromptStyle = config.GetSuccessStyle()
-	t.TextStyle = config.GetSuccessStyle()
+	t.PromptStyle = constants.GetSuccessStyle()
+	t.TextStyle = constants.GetSuccessStyle()
 	return t
 }
 
-var platformOptions = []config.Platform{
-	config.GitHubPlatform,
-	config.GitLabPlatform,
+var platformOptions = []constants.Platform{
+	constants.GitHubPlatform,
+	constants.GitLabPlatform,
 }
 
 func (am accountsModel) Init() tea.Cmd {
@@ -142,7 +143,7 @@ func (am accountsModel) View() string {
 		platformStr := platform.String()
 		if i == am.platformIndex {
 			if am.focusIndex == len(am.inputs) {
-				b.WriteString(config.GetSuccessStyle().Render("(•) " + platformStr))
+				b.WriteString(constants.GetSuccessStyle().Render("(•) " + platformStr))
 			} else {
 				b.WriteString("(•) " + platformStr)
 			}
@@ -160,16 +161,16 @@ func (am accountsModel) View() string {
 
 	var doneButton string
 	if am.focusIndex == len(am.inputs)+1 {
-		doneButton = config.GetSuccessStyle().Render(DoneButtonFocus)
+		doneButton = constants.GetSuccessStyle().Render(DoneButtonFocus)
 	} else {
-		doneButton = config.GetDebugStyle().Render(DoneButtonBlur)
+		doneButton = constants.GetDebugStyle().Render(DoneButtonBlur)
 	}
 
 	var addButton string
 	if am.focusIndex == len(am.inputs)+2 {
-		addButton = config.GetSuccessStyle().Render(AddButtonFocus)
+		addButton = constants.GetSuccessStyle().Render(AddButtonFocus)
 	} else {
-		addButton = config.GetDebugStyle().Render(AddButtonBlur)
+		addButton = constants.GetDebugStyle().Render(AddButtonBlur)
 	}
 
 	fmt.Fprintf(&b, "\n\n%s  %s\n\n", doneButton, addButton)
@@ -234,8 +235,8 @@ func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 		if i == am.focusIndex {
 			// Set focused state
 			cmds[i] = am.inputs[i].Focus()
-			am.inputs[i].PromptStyle = config.GetSuccessStyle()
-			am.inputs[i].TextStyle = config.GetSuccessStyle()
+			am.inputs[i].PromptStyle = constants.GetSuccessStyle()
+			am.inputs[i].TextStyle = constants.GetSuccessStyle()
 			continue
 		}
 		// Remove focused state

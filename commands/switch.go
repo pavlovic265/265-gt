@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +31,7 @@ func (svc switchCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(config.SuccessIndicator("Switched to previous branch"))
+			fmt.Println(constants.SuccessIndicator("Switched to previous branch"))
 			return nil
 		},
 	}

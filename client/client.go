@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 )
 
@@ -13,11 +13,11 @@ type CliClient interface {
 	ListPullRequests(args []string) ([]PullRequest, error)
 }
 
-var Client map[config.Platform]CliClient
+var Client map[constants.Platform]CliClient
 
 func InitCliClient(exe executor.Executor) {
-	Client = map[config.Platform]CliClient{
-		config.GitHubPlatform: NewGitHubCli(exe),
-		config.GitLabPlatform: NewGitLabCli(exe),
+	Client = map[constants.Platform]CliClient{
+		constants.GitHubPlatform: NewGitHubCli(exe),
+		constants.GitLabPlatform: NewGitLabCli(exe),
 	}
 }

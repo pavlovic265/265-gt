@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -205,7 +206,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 
 func (svc gitHubCli) displayAuthStatus(output string) {
 	// Simple title with subtle color
-	fmt.Println(config.GetInfoStyle().Render("GitHub Authentication Status"))
+	fmt.Println(constants.GetInfoStyle().Render("GitHub Authentication Status"))
 	fmt.Println()
 
 	lines := strings.Split(output, "\n")
@@ -224,24 +225,24 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 				fmt.Println() // Add spacing between platforms
 			}
 			currentPlatform = line
-			fmt.Println(config.GetCommandStyle().Render("> " + currentPlatform))
+			fmt.Println(constants.GetCommandStyle().Render("> " + currentPlatform))
 			continue
 		}
 
 		// Style the lines with subtle colors
 		if strings.HasPrefix(line, "✓") {
 			// Success lines (logged in accounts)
-			fmt.Println(config.GetSuccessStyle().Render(line))
+			fmt.Println(constants.GetSuccessStyle().Render(line))
 		} else if strings.HasPrefix(line, "-") {
 			// Detail lines
 			if strings.Contains(line, "Active account: true") {
-				fmt.Println(config.GetSuccessStyle().Render("  " + line))
+				fmt.Println(constants.GetSuccessStyle().Render("  " + line))
 			} else if strings.Contains(line, "Active account: false") {
-				fmt.Println(config.GetDebugStyle().Render("  " + line))
+				fmt.Println(constants.GetDebugStyle().Render("  " + line))
 			} else if strings.Contains(line, "Token:") {
-				fmt.Println(config.GetWarningStyle().Render("  " + line))
+				fmt.Println(constants.GetWarningStyle().Render("  " + line))
 			} else {
-				fmt.Println(config.GetDebugStyle().Render("  " + line))
+				fmt.Println(constants.GetDebugStyle().Render("  " + line))
 			}
 		}
 	}
@@ -251,8 +252,9 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 	// Show active account from our config
 	activeAccount := config.GetActiveAccount()
 	if activeAccount != nil {
-		fmt.Println(config.GetSuccessStyle().Render("* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
+		fmt.Println(constants.GetSuccessStyle().Render(
+			"* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
 	} else {
-		fmt.Println(config.GetWarningStyle().Render("! No active account set in gt config"))
+		fmt.Println(constants.GetWarningStyle().Render("! No active account set in gt config"))
 	}
 }

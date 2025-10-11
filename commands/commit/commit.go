@@ -3,7 +3,7 @@ package commit
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
@@ -46,9 +46,9 @@ func (svc commitCommand) Command() *cobra.Command {
 			}
 
 			if empty {
-				fmt.Println(config.SuccessIndicator("Empty commit created with message: '" + message + "'"))
+				fmt.Println(constants.SuccessIndicator("Empty commit created with message: '" + message + "'"))
 			} else {
-				fmt.Println(config.SuccessIndicator("Commit created with message: '" + message + "'"))
+				fmt.Println(constants.SuccessIndicator("Commit created with message: '" + message + "'"))
 			}
 			return nil
 		},

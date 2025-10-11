@@ -1,4 +1,4 @@
-package config
+package constants
 
 import "github.com/charmbracelet/lipgloss"
 
@@ -215,10 +215,7 @@ func GetStatusStyle() lipgloss.Style {
 
 // Theme detection based on config
 func isLightTheme() bool {
-	// Check if config is initialized and theme is set to light
-	if GlobalConfig.Theme.Type == "light" {
-		return true
-	}
-	// Default to dark theme
+	// For now, default to dark theme
+	// TODO: This should be configurable through a proper config interface
 	return false
 }

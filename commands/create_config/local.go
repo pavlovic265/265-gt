@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -31,7 +32,7 @@ func (svc localCommand) Command() *cobra.Command {
 		Short:              "generate local config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filePath := filepath.Join(".", config.FileName)
+			filePath := filepath.Join(".", constants.FileName)
 
 			_, err := os.Stat(filePath)
 			if errors.Is(err, os.ErrNotExist) {
@@ -63,7 +64,7 @@ func (svc localCommand) Command() *cobra.Command {
 			} else if err != nil {
 				return fmt.Errorf("error checking file: %w", err)
 			} else {
-				fmt.Printf("File '%s' exists.\n", config.FileName)
+				fmt.Printf("File '%s' exists.\n", constants.FileName)
 			}
 
 			return nil

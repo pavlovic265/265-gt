@@ -6,7 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -51,7 +51,7 @@ func (svc cleanCommand) cleanBranches() error {
 		return fmt.Errorf("failed to get branches: %w", err)
 	}
 
-	fmt.Println(config.TitleStyle.Render("🧹 Branch Cleanup"))
+	fmt.Println(constants.TitleStyle.Render("🧹 Branch Cleanup"))
 	fmt.Println()
 
 	cleanableCount := 0
@@ -62,13 +62,13 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	if cleanableCount == 0 {
-		fmt.Println(config.SuccessIndicator("No branches to clean up!"))
+		fmt.Println(constants.SuccessIndicator("No branches to clean up!"))
 		return nil
 	}
 
 	// Show options once at the top
-	fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", config.InfoStyle.Render("Options:"))
-	fmt.Printf("   %s Default: Yes (press Enter)\n", config.HighlightStyle.Render("💡"))
+	fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", constants.InfoStyle.Render("Options:"))
+	fmt.Printf("   %s Default: Yes (press Enter)\n", constants.HighlightStyle.Render("💡"))
 	fmt.Println()
 
 	deletedCount := 0
@@ -79,7 +79,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 		shouldBreak, err := svc.deleteBranch(branch)
 		if err != nil {
-			fmt.Printf("%s Error: %v\n", config.ErrorIconOnly(), err)
+			fmt.Printf("%s Error: %v\n", constants.ErrorIconOnly(), err)
 			continue
 		}
 
@@ -90,16 +90,16 @@ func (svc cleanCommand) cleanBranches() error {
 		deletedCount++
 	}
 
-	fmt.Printf("\n%s Cleaned up %d branches\n", config.SuccessIconOnly(), deletedCount)
+	fmt.Printf("\n%s Cleaned up %d branches\n", constants.SuccessIconOnly(), deletedCount)
 	return nil
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 	parent := svc.gitHelper.GetParent(svc.exe, branch)
 
-	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", config.InfoStyle.Render(branch))
+	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", constants.InfoStyle.Render(branch))
 	if parent != "" {
-		promptMsg += fmt.Sprintf(" (parent: %s)", config.DebugStyle.Render(parent))
+		promptMsg += fmt.Sprintf(" (parent: %s)", constants.DebugStyle.Render(parent))
 	}
 
 	initialModel := components.NewYesNoPrompt(promptMsg)
@@ -131,7 +131,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   %s %s\n", config.SuccessIconOnly(), gitOutput)
+			fmt.Printf("   %s %s\n", constants.SuccessIconOnly(), gitOutput)
 		}
 	}
 

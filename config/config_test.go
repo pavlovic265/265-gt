@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -20,7 +21,7 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 	}()
 
 	os.Setenv("HOME", tempDir)
-	configPath := filepath.Join(tempDir, FileName)
+	configPath := filepath.Join(tempDir, constants.FileName)
 
 	// Create initial config with GitHub accounts
 	initialConfig := GlobalConfigStruct{
@@ -81,7 +82,7 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 	}()
 
 	os.Setenv("HOME", tempDir)
-	configPath := filepath.Join(tempDir, FileName)
+	configPath := filepath.Join(tempDir, constants.FileName)
 
 	// Create initial config with GitHub accounts
 	initialConfig := GlobalConfigStruct{

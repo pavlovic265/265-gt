@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 type ListModel struct {
@@ -77,21 +77,21 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ListModel) View() string {
 	s := fmt.Sprintf("%s %s\n\n",
-		config.GetInfoStyle().Render("Search:"),
-		config.GetHighlightStyle().Render(m.Query))
+		constants.GetInfoStyle().Render("Search:"),
+		constants.GetHighlightStyle().Render(m.Query))
 
 	if len(m.Choices) == 0 {
-		s += config.GetWarningStyle().Render("No items found") + "\n"
+		s += constants.GetWarningStyle().Render("No items found") + "\n"
 	} else {
 		for i, choice := range m.Choices {
 			cursor := " "
 			if m.Cursor == i {
-				cursor = config.GetCommandStyle().Render(">")
+				cursor = constants.GetCommandStyle().Render(">")
 			}
 
 			styledChoice := choice
 			if m.Cursor == i {
-				styledChoice = config.GetBranchStyle().Render(choice)
+				styledChoice = constants.GetBranchStyle().Render(choice)
 			}
 
 			line := fmt.Sprintf("%s %s", cursor, styledChoice)
@@ -102,18 +102,18 @@ func (m ListModel) View() string {
 	// Only show yank option if there are URLs available
 	if len(m.URLs) > 0 && m.YankURL != "" {
 		s += fmt.Sprintf("\n%s %s %s\n",
-			config.GetDebugStyle().Render("Press"),
-			config.GetCommandStyle().Render("CTRL+q"),
-			config.GetDebugStyle().Render("to quit,"))
+			constants.GetDebugStyle().Render("Press"),
+			constants.GetCommandStyle().Render("CTRL+q"),
+			constants.GetDebugStyle().Render("to quit,"))
 		s += fmt.Sprintf("%s %s %s\n",
-			config.GetDebugStyle().Render("Press"),
-			config.GetCommandStyle().Render("CTRL+y"),
-			config.GetDebugStyle().Render("to yank URL."))
+			constants.GetDebugStyle().Render("Press"),
+			constants.GetCommandStyle().Render("CTRL+y"),
+			constants.GetDebugStyle().Render("to yank URL."))
 	} else {
 		s += fmt.Sprintf("\n%s %s %s\n",
-			config.GetDebugStyle().Render("Press"),
-			config.GetCommandStyle().Render("CTRL+q"),
-			config.GetDebugStyle().Render("to quit."))
+			constants.GetDebugStyle().Render("Press"),
+			constants.GetCommandStyle().Render("CTRL+q"),
+			constants.GetDebugStyle().Render("to quit."))
 	}
 
 	return s

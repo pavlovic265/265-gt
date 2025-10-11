@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 )
@@ -110,12 +111,12 @@ func showVersionNotification(current, latest, url string) {
 	latestDisplay := strings.TrimPrefix(latest, "v")
 
 	fmt.Printf("\n%s %s %s %s %s\n",
-		config.GetInfoStyle().Render("🔄"),
-		config.GetInfoStyle().Render("A new release of gt is available:"),
-		config.GetWarningStyle().Render(currentDisplay),
-		config.GetDebugStyle().Render(config.ArrowRightIcon),
-		config.GetWarningStyle().Render(latestDisplay))
+		constants.GetInfoStyle().Render("🔄"),
+		constants.GetInfoStyle().Render("A new release of gt is available:"),
+		constants.GetWarningStyle().Render(currentDisplay),
+		constants.GetDebugStyle().Render(constants.ArrowRightIcon),
+		constants.GetWarningStyle().Render(latestDisplay))
 
-	fmt.Printf("To upgrade, run: %s\n", config.GetSuccessStyle().Render("gt upgrade"))
-	fmt.Printf("%s\n\n", config.GetInfoStyle().Render(url))
+	fmt.Printf("To upgrade, run: %s\n", constants.GetSuccessStyle().Render("gt upgrade"))
+	fmt.Printf("%s\n\n", constants.GetInfoStyle().Render(url))
 }

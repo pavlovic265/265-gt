@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
@@ -14,9 +15,9 @@ import (
 )
 
 type Account struct {
-	User     string   `yaml:"user"`
-	Token    string   `yaml:"token"`
-	Platform Platform `yaml:"platform"`
+	User     string             `yaml:"user"`
+	Token    string             `yaml:"token"`
+	Platform constants.Platform `yaml:"platform"`
 }
 
 type Version struct {
@@ -167,7 +168,7 @@ func GetGlobalConfigPath() (string, error) {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	configPath := filepath.Join(homeDir, FileName)
+	configPath := filepath.Join(homeDir, constants.FileName)
 	_, err = os.Stat(configPath)
 	if errors.Is(err, os.ErrNotExist) {
 		return "", fmt.Errorf("config file does not exist: %w", err)

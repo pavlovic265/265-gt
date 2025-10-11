@@ -5,6 +5,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +42,7 @@ func (svc createCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(config.SuccessIndicator("Pull request created successfully"))
+			fmt.Println(constants.SuccessIndicator("Pull request created successfully"))
 			return nil
 		},
 	}

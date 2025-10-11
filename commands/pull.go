@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -42,7 +42,7 @@ func (svc pullCommand) Command() *cobra.Command {
 				return err
 			}
 
-			fmt.Println(config.SuccessIndicator("Branch '" + pointer.Deref(currentBranch) + "' pulled successfully"))
+			fmt.Println(constants.SuccessIndicator("Branch '" + pointer.Deref(currentBranch) + "' pulled successfully"))
 			return nil
 		},
 	}

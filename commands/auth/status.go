@@ -5,6 +5,7 @@ import (
 
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -31,17 +32,17 @@ func (svc statusCommand) Command() *cobra.Command {
 			fmt.Println("Checking status...")
 			account := config.GetActiveAccount()
 			if account == nil {
-				fmt.Println(config.ErrorIndicator("No active account found"))
+				fmt.Println(constants.ErrorIndicator("No active account found"))
 				return nil
 			}
 
 			err := client.Client[account.Platform].AuthStatus()
 			if err != nil {
-				fmt.Println(config.ErrorIndicator("Authentication failed"))
+				fmt.Println(constants.ErrorIndicator("Authentication failed"))
 				return err
 			}
 
-			fmt.Println(config.SuccessIndicator("Authentication successful"))
+			fmt.Println(constants.SuccessIndicator("Authentication successful"))
 			return nil
 		},
 	}

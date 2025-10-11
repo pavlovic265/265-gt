@@ -7,6 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -60,7 +61,7 @@ func (svc loginCommand) Command() *cobra.Command {
 						return err
 					}
 
-					fmt.Println(config.SuccessIndicator("Successfully authenticated with " + m.Selected))
+					fmt.Println(constants.SuccessIndicator("Successfully authenticated with " + m.Selected))
 				}
 			} else {
 				return err
