@@ -26,11 +26,8 @@ func main() {
 }
 
 func getCurrentTheme() string {
-	// Check which theme is currently active
-	if constants.GetBackgroundColor() == constants.LightBackground {
-		return "Light"
-	}
-	return "Dark"
+	// Since we only have Panda theme now, always return Dark
+	return "Dark (Panda Theme)"
 }
 
 func showThemeColors() {
