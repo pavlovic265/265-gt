@@ -44,26 +44,26 @@ func newAccountsModel() accountsModel {
 func buildUserInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = constants.GetSuccessStyle()
+	t.Cursor.Style = constants.GetSuccessAnsiStyle()
 
 	t.Placeholder = "User"
 	t.Focus()
 	t.CharLimit = 32
-	t.PromptStyle = constants.GetSuccessStyle()
+	t.PromptStyle = constants.GetSuccessAnsiStyle()
 
-	t.TextStyle = constants.GetSuccessStyle()
+	t.TextStyle = constants.GetSuccessAnsiStyle()
 	return t
 }
 
 func buildTokenInput() textinput.Model {
 	t := textinput.New()
 
-	t.Cursor.Style = constants.GetSuccessStyle()
+	t.Cursor.Style = constants.GetSuccessAnsiStyle()
 
 	t.Placeholder = "Token"
 	t.CharLimit = 128
-	t.PromptStyle = constants.GetSuccessStyle()
-	t.TextStyle = constants.GetSuccessStyle()
+	t.PromptStyle = constants.GetSuccessAnsiStyle()
+	t.TextStyle = constants.GetSuccessAnsiStyle()
 	return t
 }
 

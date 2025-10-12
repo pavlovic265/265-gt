@@ -43,9 +43,9 @@ func buildTextInput() textinput.Model {
 	pbm.Focus()
 	pbm.CharLimit = 256
 	pbm.Width = 20
-	pbm.Cursor.Style = constants.GetSuccessStyle()
-	pbm.PromptStyle = constants.GetSuccessStyle()
-	pbm.TextStyle = constants.GetSuccessStyle()
+	pbm.Cursor.Style = constants.GetSuccessAnsiStyle()
+	pbm.PromptStyle = constants.GetSuccessAnsiStyle()
+	pbm.TextStyle = constants.GetSuccessAnsiStyle()
 
 	return pbm
 }

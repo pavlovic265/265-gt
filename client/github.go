@@ -257,7 +257,7 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 	// Show active account from our config
 	activeAccount := svc.configManager.GetActiveAccount()
 	if svc.configManager.HasActiveAccount() {
-		fmt.Println(constants.GetSuccessStyle().Render(
+		fmt.Println(constants.GetSuccessAnsiStyle().Render(
 			"* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
 	} else {
 		fmt.Println("! No active account set in gt config")

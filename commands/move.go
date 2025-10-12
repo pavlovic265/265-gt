@@ -79,8 +79,7 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 		return err
 	}
 
-	fmt.Println(constants.SuccessIndicator(
-		"Branch '" + currentBranch + "' rebased onto '" + parentBranch + "' successfully"))
+	fmt.Println(constants.SuccessIcon + " Branch '" + currentBranch + "' rebased onto '" + parentBranch + "' successfully")
 	return nil
 }
 
