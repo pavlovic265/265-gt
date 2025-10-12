@@ -30,7 +30,7 @@ func (svc pushCommand) Command() *cobra.Command {
 		Aliases: []string{"pu"},
 		Short:   "push branch always froce",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return err
 			}

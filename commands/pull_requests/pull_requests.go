@@ -1,19 +1,23 @@
 package pullrequests
 
 import (
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
 type pullRequestCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewPullRequestCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) pullRequestCommand {
 	return pullRequestCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -24,8 +28,8 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 		Aliases: []string{"pr"},
 	}
 
-	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe).Command())
-	pullRequestCmd.AddCommand(NewListCommand(svc.exe).Command())
+	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe, svc.configManager).Command())
+	pullRequestCmd.AddCommand(NewListCommand(svc.exe, svc.configManager).Command())
 
 	return pullRequestCmd
 }

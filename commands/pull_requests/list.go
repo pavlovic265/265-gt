@@ -16,14 +16,17 @@ import (
 )
 
 type listCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewListCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) listCommand {
 	return listCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -33,10 +36,10 @@ func (svc listCommand) Command() *cobra.Command {
 		Short:   "show list of pull request",
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			account := config.GetActiveAccount()
-			if account == nil {
+			if !svc.configManager.HasActiveAccount() {
 				return fmt.Errorf("no active account found")
 			}
+			account := svc.configManager.GetActiveAccount()
 
 			prs, err := client.Client[account.Platform].ListPullRequests(args)
 			if err != nil {

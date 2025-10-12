@@ -29,11 +29,11 @@ func (svc downCommand) Command() *cobra.Command {
 		Use:   "down",
 		Short: "move to brunch down in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+			branch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return err
 			}
-			parent := svc.gitHelper.GetParent(svc.exe, pointer.Deref(branch))
+			parent := svc.gitHelper.GetParent(pointer.Deref(branch))
 
 			exeArgs := []string{"checkout", parent}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()

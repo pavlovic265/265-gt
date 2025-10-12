@@ -3,21 +3,22 @@ package helpers
 import (
 	"testing"
 
-	"github.com/pavlovic265/265-gt/config"
+	"github.com/golang/mock/gomock"
+	"github.com/pavlovic265/265-gt/mocks"
 )
 
 func TestIsProtectedBranch(t *testing.T) {
-	gitHelper := &GitHelperImpl{}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	gitHelper := &GitHelperImpl{configManager: mockConfigManager}
 
 	// Set up test config
-	originalLocalConfig := config.LocalConfig
-	defer func() {
-		config.LocalConfig = originalLocalConfig
-	}()
-
-	config.LocalConfig = config.LocalConfigStruct{
-		Protected: []string{"main", "develop", "master"},
-	}
+	mockConfigManager.EXPECT().
+		GetProtectedBranches().
+		Return([]string{"main", "develop", "master"}).
+		AnyTimes()
 
 	tests := []struct {
 		name     string
@@ -72,17 +73,17 @@ func TestIsProtectedBranch(t *testing.T) {
 }
 
 func TestIsProtectedBranch_EmptyProtectedList(t *testing.T) {
-	gitHelper := &GitHelperImpl{}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	gitHelper := &GitHelperImpl{configManager: mockConfigManager}
 
 	// Set up test config with empty protected list
-	originalLocalConfig := config.LocalConfig
-	defer func() {
-		config.LocalConfig = originalLocalConfig
-	}()
-
-	config.LocalConfig = config.LocalConfigStruct{
-		Protected: []string{},
-	}
+	mockConfigManager.EXPECT().
+		GetProtectedBranches().
+		Return([]string{}).
+		AnyTimes()
 
 	tests := []struct {
 		name     string
@@ -112,17 +113,17 @@ func TestIsProtectedBranch_EmptyProtectedList(t *testing.T) {
 }
 
 func TestIsProtectedBranch_CaseSensitive(t *testing.T) {
-	gitHelper := &GitHelperImpl{}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	gitHelper := &GitHelperImpl{configManager: mockConfigManager}
 
 	// Set up test config
-	originalLocalConfig := config.LocalConfig
-	defer func() {
-		config.LocalConfig = originalLocalConfig
-	}()
-
-	config.LocalConfig = config.LocalConfigStruct{
-		Protected: []string{"main", "MAIN", "Main"},
-	}
+	mockConfigManager.EXPECT().
+		GetProtectedBranches().
+		Return([]string{"main", "MAIN", "Main"}).
+		AnyTimes()
 
 	tests := []struct {
 		name     string

@@ -15,7 +15,7 @@ func TestIsGitRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Set up expectations
 	mockExecutor.EXPECT().
@@ -38,7 +38,7 @@ func TestIsGitRepository(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.IsGitRepository(mockExecutor)
+	err := gitHelper.IsGitRepository()
 
 	// Assertions
 	if err != nil {
@@ -51,7 +51,7 @@ func TestIsGitRepository_NotGitRepo(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedError := errors.New("not a git repository")
 
@@ -72,7 +72,7 @@ func TestIsGitRepository_NotGitRepo(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.IsGitRepository(mockExecutor)
+	err := gitHelper.IsGitRepository()
 
 	// Assertions
 	if err == nil {
@@ -89,7 +89,7 @@ func TestGetGitRoot(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedRoot := "/path/to/git/repo"
 
@@ -114,7 +114,7 @@ func TestGetGitRoot(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetGitRoot(mockExecutor)
+	result, err := gitHelper.GetGitRoot()
 
 	// Assertions
 	if err != nil {
@@ -130,7 +130,7 @@ func TestGetGitRoot_WithWhitespace(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedRoot := "/path/to/git/repo"
 	outputWithWhitespace := "  " + expectedRoot + "  \n"
@@ -156,7 +156,7 @@ func TestGetGitRoot_WithWhitespace(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetGitRoot(mockExecutor)
+	result, err := gitHelper.GetGitRoot()
 
 	// Assertions
 	if err != nil {
@@ -172,7 +172,7 @@ func TestGetGitRoot_NotGitRepo(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedError := errors.New("not a git repository")
 
@@ -193,7 +193,7 @@ func TestGetGitRoot_NotGitRepo(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetGitRoot(mockExecutor)
+	result, err := gitHelper.GetGitRoot()
 
 	// Assertions
 	if err == nil {
@@ -213,7 +213,7 @@ func TestEnsureGitRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Set up expectations for IsGitRepository
 	mockExecutor.EXPECT().
@@ -236,7 +236,7 @@ func TestEnsureGitRepository(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.EnsureGitRepository(mockExecutor)
+	err := gitHelper.EnsureGitRepository()
 
 	// Assertions
 	if err != nil {
@@ -249,7 +249,7 @@ func TestEnsureGitRepository_NotGitRepo(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedError := errors.New("not a git repository")
 
@@ -270,7 +270,7 @@ func TestEnsureGitRepository_NotGitRepo(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.EnsureGitRepository(mockExecutor)
+	err := gitHelper.EnsureGitRepository()
 
 	// Assertions
 	if err == nil {

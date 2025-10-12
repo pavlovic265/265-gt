@@ -21,14 +21,15 @@ import (
 )
 
 var exe = executor.NewExe()
-var gitHelper = helpers.NewGitHelper()
+var configManager = config.NewDefaultConfigManager(exe)
+var gitHelper = helpers.NewGitHelper(exe, configManager)
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
 
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		client.InitCliClient(exe)
+		client.InitCliClient(exe, configManager, gitHelper)
 
 		isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
 		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
@@ -37,20 +38,20 @@ var rootCmd = &cobra.Command{
 
 		loadLocalConfig := false
 		if isVersion || isCompletion || isConfig || isAuth {
-			config.InitConfig(exe, loadLocalConfig) // Don't load local config for these commands
+			configManager.InitConfig(loadLocalConfig) // Don't load local config for these commands
 			return
 		}
 
 		// Check if we're in a git repository
-		if err := gitHelper.EnsureGitRepository(exe); err != nil {
+		if err := gitHelper.EnsureGitRepository(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 		loadLocalConfig = true
 
-		config.InitConfig(exe, loadLocalConfig) // Load local config for these commands
+		configManager.InitConfig(loadLocalConfig) // Load local config for these commands
 
-		helpers.CheckGTVersion(exe)
+		gitHelper.CheckGTVersion()
 	},
 	// Override the default error handling to pass unknown commands to git
 	SilenceErrors: true,
@@ -86,15 +87,15 @@ func main() {
 	rootCmd.AddCommand(commands.NewMoveCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewDeleteCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewCleanCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewVersionCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewUpgradeCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewVersionCommand(exe, configManager).Command())
+	rootCmd.AddCommand(commands.NewUpgradeCommand(exe, configManager).Command())
 	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
-	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe).Command())
-	rootCmd.AddCommand(auth.NewAuthCommand(exe).Command())
-	rootCmd.AddCommand(createconfig.NewConfigCommand(exe).Command())
+	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager).Command())
+	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())
+	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "completion [bash|zsh|fish|powershell]",

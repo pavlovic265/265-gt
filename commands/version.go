@@ -10,14 +10,17 @@ import (
 )
 
 type versionCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewVersionCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) versionCommand {
 	return versionCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -43,7 +46,7 @@ func (svc versionCommand) Command() *cobra.Command {
 
 func (svc versionCommand) getCurrentVersion() error {
 	// Read version from config
-	version := config.GlobalConfig.Version.LastVersion
+	version := svc.configManager.GetCurrentVersion()
 	if version == "" {
 		version = "unknown"
 	}

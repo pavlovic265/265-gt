@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/pavlovic265/265-gt/executor"
 )
 
 // IsGitRepository checks if the current directory is a git repository
-func (gh *GitHelperImpl) IsGitRepository(exe executor.Executor) error {
+func (gh *GitHelperImpl) IsGitRepository() error {
 	exeArgs := []string{"rev-parse", "--git-dir"}
-	_, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	_, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return fmt.Errorf("not a git repository (or any of the parent directories): .git")
 	}
@@ -19,9 +17,9 @@ func (gh *GitHelperImpl) IsGitRepository(exe executor.Executor) error {
 }
 
 // GetGitRoot gets the root directory of the git repository
-func (gh *GitHelperImpl) GetGitRoot(exe executor.Executor) (string, error) {
+func (gh *GitHelperImpl) GetGitRoot() (string, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
-	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return "", fmt.Errorf("not a git repository (or any of the parent directories): .git")
 	}
@@ -29,8 +27,8 @@ func (gh *GitHelperImpl) GetGitRoot(exe executor.Executor) (string, error) {
 }
 
 // EnsureGitRepository ensures the current directory is a git repository
-func (gh *GitHelperImpl) EnsureGitRepository(exe executor.Executor) error {
-	err := gh.IsGitRepository(exe)
+func (gh *GitHelperImpl) EnsureGitRepository() error {
+	err := gh.IsGitRepository()
 	if err != nil {
 		currentDir, _ := os.Getwd()
 		return fmt.Errorf("❌ No git repository found\n\n"+

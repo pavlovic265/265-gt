@@ -14,7 +14,7 @@ func TestSetChildren(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	parent := "main"
 	children := "feature1 feature2"
@@ -36,7 +36,7 @@ func TestSetChildren(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.SetChildren(mockExecutor, parent, children)
+	err := gitHelper.SetChildren(parent, children)
 
 	// Assertions
 	if err != nil {
@@ -49,7 +49,7 @@ func TestSetChildren_Error(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	parent := "main"
 	children := "feature1 feature2"
@@ -72,7 +72,7 @@ func TestSetChildren_Error(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.SetChildren(mockExecutor, parent, children)
+	err := gitHelper.SetChildren(parent, children)
 
 	// Assertions
 	if err == nil {
@@ -88,7 +88,7 @@ func TestGetChildren(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	branch := "main"
 	expectedChildren := "feature1 feature2"
@@ -114,7 +114,7 @@ func TestGetChildren(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result := gitHelper.GetChildren(mockExecutor, branch)
+	result := gitHelper.GetChildren(branch)
 
 	// Assertions
 	if result != expectedChildren {
@@ -127,7 +127,7 @@ func TestGetChildren_Empty(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	branch := "main"
 
@@ -152,7 +152,7 @@ func TestGetChildren_Empty(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result := gitHelper.GetChildren(mockExecutor, branch)
+	result := gitHelper.GetChildren(branch)
 
 	// Assertions
 	if result != "" {
@@ -165,7 +165,7 @@ func TestDeleteChildren(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	branch := "main"
 
@@ -186,7 +186,7 @@ func TestDeleteChildren(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.DeleteChildren(mockExecutor, branch)
+	err := gitHelper.DeleteChildren(branch)
 
 	// Assertions
 	if err != nil {
@@ -199,7 +199,7 @@ func TestDeleteChildren_Error(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	branch := "main"
 	expectedError := errors.New("git config error")
@@ -221,7 +221,7 @@ func TestDeleteChildren_Error(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.DeleteChildren(mockExecutor, branch)
+	err := gitHelper.DeleteChildren(branch)
 
 	// Assertions
 	if err == nil {

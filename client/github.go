@@ -13,14 +13,20 @@ import (
 )
 
 type gitHubCli struct {
-	exe       executor.Executor
-	gitHelper helpers.GitHelper
+	exe           executor.Executor
+	gitHelper     helpers.GitHelper
+	configManager config.ConfigManager
 }
 
-func NewGitHubCli(exe executor.Executor) CliClient {
+func NewGitHubCli(
+	exe executor.Executor,
+	configManager config.ConfigManager,
+	gitHelper helpers.GitHelper,
+) CliClient {
 	return &gitHubCli{
-		exe:       exe,
-		gitHelper: helpers.NewGitHelper(),
+		exe:           exe,
+		configManager: configManager,
+		gitHelper:     gitHelper,
 	}
 }
 
@@ -48,7 +54,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 				}
 			}
 
-			accounts := config.GlobalConfig.Accounts
+			accounts := svc.configManager.GetAccounts()
 			for _, acc := range accounts {
 				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
@@ -74,7 +80,7 @@ func (svc gitHubCli) AuthStatus() error {
 }
 
 func (svc gitHubCli) AuthLogin(user string) error {
-	accounts := config.GlobalConfig.Accounts
+	accounts := svc.configManager.GetAccounts()
 	var account config.Account
 	for _, acc := range accounts {
 		if acc.User == user {
@@ -89,7 +95,7 @@ func (svc gitHubCli) AuthLogin(user string) error {
 		return err
 	}
 
-	err = config.SetActiveAccount(account)
+	err = svc.configManager.SetActiveAccount(account)
 	if err != nil {
 		return err
 	}
@@ -98,7 +104,7 @@ func (svc gitHubCli) AuthLogin(user string) error {
 }
 
 func (svc gitHubCli) AuthLogout(user string) error {
-	if !config.HasActiveAccount() {
+	if !svc.configManager.HasActiveAccount() {
 		return fmt.Errorf("no active account found")
 	}
 
@@ -114,12 +120,12 @@ func (svc gitHubCli) AuthLogout(user string) error {
 	}
 
 	if acc != nil {
-		err = config.SetActiveAccount(*acc)
+		err = svc.configManager.SetActiveAccount(*acc)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = config.ClearActiveAccount()
+		err = svc.configManager.ClearActiveAccount()
 		if err != nil {
 			return err
 		}
@@ -135,11 +141,11 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+	branch, err := svc.gitHelper.GetCurrentBranchName()
 	if err != nil {
 		return err
 	}
-	parent := svc.gitHelper.GetParent(svc.exe, pointer.Deref(branch))
+	parent := svc.gitHelper.GetParent(pointer.Deref(branch))
 
 	exeArgs := []string{
 		"pr",
@@ -250,8 +256,8 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 	fmt.Println()
 
 	// Show active account from our config
-	activeAccount := config.GetActiveAccount()
-	if activeAccount != nil {
+	activeAccount := svc.configManager.GetActiveAccount()
+	if svc.configManager.HasActiveAccount() {
 		fmt.Println(constants.GetSuccessStyle().Render(
 			"* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
 	} else {

@@ -14,7 +14,7 @@ func TestGetCurrentBranchName(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedBranch := "main"
 
@@ -39,7 +39,7 @@ func TestGetCurrentBranchName(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetCurrentBranchName(mockExecutor)
+	result, err := gitHelper.GetCurrentBranchName()
 
 	// Assertions
 	if err != nil {
@@ -59,7 +59,7 @@ func TestGetCurrentBranchName_Error(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedError := errors.New("git error")
 
@@ -80,7 +80,7 @@ func TestGetCurrentBranchName_Error(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetCurrentBranchName(mockExecutor)
+	result, err := gitHelper.GetCurrentBranchName()
 
 	// Assertions
 	if err == nil {
@@ -99,7 +99,7 @@ func TestGetBranches(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Mock git branch output
 	branchOutput := `* main
@@ -130,7 +130,7 @@ func TestGetBranches(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetBranches(mockExecutor)
+	result, err := gitHelper.GetBranches()
 
 	// Assertions
 	if err != nil {
@@ -151,7 +151,7 @@ func TestGetBranches_Empty(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Mock empty git branch output
 	branchOutput := ""
@@ -177,7 +177,7 @@ func TestGetBranches_Empty(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetBranches(mockExecutor)
+	result, err := gitHelper.GetBranches()
 
 	// Assertions
 	if err != nil {
@@ -193,7 +193,7 @@ func TestGetBranches_WithEmptyLines(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Mock git branch output with empty lines
 	branchOutput := `* main
@@ -226,7 +226,7 @@ func TestGetBranches_WithEmptyLines(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetBranches(mockExecutor)
+	result, err := gitHelper.GetBranches()
 
 	// Assertions
 	if err != nil {
@@ -247,7 +247,7 @@ func TestGetBranches_Error(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	expectedError := errors.New("git error")
 
@@ -268,7 +268,7 @@ func TestGetBranches_Error(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetBranches(mockExecutor)
+	result, err := gitHelper.GetBranches()
 
 	// Assertions
 	if err == nil {

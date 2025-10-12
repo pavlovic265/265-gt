@@ -12,18 +12,18 @@ import (
 
 // Test helper to create a clean command with mock executor and git helper
 func createCleanCommandWithMock(t *testing.T) (
-	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	cleanCmd := commands.NewCleanCommand(mockExecutor, mockGitHelper)
 	cmd := cleanCmd.Command()
-	return mockExecutor, mockGitHelper, ctrl, cmd
+	return mockGitHelper, ctrl, cmd
 }
 
 func TestCleanCommand_Command(t *testing.T) {
-	_, _, ctrl, cmd := createCleanCommandWithMock(t)
+	_, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -35,18 +35,18 @@ func TestCleanCommand_Command(t *testing.T) {
 }
 
 func TestCleanCommand_RunE_NoBranchesToClean(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
+	mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for GetBranches
 	mockGitHelper.EXPECT().
-		GetBranches(mockExecutor).
+		GetBranches().
 		Return([]string{"main"}, nil)
 
 	// Execute the command
@@ -55,18 +55,18 @@ func TestCleanCommand_RunE_NoBranchesToClean(t *testing.T) {
 }
 
 func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
+	mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for GetBranches
 	mockGitHelper.EXPECT().
-		GetBranches(mockExecutor).
+		GetBranches().
 		Return([]string{"main", "feature-branch", "test-branch"}, nil)
 
 	// Set up expectations for IsProtectedBranch - use AnyTimes since it's called in a loop
@@ -78,17 +78,17 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 	// Set up expectations for GetParent, GetChildren, and RelinkParentChildren
 	// These are called during the interactive cleanup process
 	mockGitHelper.EXPECT().
-		GetParent(gomock.Any(), gomock.Any()).
+		GetParent(gomock.Any()).
 		Return("").
 		AnyTimes()
 
 	mockGitHelper.EXPECT().
-		GetChildren(gomock.Any(), gomock.Any()).
+		GetChildren(gomock.Any()).
 		Return("").
 		AnyTimes()
 
 	mockGitHelper.EXPECT().
-		RelinkParentChildren(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		RelinkParentChildren(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil).
 		AnyTimes()
 

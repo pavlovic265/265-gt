@@ -31,11 +31,11 @@ func (svc upCommand) Command() *cobra.Command {
 		Use:   "up",
 		Short: "move to brunch up in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+			branch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return err
 			}
-			childrenStr := svc.gitHelper.GetChildren(svc.exe, pointer.Deref(branch))
+			childrenStr := svc.gitHelper.GetChildren(pointer.Deref(branch))
 			children := svc.gitHelper.UnmarshalChildren(childrenStr)
 
 			if len(children) == 1 {

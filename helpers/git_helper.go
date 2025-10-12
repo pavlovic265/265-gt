@@ -1,41 +1,48 @@
 package helpers
 
 import (
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 )
 
 // GitHelper defines the interface for all git-related helper operations
 type GitHelper interface {
 	// Parent/Children operations
-	SetParent(exe executor.Executor, parent string, child string) error
-	SetChildren(exe executor.Executor, parent string, children string) error
-	GetParent(exe executor.Executor, branch string) string
-	GetChildren(exe executor.Executor, branch string) string
-	DeleteParent(exe executor.Executor, branch string) error
-	DeleteChildren(exe executor.Executor, branch string) error
-	DeleteFromParentChildren(exe executor.Executor, parent, branch string) error
+	SetParent(parent string, child string) error
+	SetChildren(parent string, children string) error
+	GetParent(branch string) string
+	GetChildren(branch string) string
+	DeleteParent(branch string) error
+	DeleteChildren(branch string) error
+	DeleteFromParentChildren(parent, branch string) error
 
 	// Branch operations
-	GetCurrentBranchName(exe executor.Executor) (*string, error)
-	GetBranches(exe executor.Executor) ([]string, error)
+	GetCurrentBranchName() (*string, error)
+	GetBranches() ([]string, error)
 
 	// Repository operations
-	IsGitRepository(exe executor.Executor) error
-	GetGitRoot(exe executor.Executor) (string, error)
-	EnsureGitRepository(exe executor.Executor) error
+	IsGitRepository() error
+	GetGitRoot() (string, error)
+	EnsureGitRepository() error
 
 	// Branch protection
 	IsProtectedBranch(branch string) bool
 
 	// Utility functions
 	RelinkParentChildren(
-		exe executor.Executor, parent string, parentChildren string, branch string, branchChildren string,
+		parent string, parentChildren string, branch string, branchChildren string,
 	) error
 	UnmarshalChildren(children string) []string
+
+	// Version check
+	CheckGTVersion()
 }
 
-type GitHelperImpl struct{}
+type GitHelperImpl struct {
+	exe           executor.Executor
+	configManager config.ConfigManager
+}
 
-func NewGitHelper() GitHelper {
-	return &GitHelperImpl{}
+func NewGitHelper(exe executor.Executor, configManager config.ConfigManager) GitHelper {
+	return &GitHelperImpl{exe: exe, configManager: configManager}
 }

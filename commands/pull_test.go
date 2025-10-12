@@ -14,18 +14,18 @@ import (
 
 // Test helper to create a pull command with mock executor and git helper
 func createPullCommandWithMock(t *testing.T) (
-	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
 	cmd := pullCmd.Command()
-	return mockExecutor, mockGitHelper, ctrl, cmd
+	return mockGitHelper, ctrl, cmd
 }
 
 func TestPullCommand_Command(t *testing.T) {
-	_, _, ctrl, cmd := createPullCommandWithMock(t)
+	_, ctrl, cmd := createPullCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -36,13 +36,18 @@ func TestPullCommand_Command(t *testing.T) {
 }
 
 func TestPullCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
+	cmd := pullCmd.Command()
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git pull
@@ -66,13 +71,18 @@ func TestPullCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestPullCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
+	cmd := pullCmd.Command()
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git pull (ignores arguments, always pulls origin <current-branch>)
@@ -96,15 +106,20 @@ func TestPullCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestPullCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPullCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
+	cmd := pullCmd.Command()
 
 	expectedError := errors.New("git pull failed")
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git pull that will fail

@@ -12,16 +12,19 @@ import (
 )
 
 // Test helper to create a version command with mock executor
-func createVersionCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createVersionCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockConfigManager, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	versionCmd := commands.NewVersionCommand(mockExecutor)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	versionCmd := commands.NewVersionCommand(mockExecutor, mockConfigManager)
 	cmd := versionCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockConfigManager, ctrl, cmd
 }
 
 func TestVersionCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createVersionCommandWithMock(t)
+	_, _, ctrl, cmd := createVersionCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -30,17 +33,21 @@ func TestVersionCommand_Command(t *testing.T) {
 }
 
 func TestVersionCommand_RunE_NoFlags(t *testing.T) {
-	_, ctrl, cmd := createVersionCommandWithMock(t)
+	_, mockConfigManager, ctrl, cmd := createVersionCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// The getCurrentVersion method reads from config, no executor calls needed
+	// Set up expectations for config manager
+	mockConfigManager.EXPECT().
+		GetCurrentVersion().
+		Return("v1.0.0")
+
 	// Execute the command with no flags
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
 }
 
 func TestVersionCommand_RunE_WithLatestFlag(t *testing.T) {
-	_, ctrl, cmd := createVersionCommandWithMock(t)
+	_, _, ctrl, cmd := createVersionCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set the latest flag
@@ -55,10 +62,14 @@ func TestVersionCommand_RunE_WithLatestFlag(t *testing.T) {
 }
 
 func TestVersionCommand_RunE_ExecutorError(t *testing.T) {
-	_, ctrl, cmd := createVersionCommandWithMock(t)
+	_, mockConfigManager, ctrl, cmd := createVersionCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// The version command doesn't use executor for current version
+	// Set up expectations for config manager
+	mockConfigManager.EXPECT().
+		GetCurrentVersion().
+		Return("v1.0.0")
+
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
@@ -69,9 +80,10 @@ func TestNewVersionCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	// Test that NewVersionCommand creates a command with the correct executor
-	versionCmd := commands.NewVersionCommand(mockExecutor)
+	// Test that NewVersionCommand creates a command with the correct executor and config manager
+	versionCmd := commands.NewVersionCommand(mockExecutor, mockConfigManager)
 
 	// Verify the command can be created
 	cmd := versionCmd.Command()

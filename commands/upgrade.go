@@ -12,14 +12,17 @@ import (
 )
 
 type UpgradeCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewUpgradeCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) UpgradeCommand {
 	return UpgradeCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -44,7 +47,7 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 				return err
 			}
 
-			if err := config.UpdateVersion(pointer.Deref(version)); err != nil {
+			if err := svc.configManager.SaveVersion(pointer.Deref(version)); err != nil {
 				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
 				return err
 			}
@@ -73,7 +76,12 @@ func (svc UpgradeCommand) isLatestVersion() (*string, bool, error) {
 		return nil, false, err
 	}
 
-	currentVersion := config.GlobalConfig.Version.LastVersion
+	// Get current version from config manager
+	globalConfig, err := svc.configManager.LoadGlobalConfig()
+	if err != nil {
+		return nil, false, err
+	}
+	currentVersion := globalConfig.Version.CurrentVersion
 	if currentVersion == result.TagName {
 		return pointer.From(result.TagName), true, nil
 	}

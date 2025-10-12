@@ -10,14 +10,17 @@ import (
 )
 
 type createCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewCreateCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) createCommand {
 	return createCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -32,8 +35,8 @@ func (svc createCommand) Command() *cobra.Command {
 			if draft {
 				args = append([]string{"--draft"}, args...)
 			}
-			account := config.GetActiveAccount()
-			if account == nil {
+			account := svc.configManager.GetActiveAccount()
+			if !svc.configManager.HasActiveAccount() {
 				return fmt.Errorf("no active account found")
 			}
 

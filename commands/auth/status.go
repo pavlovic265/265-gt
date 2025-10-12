@@ -10,14 +10,17 @@ import (
 )
 
 type statusCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewStatusCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) statusCommand {
 	return statusCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -29,11 +32,11 @@ func (svc statusCommand) Command() *cobra.Command {
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("Checking status...")
-			account := config.GetActiveAccount()
-			if account == nil {
+			if !svc.configManager.HasActiveAccount() {
 				fmt.Println("No active account found")
 				return nil
 			}
+			account := svc.configManager.GetActiveAccount()
 
 			err := client.Client[account.Platform].AuthStatus()
 			if err != nil {

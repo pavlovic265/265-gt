@@ -12,14 +12,17 @@ import (
 )
 
 type switchCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewSwitchCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) switchCommand {
 	return switchCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -44,7 +47,7 @@ func (svc switchCommand) Command() *cobra.Command {
 }
 
 func (svc switchCommand) switchUser(user string) error {
-	accounts := config.GlobalConfig.Accounts
+	accounts := svc.configManager.GetAccounts()
 	var account *config.Account
 	for _, acc := range accounts {
 		if user == acc.User {
@@ -62,7 +65,7 @@ func (svc switchCommand) switchUser(user string) error {
 		return err
 	}
 
-	err = config.SetActiveAccount(pointer.Deref(account))
+	err = svc.configManager.SetActiveAccount(pointer.Deref(account))
 	if err != nil {
 		return err
 	}
@@ -71,7 +74,7 @@ func (svc switchCommand) switchUser(user string) error {
 }
 
 func (svc switchCommand) selectAndswitchUser() error {
-	accounts := config.GlobalConfig.Accounts
+	accounts := svc.configManager.GetAccounts()
 	var users []string
 	for _, acc := range accounts {
 		users = append(users, acc.User)

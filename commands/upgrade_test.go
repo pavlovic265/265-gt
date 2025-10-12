@@ -5,23 +5,27 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pavlovic265/265-gt/commands"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create an upgrade command with mock executor
-func createUpgradeCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+// Test helper to create an upgrade command with mock executor and config manager
+func createUpgradeCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor, *mocks.MockConfigManager, *gomock.Controller, *cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	upgradeCmd := commands.NewUpgradeCommand(mockExecutor)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	upgradeCmd := commands.NewUpgradeCommand(mockExecutor, mockConfigManager)
 	cmd := upgradeCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockConfigManager, ctrl, cmd
 }
 
 func TestUpgradeCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createUpgradeCommandWithMock(t)
+	_, _, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -30,8 +34,22 @@ func TestUpgradeCommand_Command(t *testing.T) {
 }
 
 func TestUpgradeCommand_RunE_Success(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUpgradeCommandWithMock(t)
+	mockExecutor, mockConfigManager, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
+
+	// Set up expectations for config manager
+
+	mockConfigManager.EXPECT().
+		LoadGlobalConfig().
+		Return(&config.GlobalConfigStruct{
+			Version: config.Version{
+				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
+			},
+		}, nil)
+
+	mockConfigManager.EXPECT().
+		SaveVersion(gomock.Any()).
+		Return(nil)
 
 	// Set up expectations for upgrade process
 	mockExecutor.EXPECT().
@@ -55,8 +73,22 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 	// This test handles the case where the upgrade command determines an upgrade is needed
 	// and calls the executor, but the executor fails.
 
-	mockExecutor, ctrl, cmd := createUpgradeCommandWithMock(t)
+	mockExecutor, mockConfigManager, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
+
+	// Set up expectations for config manager
+
+	mockConfigManager.EXPECT().
+		LoadGlobalConfig().
+		Return(&config.GlobalConfigStruct{
+			Version: config.Version{
+				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
+			},
+		}, nil)
+
+	mockConfigManager.EXPECT().
+		SaveVersion(gomock.Any()).
+		Return(nil)
 
 	// Set up expectations for the executor calls that will happen if an upgrade is needed
 	// We use Any() to be flexible about the exact arguments since we can't easily mock the HTTP call
@@ -87,9 +119,10 @@ func TestNewUpgradeCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	// Test that NewUpgradeCommand creates a command with the correct executor
-	upgradeCmd := commands.NewUpgradeCommand(mockExecutor)
+	// Test that NewUpgradeCommand creates a command with the correct executor and config manager
+	upgradeCmd := commands.NewUpgradeCommand(mockExecutor, mockConfigManager)
 
 	// Verify the command can be created
 	cmd := upgradeCmd.Command()

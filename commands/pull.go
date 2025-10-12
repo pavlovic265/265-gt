@@ -30,7 +30,7 @@ func (svc pullCommand) Command() *cobra.Command {
 		Aliases: []string{"pl"},
 		Short:   "pull branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return err
 			}

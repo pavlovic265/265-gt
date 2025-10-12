@@ -9,12 +9,6 @@ import (
 )
 
 func TestShouldCheckVersion(t *testing.T) {
-	// Save original config
-	originalGlobalConfig := config.GlobalConfig
-	defer func() {
-		config.GlobalConfig = originalGlobalConfig
-	}()
-
 	tests := []struct {
 		name           string
 		lastChecked    string
@@ -55,14 +49,12 @@ func TestShouldCheckVersion(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set up test config
-			config.GlobalConfig = config.GlobalConfigStruct{
-				Version: config.Version{
-					LastChecked: tt.lastChecked,
-				},
+			// Create test version
+			testVersion := config.Version{
+				LastChecked: tt.lastChecked,
 			}
 
-			result := shouldCheckVersion()
+			result := shouldCheckVersion(testVersion)
 			if result != tt.expectedResult {
 				t.Errorf("shouldCheckVersion() = %v, expected %v. %s", result, tt.expectedResult, tt.description)
 			}

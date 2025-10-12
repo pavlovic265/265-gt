@@ -14,6 +14,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// ============================================================================
+// STRUCTS
+// ============================================================================
+
 type Account struct {
 	User     string             `yaml:"user"`
 	Token    string             `yaml:"token"`
@@ -21,8 +25,8 @@ type Account struct {
 }
 
 type Version struct {
-	LastChecked string `yaml:"last_checked"`
-	LastVersion string `yaml:"last_version"`
+	LastChecked    string `yaml:"last_checked"`
+	CurrentVersion string `yaml:"current_version"`
 }
 
 type ThemeConfig struct {
@@ -31,7 +35,7 @@ type ThemeConfig struct {
 
 type GlobalConfigStruct struct {
 	Accounts      []Account   `yaml:"accounts"`
-	ActiveAccount *Account    `yaml:"active_account,omitempty"`
+	ActiveAccount Account     `yaml:"active_account"`
 	Version       Version     `yaml:"version"`
 	Theme         ThemeConfig `yaml:"theme"`
 }
@@ -40,104 +44,188 @@ type LocalConfigStruct struct {
 	Protected []string `yaml:"protected"`
 }
 
+type DefaultConfigManager struct {
+	exe executor.Executor
+}
+
+// ============================================================================
+// INTERFACE
+// ============================================================================
+
+// ConfigManager interface defines the contract for config operations
+type ConfigManager interface {
+	// Initialization
+	InitConfig(loadLocal bool)
+
+	// Global config operations
+	GetGlobalConfigPath() (string, error)
+	LoadGlobalConfig() (*GlobalConfigStruct, error)
+	SaveGlobalConfig(configToSave GlobalConfigStruct) error
+	SaveLocalConfig(configToSave LocalConfigStruct) error
+	SaveLastChecked() error
+	SaveVersion(version string) error
+
+	// Account operations
+	SaveActiveAccount(account Account) error
+	SetActiveAccount(account Account) error
+	GetActiveAccount() Account
+	GetAccounts() []Account
+	GetVersion() Version
+	GetCurrentVersion() string
+	GetProtectedBranches() []string
+	ClearActiveAccount() error
+	HasActiveAccount() bool
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
 var (
-	LocalConfig  LocalConfigStruct
-	GlobalConfig GlobalConfigStruct
+	localConfig  LocalConfigStruct
+	globalConfig GlobalConfigStruct
 )
 
-func InitConfig(exe executor.Executor, loadLocal bool) {
-	globalConfig, err := loadGlobalConfig()
+// NewDefaultConfigManager creates a new DefaultConfigManager instance
+func NewDefaultConfigManager(exe executor.Executor) *DefaultConfigManager {
+	return &DefaultConfigManager{exe: exe}
+}
+
+func (d *DefaultConfigManager) InitConfig(loadLocal bool) {
+	var err error
+	globalConfig, err = d.loadGlobalConfig()
 	if err != nil {
 		fmt.Printf("Warning: Failed to load global config: %v\n", err)
 		// Use empty config as fallback, but don't overwrite existing config
 		globalConfig = GlobalConfigStruct{}
 	}
 
-	var localConfig LocalConfigStruct
 	if loadLocal {
-		var err error
-		localConfig, err = loadLocalConfig(exe)
+		localConfig, err = d.loadLocalConfig()
 		if err != nil {
 			fmt.Printf("Warning: Failed to load local config: %v\n", err)
 			localConfig = LocalConfigStruct{}
 		}
 	}
-
-	GlobalConfig = globalConfig
-	LocalConfig = localConfig
 }
 
-func loadGlobalConfig() (GlobalConfigStruct, error) {
-	configPath, err := GetGlobalConfigPath()
+// ============================================================================
+// FUNCTIONS CONNECTED TO STRUCT (DefaultConfigManager methods)
+// ============================================================================
+
+// Global config operations
+func (d *DefaultConfigManager) GetGlobalConfigPath() (string, error) {
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return GlobalConfigStruct{}, err
-	}
-	gconf, err := readConfig[GlobalConfigStruct](configPath)
-	if err != nil {
-		return GlobalConfigStruct{}, err
+		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	return pointer.Deref(gconf), nil
+	configPath := filepath.Join(homeDir, constants.FileName)
+	_, err = os.Stat(configPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return "", fmt.Errorf("config file does not exist: %w", err)
+	}
+	if err != nil {
+		return "", fmt.Errorf("failed to stat config file: %w", err)
+	}
+	return configPath, nil
 }
 
-func loadLocalConfig(exe executor.Executor) (LocalConfigStruct, error) {
-
-	configPath, err := getLocalConfigPath(exe)
+func (d *DefaultConfigManager) LoadGlobalConfig() (*GlobalConfigStruct, error) {
+	configPath, err := d.GetGlobalConfigPath()
 	if err != nil {
-		return LocalConfigStruct{}, err
+		return nil, err
 	}
-
-	lconf, err := readConfig[LocalConfigStruct](configPath)
-	if err != nil {
-		return LocalConfigStruct{}, err
-	}
-
-	return pointer.Deref(lconf), nil
+	return readConfig[GlobalConfigStruct](configPath)
 }
 
-func SaveConfig[T any](configPath string, configToSave T) error {
-	err := writeConfig(configPath, &configToSave)
+func (d *DefaultConfigManager) SaveGlobalConfig(configToSave GlobalConfigStruct) error {
+	configPath, err := d.GetGlobalConfigPath()
 	if err != nil {
 		return err
 	}
-
+	err = writeConfig(configPath, &configToSave)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func UpdateLastChecked() error {
-	configPath, err := GetGlobalConfigPath()
+func (d *DefaultConfigManager) SaveLocalConfig(configToSave LocalConfigStruct) error {
+	configPath, err := d.getLocalConfigPath()
 	if err != nil {
 		return err
 	}
-
-	GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-
-	return SaveConfig(configPath, GlobalConfig)
-}
-
-func UpdateVersion(version string) error {
-	configPath, err := GetGlobalConfigPath()
+	err = writeConfig(configPath, &configToSave)
 	if err != nil {
 		return err
 	}
-
-	GlobalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-	GlobalConfig.Version.LastVersion = version
-
-	return SaveConfig(configPath, GlobalConfig)
+	return nil
 }
 
-func UpdateActiveAccount(account Account) error {
-	configPath, err := GetGlobalConfigPath()
-	if err != nil {
-		return err
-	}
+func (d *DefaultConfigManager) SaveLastChecked() error {
+	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 
-	GlobalConfig.ActiveAccount = &account
-
-	return SaveConfig(configPath, GlobalConfig)
+	return d.SaveGlobalConfig(globalConfig)
 }
 
+func (d *DefaultConfigManager) SaveVersion(version string) error {
+	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+	globalConfig.Version.CurrentVersion = version
+
+	return d.SaveGlobalConfig(globalConfig)
+}
+
+// Account operations
+func (d *DefaultConfigManager) SaveActiveAccount(account Account) error {
+	globalConfig.ActiveAccount = account
+
+	return d.SaveGlobalConfig(globalConfig)
+}
+
+func (d *DefaultConfigManager) SetActiveAccount(account Account) error {
+	globalConfig.ActiveAccount = account
+
+	return d.SaveGlobalConfig(globalConfig)
+}
+
+func (d *DefaultConfigManager) GetActiveAccount() Account {
+	return globalConfig.ActiveAccount
+}
+
+func (d *DefaultConfigManager) ClearActiveAccount() error {
+	globalConfig.ActiveAccount = Account{}
+
+	return d.SaveGlobalConfig(globalConfig)
+}
+
+func (d *DefaultConfigManager) HasActiveAccount() bool {
+	return globalConfig.ActiveAccount.User != ""
+}
+
+func (d *DefaultConfigManager) GetAccounts() []Account {
+	accounts := make([]Account, len(globalConfig.Accounts))
+	copy(accounts, globalConfig.Accounts)
+	return accounts
+}
+
+func (d *DefaultConfigManager) GetCurrentVersion() string {
+	return globalConfig.Version.CurrentVersion
+}
+
+func (d *DefaultConfigManager) GetVersion() Version {
+	return globalConfig.Version
+}
+
+func (d *DefaultConfigManager) GetProtectedBranches() []string {
+	return localConfig.Protected
+}
+
+// ============================================================================
+// FUNCTIONS NOT CONNECTED TO STRUCT (standalone functions)
+// ============================================================================
+
+// Generic config operations
 func readConfig[T any](filename string) (*T, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -162,26 +250,37 @@ func writeConfig[T any](filename string, cfg *T) error {
 	return os.WriteFile(filename, data, 0600)
 }
 
-func GetGlobalConfigPath() (string, error) {
-	homeDir, err := os.UserHomeDir()
+// Config loading functions
+func (d *DefaultConfigManager) loadGlobalConfig() (GlobalConfigStruct, error) {
+	configPath, err := d.GetGlobalConfigPath()
 	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
+		return GlobalConfigStruct{}, err
+	}
+	gconf, err := readConfig[GlobalConfigStruct](configPath)
+	if err != nil {
+		return GlobalConfigStruct{}, err
 	}
 
-	configPath := filepath.Join(homeDir, constants.FileName)
-	_, err = os.Stat(configPath)
-	if errors.Is(err, os.ErrNotExist) {
-		return "", fmt.Errorf("config file does not exist: %w", err)
-	}
-	if err != nil {
-		return "", fmt.Errorf("failed to stat config file: %w", err)
-	}
-	return configPath, nil
+	return pointer.Deref(gconf), nil
 }
 
-func getLocalConfigPath(exe executor.Executor) (string, error) {
+func (d *DefaultConfigManager) loadLocalConfig() (LocalConfigStruct, error) {
+	configPath, err := d.getLocalConfigPath()
+	if err != nil {
+		return LocalConfigStruct{}, err
+	}
+
+	lconf, err := readConfig[LocalConfigStruct](configPath)
+	if err != nil {
+		return LocalConfigStruct{}, err
+	}
+
+	return pointer.Deref(lconf), nil
+}
+
+func (d *DefaultConfigManager) getLocalConfigPath() (string, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
-	output, err := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, err := d.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		// This should not happen since we already checked for git repository in main.go
 		// But handle gracefully just in case
@@ -198,32 +297,4 @@ func getLocalConfigPath(exe executor.Executor) (string, error) {
 	}
 
 	return configPath, nil
-}
-
-func SetActiveAccount(account Account) error {
-	configPath, err := GetGlobalConfigPath()
-	if err != nil {
-		return err
-	}
-
-	GlobalConfig.ActiveAccount = &account
-	return SaveConfig(configPath, GlobalConfig)
-}
-
-func GetActiveAccount() *Account {
-	return GlobalConfig.ActiveAccount
-}
-
-func ClearActiveAccount() error {
-	configPath, err := GetGlobalConfigPath()
-	if err != nil {
-		return err
-	}
-
-	GlobalConfig.ActiveAccount = nil
-	return SaveConfig(configPath, GlobalConfig)
-}
-
-func HasActiveAccount() bool {
-	return GlobalConfig.ActiveAccount != nil
 }

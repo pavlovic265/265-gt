@@ -37,7 +37,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := svc.gitHelper.GetBranches(svc.exe)
+				branches, err := svc.gitHelper.GetBranches()
 				if err != nil {
 					return err
 				}

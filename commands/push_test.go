@@ -14,18 +14,18 @@ import (
 
 // Test helper to create a push command with mock executor and git helper
 func createPushCommandWithMock(t *testing.T) (
-	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
 	cmd := pushCmd.Command()
-	return mockExecutor, mockGitHelper, ctrl, cmd
+	return mockGitHelper, ctrl, cmd
 }
 
 func TestPushCommand_Command(t *testing.T) {
-	_, _, ctrl, cmd := createPushCommandWithMock(t)
+	_, ctrl, cmd := createPushCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -36,13 +36,18 @@ func TestPushCommand_Command(t *testing.T) {
 }
 
 func TestPushCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
+	cmd := pushCmd.Command()
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git push (ignores arguments, always pushes --force origin <current-branch>)
@@ -66,13 +71,18 @@ func TestPushCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestPushCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
+	cmd := pushCmd.Command()
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git push (ignores arguments, always pushes --force origin <current-branch>)
@@ -96,15 +106,20 @@ func TestPushCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestPushCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createPushCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	pushCmd := commands.NewPushCommand(mockExecutor, mockGitHelper)
+	cmd := pushCmd.Command()
 
 	expectedError := errors.New("git push failed")
 
 	// Set up expectations for GetCurrentBranchName call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for git push that will fail

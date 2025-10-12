@@ -2,14 +2,12 @@ package helpers
 
 import (
 	"strings"
-
-	"github.com/pavlovic265/265-gt/executor"
 )
 
 // SetParent sets the parent branch for a given child branch
-func (gh *GitHelperImpl) SetParent(exe executor.Executor, parent string, child string) error {
+func (gh *GitHelperImpl) SetParent(parent string, child string) error {
 	exeArgs := []string{"config", "branch." + child + ".parent", parent}
-	err := exe.WithGit().WithArgs(exeArgs).Run()
+	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
@@ -17,17 +15,17 @@ func (gh *GitHelperImpl) SetParent(exe executor.Executor, parent string, child s
 }
 
 // GetParent gets the parent branch for a given branch
-func (gh *GitHelperImpl) GetParent(exe executor.Executor, branch string) string {
+func (gh *GitHelperImpl) GetParent(branch string) string {
 	exeArgs := []string{"config", "--get", "branch." + branch + ".parent"}
-	output, _ := exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, _ := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	parent := strings.TrimSuffix(output.String(), "\n")
 	return parent
 }
 
 // DeleteParent removes the parent configuration for a given branch
-func (gh *GitHelperImpl) DeleteParent(exe executor.Executor, branch string) error {
+func (gh *GitHelperImpl) DeleteParent(branch string) error {
 	exeArgs := []string{"config", "--unset", "branch." + branch + ".parent"}
-	err := exe.WithGit().WithArgs(exeArgs).Run()
+	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
 	}
@@ -35,8 +33,8 @@ func (gh *GitHelperImpl) DeleteParent(exe executor.Executor, branch string) erro
 }
 
 // DeleteFromParentChildren removes a branch from its parent's children list
-func (gh *GitHelperImpl) DeleteFromParentChildren(exe executor.Executor, parent, branch string) error {
-	children := gh.GetChildren(exe, parent)
+func (gh *GitHelperImpl) DeleteFromParentChildren(parent, branch string) error {
+	children := gh.GetChildren(parent)
 	splitChildren := strings.Split(children, " ")
 	if len(splitChildren) == 0 {
 		return nil
@@ -51,11 +49,11 @@ func (gh *GitHelperImpl) DeleteFromParentChildren(exe executor.Executor, parent,
 	}
 	if len(newChildren) > 0 {
 		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
-		if err := gh.SetChildren(exe, parent, joinChildren); err != nil {
+		if err := gh.SetChildren(parent, joinChildren); err != nil {
 			return err
 		}
 	} else {
-		_ = gh.DeleteChildren(exe, parent)
+		_ = gh.DeleteChildren(parent)
 	}
 	return nil
 }

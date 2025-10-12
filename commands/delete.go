@@ -34,7 +34,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 		Short:              "delete branch",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return err
 			}
@@ -48,7 +48,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 					return err
 				}
 			} else {
-				branches, err := svc.gitHelper.GetBranches(svc.exe)
+				branches, err := svc.gitHelper.GetBranches()
 				if err != nil {
 					return err
 				}
@@ -68,9 +68,9 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
-	parent := svc.gitHelper.GetParent(svc.exe, branch)
-	parentChildren := svc.gitHelper.GetChildren(svc.exe, parent)
-	branchChildren := svc.gitHelper.GetChildren(svc.exe, branch)
+	parent := svc.gitHelper.GetParent(branch)
+	parentChildren := svc.gitHelper.GetChildren(parent)
+	branchChildren := svc.gitHelper.GetChildren(branch)
 
 	exeArgs := []string{"branch", "-D", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
@@ -78,7 +78,7 @@ func (svc deleteCommand) deleteBranch(
 		return err
 	}
 
-	err = svc.gitHelper.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+	err = svc.gitHelper.RelinkParentChildren(parent, parentChildren, branch, branchChildren)
 	if err != nil {
 		return err
 	}

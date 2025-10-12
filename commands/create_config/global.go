@@ -15,14 +15,17 @@ import (
 )
 
 type globalCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewGlobalCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) globalCommand {
 	return globalCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -33,7 +36,7 @@ func (svc globalCommand) Command() *cobra.Command {
 		Short:              "generate global config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			configPath, err := config.GetGlobalConfigPath()
+			configPath, err := svc.configManager.GetGlobalConfigPath()
 			if errors.Is(err, os.ErrNotExist) {
 				err = svc.createGlobalConfig(configPath)
 				if err != nil {
@@ -72,13 +75,14 @@ func (svc globalCommand) createGlobalConfig(configPath string) error {
 	globalConfig := config.GlobalConfigStruct{
 		Accounts: accounts,
 		Version: config.Version{
-			LastChecked: timeutils.Now().Format(timeutils.LayoutISOWithTime),
-			LastVersion: latestVersion,
+			LastChecked:    timeutils.Now().Format(timeutils.LayoutISOWithTime),
+			CurrentVersion: latestVersion,
 		},
-		Theme: pointer.Deref(theme),
+		ActiveAccount: config.Account{},
+		Theme:         pointer.Deref(theme),
 	}
 
-	err = config.SaveConfig(configPath, globalConfig)
+	err = svc.configManager.SaveGlobalConfig(globalConfig)
 	if err != nil {
 		return err
 	}

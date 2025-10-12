@@ -111,6 +111,35 @@ major:
 mocks:
 	@echo "🔧 Generating mocks..."
 	@mkdir -p mocks
+	@echo "📦 Generating executor mock..."
 	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@echo "📦 Generating git helper mock..."
 	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
-	@echo "✅ Mocks generated successfully"
+	@echo "📦 Generating config manager mock..."
+	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
+	@echo "✅ All mocks generated successfully"
+
+# Generate specific mocks
+mocks-executor:
+	@echo "🔧 Generating executor mock..."
+	@mkdir -p mocks
+	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@echo "✅ Executor mock generated successfully"
+
+mocks-git-helper:
+	@echo "🔧 Generating git helper mock..."
+	@mkdir -p mocks
+	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@echo "✅ Git helper mock generated successfully"
+
+mocks-config:
+	@echo "🔧 Generating config manager mock..."
+	@mkdir -p mocks
+	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
+	@echo "✅ Config manager mock generated successfully"
+
+# Clean mocks
+clean-mocks:
+	@echo "🧹 Cleaning mocks..."
+	@rm -rf mocks/
+	@echo "✅ Mocks cleaned successfully"

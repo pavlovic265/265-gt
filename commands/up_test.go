@@ -14,18 +14,18 @@ import (
 
 // Test helper to create an up command with mock executor and git helper
 func createUpCommandWithMock(t *testing.T) (
-	*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
+	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
 	cmd := upCmd.Command()
-	return mockExecutor, mockGitHelper, ctrl, cmd
+	return mockGitHelper, ctrl, cmd
 }
 
 func TestUpCommand_Command(t *testing.T) {
-	_, _, ctrl, cmd := createUpCommandWithMock(t)
+	_, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -34,18 +34,23 @@ func TestUpCommand_Command(t *testing.T) {
 }
 
 func TestUpCommand_RunE_Success(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
+	cmd := upCmd.Command()
 
 	// Set up expectations for GetCurrentBranchName
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().
-		GetChildren(mockExecutor, "main").
+		GetChildren("main").
 		Return("feature-branch")
 
 	// Set up expectations for UnmarshalChildren
@@ -74,18 +79,18 @@ func TestUpCommand_RunE_Success(t *testing.T) {
 }
 
 func TestUpCommand_RunE_NoChildren(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
+	mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for GetCurrentBranchName
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren (no children)
 	mockGitHelper.EXPECT().
-		GetChildren(mockExecutor, "main").
+		GetChildren("main").
 		Return("")
 
 	// Set up expectations for UnmarshalChildren
@@ -100,20 +105,25 @@ func TestUpCommand_RunE_NoChildren(t *testing.T) {
 }
 
 func TestUpCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
+	cmd := upCmd.Command()
 
 	expectedError := errors.New("git checkout failed")
 
 	// Set up expectations for GetCurrentBranchName
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName(mockExecutor).
+		GetCurrentBranchName().
 		Return(&branchName, nil)
 
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().
-		GetChildren(mockExecutor, "main").
+		GetChildren("main").
 		Return("feature-branch")
 
 	// Set up expectations for UnmarshalChildren

@@ -1,13 +1,19 @@
 package client
 
-import "github.com/pavlovic265/265-gt/executor"
+import (
+	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
+)
 
 type gitLabCli struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
+	gitHelper     helpers.GitHelper
 }
 
-func NewGitLabCli(exe executor.Executor) CliClient {
-	return &gitLabCli{exe: exe}
+func NewGitLabCli(exe executor.Executor, configManager config.ConfigManager, gitHelper helpers.GitHelper) CliClient {
+	return &gitLabCli{exe: exe, configManager: configManager, gitHelper: gitHelper}
 }
 
 func (svc gitLabCli) AuthStatus() error {

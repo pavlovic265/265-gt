@@ -12,14 +12,17 @@ import (
 )
 
 type loginCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewLoginCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) loginCommand {
 	return loginCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -30,7 +33,7 @@ func (svc loginCommand) Command() *cobra.Command {
 		Short:              "login user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accounts := config.GlobalConfig.Accounts
+			accounts := svc.configManager.GetAccounts()
 
 			var users []string
 			for _, acc := range accounts {

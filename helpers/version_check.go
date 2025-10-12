@@ -11,7 +11,6 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/executor"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
@@ -21,8 +20,9 @@ type GitHubRelease struct {
 	HTMLURL string `json:"html_url"`
 }
 
-func CheckGTVersion(exe executor.Executor) {
-	if !shouldCheckVersion() {
+func (gh *GitHelperImpl) CheckGTVersion() {
+	version := gh.configManager.GetVersion()
+	if !shouldCheckVersion(version) {
 		return // Silently fail if check is not needed
 	}
 
@@ -35,9 +35,9 @@ func CheckGTVersion(exe executor.Executor) {
 		return // Silently fail if we can't get latest version
 	}
 
-	storedVersion := config.GlobalConfig.Version.LastVersion
+	storedVersion := version.CurrentVersion
 	// Only update the config if it exists (to avoid overwriting GitHub accounts)
-	if err := config.UpdateLastChecked(); err != nil {
+	if err := gh.configManager.SaveLastChecked(); err != nil {
 		return // Silently fail if we can't update last checked
 	}
 
@@ -55,9 +55,7 @@ func CheckGTVersion(exe executor.Executor) {
 	showVersionNotification(storedVersion, latestVersion, latestURL)
 }
 
-func shouldCheckVersion() bool {
-	version := config.GlobalConfig.Version
-
+func shouldCheckVersion(version config.Version) bool {
 	// If no last checked time, should check
 	if version.LastChecked == "" {
 		return true

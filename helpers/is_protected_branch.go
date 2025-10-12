@@ -1,10 +1,8 @@
 package helpers
 
-import "github.com/pavlovic265/265-gt/config"
-
 // IsProtectedBranch checks if a branch is protected
 func (gh *GitHelperImpl) IsProtectedBranch(branch string) bool {
-	for _, pBranch := range config.LocalConfig.Protected {
+	for _, pBranch := range gh.configManager.GetProtectedBranches() {
 		if branch == pBranch {
 			return true
 		}

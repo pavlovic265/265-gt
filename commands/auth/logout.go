@@ -10,14 +10,17 @@ import (
 )
 
 type logoutCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewLogoutCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) logoutCommand {
 	return logoutCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -28,8 +31,8 @@ func (svc logoutCommand) Command() *cobra.Command {
 		Short:              "logout user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			account := config.GetActiveAccount()
-			if account == nil {
+			account := svc.configManager.GetActiveAccount()
+			if !svc.configManager.HasActiveAccount() {
 				return fmt.Errorf("no active account found")
 			}
 

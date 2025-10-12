@@ -2,12 +2,9 @@ package helpers
 
 import (
 	"strings"
-
-	"github.com/pavlovic265/265-gt/executor"
 )
 
 func (gh *GitHelperImpl) RelinkParentChildren(
-	exe executor.Executor,
 	parent string,
 	parentChildren string,
 	branch string,
@@ -35,7 +32,7 @@ func (gh *GitHelperImpl) RelinkParentChildren(
 	// 4. assing branch children to parent children and assing new parent to branch children
 	for _, child := range splitBranchChildren {
 		// 4.1 assign new parent to children
-		if err := gh.SetParent(exe, parent, child); err != nil {
+		if err := gh.SetParent(parent, child); err != nil {
 			return err
 		}
 		// 4.2 assign child to parent children
@@ -44,7 +41,7 @@ func (gh *GitHelperImpl) RelinkParentChildren(
 
 	childrenStr := gh.marshalChildren(children)
 
-	if err := gh.SetChildren(exe, parent, childrenStr); err != nil {
+	if err := gh.SetChildren(parent, childrenStr); err != nil {
 		return err
 	}
 

@@ -14,7 +14,7 @@ func TestRelinkParentChildren(t *testing.T) {
 
 	// Create mocks
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Test data
 	parent := "main"
@@ -61,7 +61,6 @@ func TestRelinkParentChildren(t *testing.T) {
 
 	// Execute the function
 	err := gitHelper.RelinkParentChildren(
-		mockExecutor,
 		parent,
 		parentChildren,
 		branch,
@@ -79,7 +78,6 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create mocks
-	mockExecutor := mocks.NewMockExecutor(ctrl)
 	gitHelper := &GitHelperImpl{}
 
 	// Test data with empty parent
@@ -92,7 +90,6 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 
 	// Execute the function
 	err := gitHelper.RelinkParentChildren(
-		mockExecutor,
 		parent,
 		parentChildren,
 		branch,
@@ -111,7 +108,7 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 
 	// Create mocks
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	gitHelper := &GitHelperImpl{}
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
 
 	// Test data
 	parent := "main"
@@ -138,7 +135,6 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 
 	// Execute the function
 	err := gitHelper.RelinkParentChildren(
-		mockExecutor,
 		parent,
 		parentChildren,
 		branch,

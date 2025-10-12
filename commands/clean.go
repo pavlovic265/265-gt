@@ -40,12 +40,12 @@ func (svc cleanCommand) Command() *cobra.Command {
 }
 
 func (svc cleanCommand) cleanBranches() error {
-	currentBranch, err := svc.gitHelper.GetCurrentBranchName(svc.exe)
+	currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 	if err != nil {
 		return fmt.Errorf("failed to get current branch: %w", err)
 	}
 
-	branches, err := svc.gitHelper.GetBranches(svc.exe)
+	branches, err := svc.gitHelper.GetBranches()
 	if err != nil {
 		return fmt.Errorf("failed to get branches: %w", err)
 	}
@@ -94,7 +94,7 @@ func (svc cleanCommand) cleanBranches() error {
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
-	parent := svc.gitHelper.GetParent(svc.exe, branch)
+	parent := svc.gitHelper.GetParent(branch)
 
 	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", branch)
 	if parent != "" {
@@ -115,8 +115,8 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 		}
 
 		if model.IsYes() {
-			parentChildren := svc.gitHelper.GetChildren(svc.exe, parent)
-			branchChildren := svc.gitHelper.GetChildren(svc.exe, branch)
+			parentChildren := svc.gitHelper.GetChildren(parent)
+			branchChildren := svc.gitHelper.GetChildren(branch)
 
 			exeArgs := []string{"branch", "-D", branch}
 			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
@@ -124,7 +124,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 				return false, err
 			}
 
-			err = svc.gitHelper.RelinkParentChildren(svc.exe, parent, parentChildren, branch, branchChildren)
+			err = svc.gitHelper.RelinkParentChildren(parent, parentChildren, branch, branchChildren)
 			if err != nil {
 				return false, err
 			}
