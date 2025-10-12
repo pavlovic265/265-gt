@@ -9,7 +9,8 @@ import (
 // ExampleUsage demonstrates how to use the new 16-color ANSI palette
 func ExampleUsage() {
 	// Example 1: Using individual ANSI colors
-	fmt.Println("=== 16-Color ANSI Palette Example ===")
+	fmt.Println("=== Panda Terminal Theme Example ===")
+	fmt.Println("Based on: https://github.com/PandaTheme/panda-terminal")
 
 	// Dark theme colors (0-15)
 	for i := 0; i < 16; i++ {

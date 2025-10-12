@@ -220,169 +220,86 @@ func isLightTheme() bool {
 	return false
 }
 
-// 16-Color ANSI Palette (Dark Theme)
-// Based on ~/.gtconfig.yaml theme configuration
+// Panda Terminal Theme Colors
+// Based on https://github.com/PandaTheme/panda-terminal
 var (
-	// Dark theme colors
-	DarkBackground = lipgloss.Color("#1d1e20") // distinct dark bg
-	DarkForeground = lipgloss.Color("#e6e6e6") // distinct light fg
-	DarkCursor     = lipgloss.Color("#ffb86c") // cursor
+	// Base colors
+	Background = lipgloss.Color("#292A2B") // Panda background
+	Foreground = lipgloss.Color("#CCCCCC") // Panda foreground
+	Cursor     = lipgloss.Color("#FFB86C") // Panda cursor (yellow)
 
-	// ANSI 0-7 (normal colors)
-	DarkAnsi0 = lipgloss.Color("#1d1e20") // black
-	DarkAnsi1 = lipgloss.Color("#ff5c57") // red
-	DarkAnsi2 = lipgloss.Color("#A9DC52") // green
-	DarkAnsi3 = lipgloss.Color("#f3f99d") // yellow
-	DarkAnsi4 = lipgloss.Color("#57c7ff") // blue
-	DarkAnsi5 = lipgloss.Color("#ff6ac1") // magenta
-	DarkAnsi6 = lipgloss.Color("#9aedfe") // cyan
-	DarkAnsi7 = lipgloss.Color("#e6e6e6") // white
+	// Panda Theme colors
+	Black   = lipgloss.Color("#000000") // black
+	Red     = lipgloss.Color("#EC2864") // red
+	Green   = lipgloss.Color("#13FFDC") // green
+	Yellow  = lipgloss.Color("#FFB86C") // yellow
+	Blue    = lipgloss.Color("#7DC1FF") // blue
+	Magenta = lipgloss.Color("#B084EB") // magenta (purple)
+	Cyan    = lipgloss.Color("#35FFDC") // cyan
+	White   = lipgloss.Color("#FFFFFF") // white
 
-	// ANSI 8-15 (bright colors)
-	DarkAnsi8  = lipgloss.Color("#555555") // bright_black
-	DarkAnsi9  = lipgloss.Color("#ff7a90") // bright_red
-	DarkAnsi10 = lipgloss.Color("#69ff94") // bright_green
-	DarkAnsi11 = lipgloss.Color("#ffffa5") // bright_yellow
-	DarkAnsi12 = lipgloss.Color("#9aedfe") // bright_blue
-	DarkAnsi13 = lipgloss.Color("#ff92d0") // bright_magenta
-	DarkAnsi14 = lipgloss.Color("#c8ffff") // bright_cyan
-	DarkAnsi15 = lipgloss.Color("#ffffff") // bright_white
+	// Bright colors
+	BrightBlack   = lipgloss.Color("#7A8181") // bright_black
+	BrightRed     = lipgloss.Color("#F76E6E") // bright_red
+	BrightGreen   = lipgloss.Color("#13FFDC") // bright_green
+	BrightYellow  = lipgloss.Color("#DAC26B") // bright_yellow
+	BrightBlue    = lipgloss.Color("#5CA7E4") // bright_blue
+	BrightMagenta = lipgloss.Color("#FF9AC1") // bright_magenta (pink)
+	BrightCyan    = lipgloss.Color("#00C990") // bright_cyan
+	BrightWhite   = lipgloss.Color("#989FB1") // bright_white
 )
 
-// 16-Color ANSI Palette (Light Theme)
-var (
-	// Light theme colors
-	LightBackground = lipgloss.Color("#fafafa")
-	LightForeground = lipgloss.Color("#2e2e2e")
-	LightCursor     = lipgloss.Color("#ff5c57")
-
-	// ANSI 0-7 (normal colors)
-	LightAnsi0 = lipgloss.Color("#2e2e2e") // black (text)
-	LightAnsi1 = lipgloss.Color("#ff5c57") // red
-	LightAnsi2 = lipgloss.Color("#3bb273") // green
-	LightAnsi3 = lipgloss.Color("#d4b106") // yellow
-	LightAnsi4 = lipgloss.Color("#268bd2") // blue
-	LightAnsi5 = lipgloss.Color("#af5fff") // magenta
-	LightAnsi6 = lipgloss.Color("#00bcd4") // cyan
-	LightAnsi7 = lipgloss.Color("#fafafa") // white (bg-like)
-
-	// ANSI 8-15 (bright colors)
-	LightAnsi8  = lipgloss.Color("#999999") // bright_black
-	LightAnsi9  = lipgloss.Color("#ff7b72") // bright_red
-	LightAnsi10 = lipgloss.Color("#44d88d") // bright_green
-	LightAnsi11 = lipgloss.Color("#ffe36e") // bright_yellow
-	LightAnsi12 = lipgloss.Color("#4fc3f7") // bright_blue
-	LightAnsi13 = lipgloss.Color("#c586c0") // bright_magenta
-	LightAnsi14 = lipgloss.Color("#4dd0e1") // bright_cyan
-	LightAnsi15 = lipgloss.Color("#ffffff") // bright_white
-)
-
-// Helper functions to get ANSI colors based on theme
+// Helper functions to get Panda colors
 func GetAnsiColor(ansiNumber int) lipgloss.Color {
-	if isLightTheme() {
-		return getLightAnsiColor(ansiNumber)
-	}
-	return getDarkAnsiColor(ansiNumber)
-}
-
-func getDarkAnsiColor(ansiNumber int) lipgloss.Color {
 	switch ansiNumber {
 	case 0:
-		return DarkAnsi0
+		return Black
 	case 1:
-		return DarkAnsi1
+		return Red
 	case 2:
-		return DarkAnsi2
+		return Green
 	case 3:
-		return DarkAnsi3
+		return Yellow
 	case 4:
-		return DarkAnsi4
+		return Blue
 	case 5:
-		return DarkAnsi5
+		return Magenta
 	case 6:
-		return DarkAnsi6
+		return Cyan
 	case 7:
-		return DarkAnsi7
+		return White
 	case 8:
-		return DarkAnsi8
+		return BrightBlack
 	case 9:
-		return DarkAnsi9
+		return BrightRed
 	case 10:
-		return DarkAnsi10
+		return BrightGreen
 	case 11:
-		return DarkAnsi11
+		return BrightYellow
 	case 12:
-		return DarkAnsi12
+		return BrightBlue
 	case 13:
-		return DarkAnsi13
+		return BrightMagenta
 	case 14:
-		return DarkAnsi14
+		return BrightCyan
 	case 15:
-		return DarkAnsi15
+		return BrightWhite
 	default:
-		return DarkForeground
+		return Foreground
 	}
 }
 
-func getLightAnsiColor(ansiNumber int) lipgloss.Color {
-	switch ansiNumber {
-	case 0:
-		return LightAnsi0
-	case 1:
-		return LightAnsi1
-	case 2:
-		return LightAnsi2
-	case 3:
-		return LightAnsi3
-	case 4:
-		return LightAnsi4
-	case 5:
-		return LightAnsi5
-	case 6:
-		return LightAnsi6
-	case 7:
-		return LightAnsi7
-	case 8:
-		return LightAnsi8
-	case 9:
-		return LightAnsi9
-	case 10:
-		return LightAnsi10
-	case 11:
-		return LightAnsi11
-	case 12:
-		return LightAnsi12
-	case 13:
-		return LightAnsi13
-	case 14:
-		return LightAnsi14
-	case 15:
-		return LightAnsi15
-	default:
-		return LightForeground
-	}
-}
-
-// Convenience functions for common ANSI colors
+// Convenience functions for Panda colors
 func GetBackgroundColor() lipgloss.Color {
-	if isLightTheme() {
-		return LightBackground
-	}
-	return DarkBackground
+	return Background
 }
 
 func GetForegroundColor() lipgloss.Color {
-	if isLightTheme() {
-		return LightForeground
-	}
-	return DarkForeground
+	return Foreground
 }
 
 func GetCursorColor() lipgloss.Color {
-	if isLightTheme() {
-		return LightCursor
-	}
-	return DarkCursor
+	return Cursor
 }
 
 // ANSI color styles for common use cases
