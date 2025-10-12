@@ -36,8 +36,8 @@ func ExampleUsage() {
 
 	// Example 4: Custom combinations
 	customStyle := lipgloss.NewStyle().
-		Foreground(GetAnsiColor(2)). // Green
-		Background(GetAnsiColor(0)). // Black
+		Foreground(Green). // Green
+		Background(Black). // Black
 		Bold(true)
 
 	fmt.Println(customStyle.Render("Custom styled text"))

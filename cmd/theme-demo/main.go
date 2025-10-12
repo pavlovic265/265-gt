@@ -34,12 +34,12 @@ func showThemeColors() {
 	// Show background and foreground
 	bgStyle := lipgloss.NewStyle().
 		Background(constants.GetBackgroundColor()).
-		Foreground(constants.GetAnsiColor(7)). // White text
+		Foreground(constants.White). // White text
 		Padding(1, 2)
 
 	fgStyle := lipgloss.NewStyle().
 		Foreground(constants.GetForegroundColor()).
-		Background(constants.GetAnsiColor(0)). // Black background
+		Background(constants.Black). // Black background
 		Padding(1, 2)
 
 	fmt.Println("Background:", bgStyle.Render("  Background  "))

@@ -96,10 +96,10 @@ style := lipgloss.NewStyle().
 
 ### Custom Combinations
 ```go
-// Create custom styles
+// Create custom styles using named colors
 customStyle := lipgloss.NewStyle().
-    Foreground(constants.GetAnsiColor(2)).  // Green
-    Background(constants.GetAnsiColor(0)).  // Black
+    Foreground(constants.Green).  // Green
+    Background(constants.Black).  // Black
     Bold(true)
 ```
 

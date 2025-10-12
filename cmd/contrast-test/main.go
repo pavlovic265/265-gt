@@ -35,12 +35,12 @@ func main() {
 	fmt.Println("\n🌈 ANSI Black vs White:")
 
 	ansi0Style := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(0)). // Black
+		Foreground(constants.Black).           // Black
 		Background(lipgloss.Color("#ffffff")). // White background
 		Padding(1, 2)
 
 	ansi7Style := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(7)). // White
+		Foreground(constants.White).           // White
 		Background(lipgloss.Color("#000000")). // Black background
 		Padding(1, 2)
 

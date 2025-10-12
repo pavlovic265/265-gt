@@ -50,37 +50,38 @@ func (svc statusCommand) styleGitStatus(output string) string {
 	lines := strings.Split(output, "\n")
 	var styledLines []string
 
-	// Define styles using the new color schema
 	branchStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(4)). // Blue for branch info
+		Foreground(constants.Blue).
 		Bold(true)
 
 	headerStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(3)). // Yellow for headers
+		Foreground(constants.Magenta).
 		Bold(true)
 
 	modifiedStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(1)) // Red for modified files
+		Foreground(constants.Yellow)
 
 	newFileStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(2)) // Green for new files
+		Foreground(constants.Green)
 
 	deletedStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(1)) // Red for deleted files
+		Foreground(constants.Red)
 
 	untrackedStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(6)) // Cyan for untracked files
+		Foreground(constants.Red)
+
+	renamedStyle := lipgloss.NewStyle().
+		Foreground(constants.Yellow)
 
 	helpStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(8)) // Dim for help text
+		Foreground(constants.BrightBlack)
 
 	cleanStyle := lipgloss.NewStyle().
-		Foreground(constants.GetAnsiColor(2)) // Green for clean status
+		Foreground(constants.Green)
 
 	for _, line := range lines {
 		styledLine := line
 
-		// Style branch information
 		if strings.Contains(line, "On branch") {
 			parts := strings.Split(line, " ")
 			if len(parts) >= 3 {
@@ -122,6 +123,16 @@ func (svc statusCommand) styleGitStatus(output string) string {
 				styledLine = fmt.Sprintf("%s: %s",
 					deletedStyle.Render(status),
 					file)
+			}
+		} else if strings.Contains(line, "renamed:") {
+			// Handle renamed files (format: "renamed: old -> new")
+			parts := strings.Split(line, ":")
+			if len(parts) >= 2 {
+				status := parts[0]
+				fileInfo := strings.TrimSpace(parts[1])
+				styledLine = fmt.Sprintf("%s: %s",
+					renamedStyle.Render(status),
+					fileInfo)
 			}
 		} else if strings.Contains(line, "use \"git") {
 			styledLine = helpStyle.Render(line)
