@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 type selectThemeModel struct {
@@ -14,8 +15,8 @@ type selectThemeModel struct {
 }
 
 var themeChoices = []string{
-	"dark",
-	"light",
+	constants.DarkTheme.String(),
+	constants.LightTheme.String(),
 }
 
 func newSelectThemeModel() selectThemeModel {
@@ -78,7 +79,7 @@ func (sm selectThemeModel) View() string {
 	return s.String()
 }
 
-func HandleSelectTheme() (*string, error) {
+func HandleSelectTheme() (*constants.Theme, error) {
 	themeModel := newSelectThemeModel()
 	selectProgram := tea.NewProgram(themeModel)
 	m, err := selectProgram.Run()
@@ -87,7 +88,17 @@ func HandleSelectTheme() (*string, error) {
 	}
 
 	if m, ok := m.(selectThemeModel); ok && m.choice != "" {
-		return &m.choice, nil
+		// Convert string choice back to Theme type
+		var theme constants.Theme
+		switch m.choice {
+		case constants.DarkTheme.String():
+			theme = constants.DarkTheme
+		case constants.LightTheme.String():
+			theme = constants.LightTheme
+		default:
+			return nil, fmt.Errorf("invalid theme choice: %s", m.choice)
+		}
+		return &theme, nil
 	}
 
 	return nil, fmt.Errorf("failed to select theme")

@@ -25,15 +25,11 @@ type Version struct {
 	LastVersion string `yaml:"last_version"`
 }
 
-type Theme struct {
-	Type string `yaml:"type"` // "dark" or "light"
-}
-
 type GlobalConfigStruct struct {
-	Accounts      []Account `yaml:"accounts"`
-	ActiveAccount *Account  `yaml:"active_account,omitempty"`
-	Version       Version   `yaml:"version"`
-	Theme         Theme     `yaml:"theme"`
+	Accounts      []Account       `yaml:"accounts"`
+	ActiveAccount *Account        `yaml:"active_account,omitempty"`
+	Version       Version         `yaml:"version"`
+	Theme         constants.Theme `yaml:"theme"`
 }
 
 type LocalConfigStruct struct {

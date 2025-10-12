@@ -75,9 +75,7 @@ func (svc globalCommand) createGlobalConfig(configPath string) error {
 			LastChecked: timeutils.Now().Format(timeutils.LayoutISOWithTime),
 			LastVersion: latestVersion,
 		},
-		Theme: config.Theme{
-			Type: pointer.Deref(theme),
-		},
+		Theme: pointer.Deref(theme),
 	}
 
 	err = config.SaveConfig(configPath, globalConfig)
