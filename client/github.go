@@ -135,7 +135,6 @@ func (svc gitHubCli) AuthLogout(user string) error {
 }
 
 func (svc *gitHubCli) CreatePullRequest(args []string) error {
-	fmt.Println("Creating pull request on GitHub...")
 	acc, err := svc.getActiveAccount()
 	if err != nil {
 		return err
