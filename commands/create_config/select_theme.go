@@ -5,18 +5,19 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
 )
 
 type selectThemeModel struct {
 	cursor  int
-	choice  string
-	choices []string
+	choice  constants.Theme
+	choices []constants.Theme
 }
 
-var themeChoices = []string{
-	constants.DarkTheme.String(),
-	constants.LightTheme.String(),
+var themeChoices = []constants.Theme{
+	constants.DarkTheme,
+	constants.LightTheme,
 }
 
 func newSelectThemeModel() selectThemeModel {
@@ -67,11 +68,7 @@ func (sm selectThemeModel) View() string {
 		} else {
 			s.WriteString("( ) ")
 		}
-		if sm.cursor == i {
-			s.WriteString(sm.choices[i])
-		} else {
-			s.WriteString(sm.choices[i])
-		}
+		s.WriteString(sm.choices[i].String())
 		s.WriteString("\n")
 	}
 	s.WriteString("\n(press ctrl+q to quit)\n")
@@ -79,7 +76,7 @@ func (sm selectThemeModel) View() string {
 	return s.String()
 }
 
-func HandleSelectTheme() (*constants.Theme, error) {
+func HandleSelectTheme() (*config.ThemeConfig, error) {
 	themeModel := newSelectThemeModel()
 	selectProgram := tea.NewProgram(themeModel)
 	m, err := selectProgram.Run()
@@ -88,17 +85,8 @@ func HandleSelectTheme() (*constants.Theme, error) {
 	}
 
 	if m, ok := m.(selectThemeModel); ok && m.choice != "" {
-		// Convert string choice back to Theme type
-		var theme constants.Theme
-		switch m.choice {
-		case constants.DarkTheme.String():
-			theme = constants.DarkTheme
-		case constants.LightTheme.String():
-			theme = constants.LightTheme
-		default:
-			return nil, fmt.Errorf("invalid theme choice: %s", m.choice)
-		}
-		return &theme, nil
+		themeConfig := config.ThemeConfig{Type: m.choice}
+		return &themeConfig, nil
 	}
 
 	return nil, fmt.Errorf("failed to select theme")

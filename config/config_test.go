@@ -33,7 +33,7 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 			LastChecked: "2023-01-01T00:00:00.000000Z",
 			LastVersion: "1.0.0",
 		},
-		Theme: constants.DarkTheme,
+		Theme: ThemeConfig{Type: constants.DarkTheme},
 	}
 
 	// Write initial config to file
@@ -94,7 +94,7 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 			LastChecked: "2023-01-01T00:00:00.000000Z",
 			LastVersion: "1.0.0",
 		},
-		Theme: constants.DarkTheme,
+		Theme: ThemeConfig{Type: constants.DarkTheme},
 	}
 
 	// Write initial config to file
