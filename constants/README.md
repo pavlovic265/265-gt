@@ -86,8 +86,8 @@ fmt.Println(constants.GetDebugAnsiStyle().Render("[D] Debug"))
 ### Background and Foreground
 ```go
 // Get theme-aware colors
-bgColor := constants.GetBackgroundColor()
-fgColor := constants.GetForegroundColor()
+bgColor := constants.Background
+fgColor := constants.Foreground
 
 style := lipgloss.NewStyle().
     Background(bgColor).
