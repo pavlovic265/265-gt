@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -33,9 +32,9 @@ func (svc addCommand) Command() *cobra.Command {
 				return err
 			}
 			if len(args) == 0 {
-				fmt.Println(constants.SuccessIndicator("All changes staged"))
+				fmt.Println("All changes staged")
 			} else {
-				fmt.Println(constants.SuccessIndicator("Files staged successfully"))
+				fmt.Println("Files staged successfully")
 			}
 			return nil
 		},

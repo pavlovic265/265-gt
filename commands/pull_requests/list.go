@@ -11,7 +11,6 @@ import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -78,10 +77,9 @@ func (svc listCommand) selectPullRequest(
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok {
 			if m.Yanked {
-				fmt.Printf("%s %s %s\n",
-					constants.SuccessIconOnly(),
-					constants.GetSuccessStyle().Render("URL yanked to clipboard:"),
-					constants.GetFileStyle().Render(currentURL))
+				fmt.Printf("✓ %s %s\n",
+					"URL yanked to clipboard:",
+					currentURL)
 				return nil
 			}
 			if m.Selected != "" {

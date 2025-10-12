@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -32,9 +31,9 @@ func (svc unstageCommand) Command() *cobra.Command {
 				return err
 			}
 			if len(args) == 0 {
-				fmt.Println(constants.SuccessIndicator("All staged changes unstaged"))
+				fmt.Println("All staged changes unstaged")
 			} else {
-				fmt.Println(constants.SuccessIndicator("Files unstaged successfully"))
+				fmt.Println("Files unstaged successfully")
 			}
 			return nil
 		},

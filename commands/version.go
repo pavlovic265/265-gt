@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/spf13/cobra"
@@ -50,8 +49,8 @@ func (svc versionCommand) getCurrentVersion() error {
 	}
 
 	fmt.Printf("%s %s\n",
-		constants.GetInfoStyle().Render("Current version:"),
-		constants.GetCommandStyle().Render(version))
+		"Current version:",
+		version)
 	return nil
 }
 
@@ -62,7 +61,7 @@ func (svc versionCommand) getLatestVersion() error {
 	}
 
 	fmt.Printf("%s %s\n",
-		constants.GetInfoStyle().Render("Latest version:"),
-		constants.GetCommandStyle().Render(version))
+		"Latest version:",
+		version)
 	return nil
 }

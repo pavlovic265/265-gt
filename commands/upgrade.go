@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
@@ -50,9 +49,8 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("%s %s\n",
-				constants.SuccessIconOnly(),
-				constants.GetSuccessStyle().Render("Tool upgraded successfully"))
+			fmt.Printf("✓ %s\n",
+				"Tool upgraded successfully")
 			return nil
 		},
 	}

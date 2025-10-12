@@ -5,7 +5,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -61,7 +60,7 @@ func (svc upCommand) checkoutBranch(
 	if err != nil {
 		return err
 	}
-	fmt.Println(constants.SuccessIndicator("Moved up to branch '" + branch + "'"))
+	fmt.Println("Moved up to branch '" + branch + "'")
 	return nil
 }
 

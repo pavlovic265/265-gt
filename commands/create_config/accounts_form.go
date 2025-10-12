@@ -143,7 +143,7 @@ func (am accountsModel) View() string {
 		platformStr := platform.String()
 		if i == am.platformIndex {
 			if am.focusIndex == len(am.inputs) {
-				b.WriteString(constants.GetSuccessStyle().Render("(•) " + platformStr))
+				b.WriteString("(• " + platformStr + ")")
 			} else {
 				b.WriteString("(•) " + platformStr)
 			}
@@ -161,16 +161,16 @@ func (am accountsModel) View() string {
 
 	var doneButton string
 	if am.focusIndex == len(am.inputs)+1 {
-		doneButton = constants.GetSuccessStyle().Render(DoneButtonFocus)
+		doneButton = DoneButtonFocus
 	} else {
-		doneButton = constants.GetDebugStyle().Render(DoneButtonBlur)
+		doneButton = DoneButtonBlur
 	}
 
 	var addButton string
 	if am.focusIndex == len(am.inputs)+2 {
-		addButton = constants.GetSuccessStyle().Render(AddButtonFocus)
+		addButton = AddButtonFocus
 	} else {
-		addButton = constants.GetDebugStyle().Render(AddButtonBlur)
+		addButton = AddButtonBlur
 	}
 
 	fmt.Fprintf(&b, "\n\n%s  %s\n\n", doneButton, addButton)
@@ -235,8 +235,8 @@ func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 		if i == am.focusIndex {
 			// Set focused state
 			cmds[i] = am.inputs[i].Focus()
-			am.inputs[i].PromptStyle = constants.GetSuccessStyle()
-			am.inputs[i].TextStyle = constants.GetSuccessStyle()
+			am.inputs[i].PromptStyle = lipgloss.NewStyle()
+			am.inputs[i].TextStyle = lipgloss.NewStyle()
 			continue
 		}
 		// Remove focused state

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
@@ -58,49 +57,49 @@ func (svc statusCommand) styleGitStatus(output string) string {
 			if len(parts) >= 3 {
 				branchName := strings.Join(parts[2:], " ")
 				styledLine = fmt.Sprintf("%s %s %s",
-					parts[0], parts[1], constants.GetBranchStyle().Render(branchName))
+					parts[0], parts[1], branchName)
 			}
 		}
 
 		// Style file status indicators
 		if strings.Contains(line, "Changes to be committed") {
-			styledLine = constants.GetInfoStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "Changes not staged for commit") {
-			styledLine = constants.GetWarningStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "Untracked files") {
-			styledLine = constants.GetErrorStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "modified:") {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 2 {
 				styledLine = fmt.Sprintf("%s:%s",
-					constants.GetStatusStyle().Render(parts[0]),
-					constants.GetFileStyle().Render(parts[1]))
+					parts[0],
+					parts[1])
 			}
 		} else if strings.Contains(line, "new file:") {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 2 {
 				styledLine = fmt.Sprintf("%s:%s",
-					constants.GetSuccessStyle().Render(parts[0]),
-					constants.GetFileStyle().Render(parts[1]))
+					parts[0],
+					parts[1])
 			}
 		} else if strings.Contains(line, "deleted:") {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 2 {
 				styledLine = fmt.Sprintf("%s:%s",
-					constants.GetErrorStyle().Render(parts[0]),
-					constants.GetFileStyle().Render(parts[1]))
+					parts[0],
+					parts[1])
 			}
 		} else if strings.Contains(line, "use \"git add <file>...\" to include in what will be committed") {
-			styledLine = constants.GetDebugStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "use \"git restore --staged <file>...\" to unstage") {
-			styledLine = constants.GetDebugStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "use \"git add/rm <file>...\" to update what will be committed") {
-			styledLine = constants.GetDebugStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "use \"git restore <file>...\" to discard changes in working directory") {
-			styledLine = constants.GetDebugStyle().Render(line)
+			styledLine = line
 		} else if strings.Contains(line, "\t") && !strings.Contains(line, ":") {
 			// This is likely an untracked file (indented with tab, no colon)
-			styledLine = fmt.Sprintf("\t%s", constants.GetFileStyle().Render(strings.TrimSpace(line)))
+			styledLine = fmt.Sprintf("\t%s", strings.TrimSpace(line))
 		}
 
 		styledLines = append(styledLines, styledLine)

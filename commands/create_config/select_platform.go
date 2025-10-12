@@ -60,22 +60,22 @@ func (sm selectPlatformModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (sm selectPlatformModel) View() string {
 	s := strings.Builder{}
-	s.WriteString(constants.GetInfoStyle().Render("Choose platform?") + "\n\n")
+	s.WriteString("Choose platform?" + "\n\n")
 
 	for i := 0; i < len(sm.choices); i++ {
 		if sm.cursor == i {
-			s.WriteString(constants.GetSuccessStyle().Render("(•) "))
+			s.WriteString("(•) ")
 		} else {
 			s.WriteString("( ) ")
 		}
 		if sm.cursor == i {
-			s.WriteString(constants.GetBranchStyle().Render(sm.choices[i]))
+			s.WriteString(sm.choices[i])
 		} else {
 			s.WriteString(sm.choices[i])
 		}
 		s.WriteString("\n")
 	}
-	s.WriteString("\n" + constants.GetDebugStyle().Render("(press ctrl+q to quit)") + "\n")
+	s.WriteString("\n(press ctrl+q to quit)\n")
 
 	return s.String()
 }

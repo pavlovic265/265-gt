@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -42,7 +41,7 @@ func (svc downCommand) Command() *cobra.Command {
 				return err
 			}
 
-			fmt.Println(constants.SuccessIndicator("Moved down to branch '" + parent + "'"))
+			fmt.Println("Moved down to branch '" + parent + "'")
 			return nil
 		},
 	}

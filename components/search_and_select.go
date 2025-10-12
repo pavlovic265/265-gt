@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/constants"
 )
 
 type ListModel struct {
@@ -77,21 +76,21 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ListModel) View() string {
 	s := fmt.Sprintf("%s %s\n\n",
-		constants.GetInfoStyle().Render("Search:"),
-		constants.GetHighlightStyle().Render(m.Query))
+		"Search:",
+		m.Query)
 
 	if len(m.Choices) == 0 {
-		s += constants.GetWarningStyle().Render("No items found") + "\n"
+		s += "No items found" + "\n"
 	} else {
 		for i, choice := range m.Choices {
 			cursor := " "
 			if m.Cursor == i {
-				cursor = constants.GetCommandStyle().Render(">")
+				cursor = ">"
 			}
 
 			styledChoice := choice
 			if m.Cursor == i {
-				styledChoice = constants.GetBranchStyle().Render(choice)
+				styledChoice = choice
 			}
 
 			line := fmt.Sprintf("%s %s", cursor, styledChoice)
@@ -102,18 +101,18 @@ func (m ListModel) View() string {
 	// Only show yank option if there are URLs available
 	if len(m.URLs) > 0 && m.YankURL != "" {
 		s += fmt.Sprintf("\n%s %s %s\n",
-			constants.GetDebugStyle().Render("Press"),
-			constants.GetCommandStyle().Render("CTRL+q"),
-			constants.GetDebugStyle().Render("to quit,"))
+			"Press",
+			"CTRL+q",
+			"to quit,")
 		s += fmt.Sprintf("%s %s %s\n",
-			constants.GetDebugStyle().Render("Press"),
-			constants.GetCommandStyle().Render("CTRL+y"),
-			constants.GetDebugStyle().Render("to yank URL."))
+			"Press",
+			"CTRL+y",
+			"to yank URL.")
 	} else {
 		s += fmt.Sprintf("\n%s %s %s\n",
-			constants.GetDebugStyle().Render("Press"),
-			constants.GetCommandStyle().Render("CTRL+q"),
-			constants.GetDebugStyle().Render("to quit."))
+			"Press",
+			"CTRL+q",
+			"to quit.")
 	}
 
 	return s

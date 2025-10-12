@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/constants"
 )
 
 type selectThemeModel struct {
@@ -59,22 +58,22 @@ func (sm selectThemeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (sm selectThemeModel) View() string {
 	s := strings.Builder{}
-	s.WriteString(constants.GetInfoStyle().Render("Choose theme?") + "\n\n")
+	s.WriteString("Choose theme?" + "\n\n")
 
 	for i := 0; i < len(sm.choices); i++ {
 		if sm.cursor == i {
-			s.WriteString(constants.GetSuccessStyle().Render("(•) "))
+			s.WriteString("(•) ")
 		} else {
 			s.WriteString("( ) ")
 		}
 		if sm.cursor == i {
-			s.WriteString(constants.GetBranchStyle().Render(sm.choices[i]))
+			s.WriteString(sm.choices[i])
 		} else {
 			s.WriteString(sm.choices[i])
 		}
 		s.WriteString("\n")
 	}
-	s.WriteString("\n" + constants.GetDebugStyle().Render("(press ctrl+q to quit)") + "\n")
+	s.WriteString("\n(press ctrl+q to quit)\n")
 
 	return s.String()
 }

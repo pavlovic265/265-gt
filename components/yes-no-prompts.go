@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/constants"
 )
 
 type YesNoPrompt struct {
@@ -53,22 +52,21 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
-		return fmt.Sprintf("\n%s %s\n",
-			constants.ErrorIconOnly(),
-			constants.GetErrorStyle().Render("Operation canceled by user"))
+		return fmt.Sprintf("\n✗ %s\n",
+			"Operation canceled by user")
 	}
 
 	// Style the question with options
-	s := fmt.Sprintf("%s\n", constants.GetInfoStyle().Render(m.question))
+	s := fmt.Sprintf("%s\n", m.question)
 	s += fmt.Sprintf("%s %s %s %s\n",
-		constants.GetDebugStyle().Render("Press"),
-		constants.GetSuccessStyle().Render("Y"),
-		constants.GetDebugStyle().Render("for Yes,"),
-		constants.GetErrorStyle().Render("N"))
+		"Press",
+		"Y",
+		"for Yes,",
+		"N")
 	s += fmt.Sprintf("%s %s %s\n",
-		constants.GetDebugStyle().Render("for No, or"),
-		constants.GetCommandStyle().Render("ENTER"),
-		constants.GetDebugStyle().Render("for Yes."))
+		"for No, or",
+		"ENTER",
+		"for Yes.")
 
 	return s
 }

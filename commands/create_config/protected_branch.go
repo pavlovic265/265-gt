@@ -125,16 +125,16 @@ func (pbm protectedBranchModele) View() string {
 
 	var doneButton string
 	if pbm.focusIndex == 1 {
-		doneButton = constants.GetSuccessStyle().Render("[ Done ]")
+		doneButton = "[ Done ]"
 	} else {
-		doneButton = constants.GetDebugStyle().Render("[ Done ]")
+		doneButton = "[ Done ]"
 	}
 
 	var addButton string
 	if pbm.focusIndex == 2 {
-		addButton = constants.GetSuccessStyle().Render("[ Add ]")
+		addButton = "[ Add ]"
 	} else {
-		addButton = constants.GetDebugStyle().Render("[ Add ]")
+		addButton = "[ Add ]"
 	}
 
 	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton, addButton)

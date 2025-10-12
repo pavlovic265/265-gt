@@ -111,12 +111,12 @@ func showVersionNotification(current, latest, url string) {
 	latestDisplay := strings.TrimPrefix(latest, "v")
 
 	fmt.Printf("\n%s %s %s %s %s\n",
-		constants.GetInfoStyle().Render("🔄"),
-		constants.GetInfoStyle().Render("A new release of gt is available:"),
-		constants.GetWarningStyle().Render(currentDisplay),
-		constants.GetDebugStyle().Render(constants.ArrowRightIcon),
-		constants.GetWarningStyle().Render(latestDisplay))
+		"🔄",
+		"A new release of gt is available:",
+		currentDisplay,
+		constants.ArrowRightIcon,
+		latestDisplay)
 
-	fmt.Printf("To upgrade, run: %s\n", constants.GetSuccessStyle().Render("gt upgrade"))
-	fmt.Printf("%s\n\n", constants.GetInfoStyle().Render(url))
+	fmt.Printf("To upgrade, run: %s\n", "gt upgrade")
+	fmt.Printf("%s\n\n", url)
 }

@@ -206,7 +206,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 
 func (svc gitHubCli) displayAuthStatus(output string) {
 	// Simple title with subtle color
-	fmt.Println(constants.GetInfoStyle().Render("GitHub Authentication Status"))
+	fmt.Println("GitHub Authentication Status")
 	fmt.Println()
 
 	lines := strings.Split(output, "\n")
@@ -225,24 +225,24 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 				fmt.Println() // Add spacing between platforms
 			}
 			currentPlatform = line
-			fmt.Println(constants.GetCommandStyle().Render("> " + currentPlatform))
+			fmt.Println("> " + currentPlatform)
 			continue
 		}
 
 		// Style the lines with subtle colors
 		if strings.HasPrefix(line, "✓") {
 			// Success lines (logged in accounts)
-			fmt.Println(constants.GetSuccessStyle().Render(line))
+			fmt.Println(line)
 		} else if strings.HasPrefix(line, "-") {
 			// Detail lines
 			if strings.Contains(line, "Active account: true") {
-				fmt.Println(constants.GetSuccessStyle().Render("  " + line))
+				fmt.Println("  " + line)
 			} else if strings.Contains(line, "Active account: false") {
-				fmt.Println(constants.GetDebugStyle().Render("  " + line))
+				fmt.Println("  " + line)
 			} else if strings.Contains(line, "Token:") {
-				fmt.Println(constants.GetWarningStyle().Render("  " + line))
+				fmt.Println("  " + line)
 			} else {
-				fmt.Println(constants.GetDebugStyle().Render("  " + line))
+				fmt.Println("  " + line)
 			}
 		}
 	}
@@ -255,6 +255,6 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 		fmt.Println(constants.GetSuccessStyle().Render(
 			"* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
 	} else {
-		fmt.Println(constants.GetWarningStyle().Render("! No active account set in gt config"))
+		fmt.Println("! No active account set in gt config")
 	}
 }
