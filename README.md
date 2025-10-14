@@ -25,27 +25,35 @@
 - **Panda Syntax Theme**: Stunning color scheme with dark/light theme support
 - **Version Management**: Automatic version checking and upgrade notifications
 
-## 📋 Requirements
-
-- **Go**: 1.24 or higher
-- **Git**: 2.39.5 or higher
-- **GitHub CLI**: 2.81.0 or higher (for GitHub integration)
-
 ## 🛠️ Installation
 
-### Quick Install
+### Homebrew (Recommended for macOS)
+```bash
+brew tap pavlovic265/265-gt
+brew install 265-gt
+```
+
+### Quick Install Script
 ```bash
 curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh | bash
 ```
 
-### Manual Installation
+### Build from Source (For Developers)
 ```bash
 # Clone the repository
 git clone https://github.com/pavlovic265/265-gt.git
 cd 265-gt
 
-# Build and install
+# Build the binary
 go build -o gt main.go
+
+# Install to your PATH (choose one):
+# Option 1: User directory (no sudo needed)
+mkdir -p ~/.local/bin
+mv gt ~/.local/bin/
+export PATH="$HOME/.local/bin:$PATH"
+
+# Option 2: System directory (requires sudo)
 sudo mv gt /usr/local/bin/
 ```
 
