@@ -22,6 +22,9 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
 
 archives:
   - format: tar.gz
@@ -48,7 +51,7 @@ nfpms:
     description: "Git workflow utility with intelligent branch management and automation"
     license: "MIT"
     contents:
-      - src: ./dist/{{ .Os }}_{{ .Arch }}/265-gt
+      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}
         dst: /usr/local/bin/gt
         type: file
         file_info:
