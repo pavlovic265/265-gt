@@ -25,7 +25,7 @@ builds:
     goarch:
       - amd64
       - arm64
-   overrides:
+    overrides:
       - goarch: amd64_v1
         id: amd64
 
