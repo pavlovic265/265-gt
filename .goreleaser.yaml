@@ -25,6 +25,9 @@ builds:
     goarch:
       - amd64
       - arm64
+   overrides:
+      - goarch: amd64_v1
+        id: amd64
 
 archives:
   - format: tar.gz
@@ -51,11 +54,10 @@ nfpms:
     description: "Git workflow utility with intelligent branch management and automation"
     license: "MIT"
     contents:
-      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}
+      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}*/{{ .ProjectName }}
         dst: /usr/local/bin/gt
         type: file
-        file_info:
-          mode: 0755
+        mode: 0755
 
 changelog:
   sort: asc
