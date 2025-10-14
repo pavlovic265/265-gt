@@ -33,6 +33,22 @@ brew tap pavlovic265/265-gt
 brew install 265-gt
 ```
 
+### Ubuntu/Debian (.deb package)
+```bash
+# Download and install the latest .deb package
+wget https://github.com/pavlovic265/265-gt/releases/download/v0.3.0/gt_0.3.0_linux_amd64.deb
+sudo apt install ./gt_0.3.0_linux_amd64.deb
+```
+
+### Fedora / RHEL / CentOS (.rpm package)
+```bash
+# Download and install the latest .rpm package
+wget https://github.com/pavlovic265/265-gt/releases/download/v0.3.0/gt_0.3.0_linux_amd64.rpm
+sudo rpm -i gt_0.3.0_linux_amd64.rpm
+```
+
+
+
 ### Quick Install Script
 ```bash
 curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh | bash

@@ -38,6 +38,21 @@ archives:
       - goos: windows
         format: zip
 
+nfpms:
+  - id: linux-packages
+    package_name: gt
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: ["deb", "rpm"] 
+    maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
+    homepage: "https://github.com/pavlovic265/265-gt"
+    description: "Developer CLI tool for managing and generating Go templates"
+    license: "MIT"
+    contents:
+      - src: ./dist/{{ .Os }}_{{ .Arch }}/265-gt
+        dst: /usr/local/bin/gt
+        type: file
+        mode: 0755
+
 changelog:
   sort: asc
   filters:
