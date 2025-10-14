@@ -97,29 +97,7 @@ func main() {
 	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
 
-	rootCmd.AddCommand(&cobra.Command{
-		Use:   "completion [bash|zsh|fish|powershell]",
-		Short: "Generate shell completion scripts",
-		Long:  "Install auto-completion for Bash, Zsh, Fish, or PowerShell",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			var err error
-			switch args[0] {
-			case "bash":
-				err = cmd.Root().GenBashCompletion(os.Stdout)
-			case "zsh":
-				err = cmd.Root().GenZshCompletion(os.Stdout)
-			case "fish":
-				err = cmd.Root().GenFishCompletion(os.Stdout, true)
-			case "powershell":
-				err = cmd.Root().GenPowerShellCompletion(os.Stdout)
-			}
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error generating completion: %v\n", err)
-				os.Exit(1)
-			}
-		},
-	})
+	rootCmd.AddCommand(commands.NewCompletionCommand().Command())
 
 	// Execute the command and handle unknown commands
 	if err := rootCmd.Execute(); err != nil {
