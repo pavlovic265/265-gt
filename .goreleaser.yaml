@@ -45,13 +45,14 @@ nfpms:
     formats: ["deb", "rpm"] 
     maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
     homepage: "https://github.com/pavlovic265/265-gt"
-    description: "Developer CLI tool for managing and generating Go templates"
+    description: "Git workflow utility with intelligent branch management and automation"
     license: "MIT"
     contents:
       - src: ./dist/{{ .Os }}_{{ .Arch }}/265-gt
         dst: /usr/local/bin/gt
         type: file
-        mode: 0755
+        file_info:
+          mode: 0755
 
 changelog:
   sort: asc
