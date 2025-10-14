@@ -10,13 +10,14 @@ version: 2
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
     - go generate ./...
 
 builds:
-  - env:
+  - id: gt
+    main: .
+    binary: gt
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -25,13 +26,9 @@ builds:
     goarch:
       - amd64
       - arm64
-    overrides:
-      - goarch: amd64_v1
-        id: amd64
 
 archives:
   - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -39,25 +36,25 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - LICENSE
+      - README.md
 
 nfpms:
-  - id: linux-packages
-    package_name: gt
+  - package_name: gt
     file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    formats: ["deb", "rpm"] 
+    formats: ["deb", "rpm"]
     maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
     homepage: "https://github.com/pavlovic265/265-gt"
-    description: "Git workflow utility with intelligent branch management and automation"
+    description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
     contents:
-      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}*/{{ .ProjectName }}
+      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}
         dst: /usr/local/bin/gt
         type: file
-        mode: 0755
 
 changelog:
   sort: asc
