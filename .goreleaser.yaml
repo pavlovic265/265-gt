@@ -44,17 +44,17 @@ archives:
       - README.md
 
 nfpms:
-  - package_name: gt
+  - id: gtpkg
+    package_name: gt
     file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     formats: ["deb", "rpm"]
     maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
     homepage: "https://github.com/pavlovic265/265-gt"
     description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
-    contents:
-      - src: ./dist/{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}/{{ .ProjectName }}
-        dst: /usr/local/bin/gt
-        type: file
+    builds:
+      - gt
+    bindir: /usr/local/bin
 
 changelog:
   sort: asc
