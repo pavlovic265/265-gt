@@ -1,6 +1,8 @@
 package commands_test
 
 import (
+	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -47,9 +49,18 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 			},
 		}, nil)
 
-	mockConfigManager.EXPECT().
-		SaveVersion(gomock.Any()).
-		Return(nil)
+	// Set up expectations for checkWhichBinary() call
+	mockExecutor.EXPECT().
+		WithName("bash").
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"which", "gt"}).
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		RunWithOutput().
+		Return(*bytes.NewBufferString("/usr/local/bin/gt"), nil)
 
 	// Set up expectations for upgrade process
 	mockExecutor.EXPECT().
@@ -62,6 +73,10 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 
 	mockExecutor.EXPECT().
 		Run().
+		Return(nil)
+
+	mockConfigManager.EXPECT().
+		SaveVersion(gomock.Any()).
 		Return(nil)
 
 	// Execute the command
@@ -86,9 +101,18 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 			},
 		}, nil)
 
-	mockConfigManager.EXPECT().
-		SaveVersion(gomock.Any()).
-		Return(nil)
+	// Set up expectations for checkWhichBinary() call
+	mockExecutor.EXPECT().
+		WithName("bash").
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"which", "gt"}).
+		Return(mockExecutor)
+
+	mockExecutor.EXPECT().
+		RunWithOutput().
+		Return(*bytes.NewBufferString("/usr/local/bin/gt"), nil)
 
 	// Set up expectations for the executor calls that will happen if an upgrade is needed
 	// We use Any() to be flexible about the exact arguments since we can't easily mock the HTTP call
@@ -104,14 +128,14 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 
 	mockExecutor.EXPECT().
 		Run().
-		Return(nil). // Return success for this test
+		Return(fmt.Errorf("executor failed")). // Return error for this test
 		AnyTimes()
 
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 
-	// The command should complete successfully
-	assert.NoError(t, err, "Upgrade command should complete successfully")
+	// The command should fail due to executor error
+	assert.Error(t, err, "Upgrade command should fail when executor fails")
 }
 
 func TestNewUpgradeCommand(t *testing.T) {
