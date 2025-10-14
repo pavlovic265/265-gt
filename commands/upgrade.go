@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
@@ -40,11 +41,20 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 				return nil // silently fail if version is not found
 			}
 
-			installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
-			exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
-			err = svc.exe.WithName("bash").WithArgs(exeArgs).Run()
-			if err != nil {
-				return err
+			binary := svc.checkWhichBinary()
+			if binary == nil {
+				return fmt.Errorf("failed to check if homebrew is installed")
+			}
+
+			switch pointer.Deref(binary) {
+			case BinaryHomebrew:
+				if err := svc.upgradeWithHomebrew(); err != nil {
+					return err
+				}
+			case BinaryScript:
+				if err := svc.upgradeWithScript(); err != nil {
+					return err
+				}
 			}
 
 			if err := svc.configManager.SaveVersion(pointer.Deref(version)); err != nil {
@@ -57,6 +67,48 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
+}
+
+type Binary string
+
+const (
+	BinaryHomebrew Binary = "homebrew"
+	BinaryScript   Binary = "script"
+)
+
+func (svc UpgradeCommand) checkWhichBinary() *Binary {
+	exeArgs := []string{"which", "gt"}
+	out, err := svc.exe.WithName("bash").WithArgs(exeArgs).RunWithOutput()
+	if err != nil {
+		fmt.Printf("Warning: Failed to check if homebrew is installed: %v\n", err)
+		return nil
+	}
+	if strings.Contains(out.String(), "homebrew") {
+		return pointer.From(BinaryHomebrew)
+	}
+
+	return pointer.From(BinaryScript)
+}
+
+func (svc UpgradeCommand) upgradeWithHomebrew() error {
+	exeArgs := []string{"brew", "upgrade", "gt"}
+	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc UpgradeCommand) upgradeWithScript() error {
+	installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
+	exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
+	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (svc UpgradeCommand) isLatestVersion() (*string, bool, error) {
