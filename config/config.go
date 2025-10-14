@@ -34,14 +34,14 @@ type ThemeConfig struct {
 }
 
 type GlobalConfigStruct struct {
-	Accounts      []Account   `yaml:"accounts"`
-	ActiveAccount Account     `yaml:"active_account"`
-	Version       Version     `yaml:"version"`
-	Theme         ThemeConfig `yaml:"theme"`
+	Accounts      []Account    `yaml:"accounts,omitempty"`
+	ActiveAccount *Account     `yaml:"active_account,omitempty"`
+	Version       *Version     `yaml:"version,omitempty"`
+	Theme         *ThemeConfig `yaml:"theme,omitempty"`
 }
 
 type LocalConfigStruct struct {
-	Protected []string `yaml:"protected"`
+	Protected []string `yaml:"protected,omitempty"`
 }
 
 type DefaultConfigManager struct {
@@ -164,12 +164,18 @@ func (d *DefaultConfigManager) SaveLocalConfig(configToSave LocalConfigStruct) e
 }
 
 func (d *DefaultConfigManager) SaveLastChecked() error {
+	if globalConfig.Version == nil {
+		globalConfig.Version = &Version{}
+	}
 	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 
 	return d.SaveGlobalConfig(globalConfig)
 }
 
 func (d *DefaultConfigManager) SaveVersion(version string) error {
+	if globalConfig.Version == nil {
+		globalConfig.Version = &Version{}
+	}
 	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 	globalConfig.Version.CurrentVersion = version
 
@@ -178,29 +184,29 @@ func (d *DefaultConfigManager) SaveVersion(version string) error {
 
 // Account operations
 func (d *DefaultConfigManager) SaveActiveAccount(account Account) error {
-	globalConfig.ActiveAccount = account
+	globalConfig.ActiveAccount = pointer.From(account)
 
 	return d.SaveGlobalConfig(globalConfig)
 }
 
 func (d *DefaultConfigManager) SetActiveAccount(account Account) error {
-	globalConfig.ActiveAccount = account
+	globalConfig.ActiveAccount = pointer.From(account)
 
 	return d.SaveGlobalConfig(globalConfig)
 }
 
 func (d *DefaultConfigManager) GetActiveAccount() Account {
-	return globalConfig.ActiveAccount
+	return pointer.Deref(globalConfig.ActiveAccount)
 }
 
 func (d *DefaultConfigManager) ClearActiveAccount() error {
-	globalConfig.ActiveAccount = Account{}
+	globalConfig.ActiveAccount = nil
 
 	return d.SaveGlobalConfig(globalConfig)
 }
 
 func (d *DefaultConfigManager) HasActiveAccount() bool {
-	return globalConfig.ActiveAccount.User != ""
+	return globalConfig.ActiveAccount != nil && globalConfig.ActiveAccount.User != ""
 }
 
 func (d *DefaultConfigManager) GetAccounts() []Account {
@@ -210,11 +216,14 @@ func (d *DefaultConfigManager) GetAccounts() []Account {
 }
 
 func (d *DefaultConfigManager) GetCurrentVersion() string {
+	if globalConfig.Version == nil {
+		return ""
+	}
 	return globalConfig.Version.CurrentVersion
 }
 
 func (d *DefaultConfigManager) GetVersion() Version {
-	return globalConfig.Version
+	return pointer.Deref(globalConfig.Version)
 }
 
 func (d *DefaultConfigManager) GetProtectedBranches() []string {

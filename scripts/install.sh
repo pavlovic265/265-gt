@@ -20,9 +20,29 @@ fi
 echo "Installing $BINARY from $REPO version $VERSION..."
 go install "$REPO$VERSION"
 
-# Set symlink to executable
-if [ ! -L /usr/local/bin/$BINARY ]; then
-  ln -s ~/go/bin/265-gt /usr/local/bin/$BINARY
+# Set symlink to executable in user's local bin directory
+USER_BIN_DIR="$HOME/.local/bin"
+mkdir -p "$USER_BIN_DIR"
+
+if [ ! -L "$USER_BIN_DIR/$BINARY" ]; then
+  ln -sf ~/go/bin/265-gt "$USER_BIN_DIR/$BINARY"
+fi
+
+# Add to PATH if not already there
+if [[ ":$PATH:" != *":$USER_BIN_DIR:"* ]]; then
+  echo "Adding $USER_BIN_DIR to PATH..."
+  
+  # Add to common shell config files
+  for config_file in ~/.bashrc ~/.zshrc ~/.profile ~/.bash_profile; do
+    if [ -f "$config_file" ]; then
+      if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$config_file"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$config_file"
+        echo "Added to $config_file"
+      fi
+    fi
+  done
+  
+  echo "Please restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
 fi
 
 # Verify installation

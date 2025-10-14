@@ -42,7 +42,7 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 	mockConfigManager.EXPECT().
 		LoadGlobalConfig().
 		Return(&config.GlobalConfigStruct{
-			Version: config.Version{
+			Version: &config.Version{
 				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
 			},
 		}, nil)
@@ -81,7 +81,7 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 	mockConfigManager.EXPECT().
 		LoadGlobalConfig().
 		Return(&config.GlobalConfigStruct{
-			Version: config.Version{
+			Version: &config.Version{
 				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
 			},
 		}, nil)

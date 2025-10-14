@@ -86,11 +86,11 @@ func TestConfigManagerSaveOperations(t *testing.T) {
 		Accounts: []config.Account{
 			{User: "user1", Token: "token1", Platform: "GitHub"},
 		},
-		Version: config.Version{
+		Version: &config.Version{
 			LastChecked:    "2023-01-01T00:00:00Z",
 			CurrentVersion: "v1.0.0",
 		},
-		Theme: config.ThemeConfig{Type: "dark"},
+		Theme: &config.ThemeConfig{Type: "dark"},
 	}
 
 	mockConfigManager.EXPECT().

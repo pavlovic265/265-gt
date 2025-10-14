@@ -28,11 +28,11 @@ func TestUpdateLastChecked_PreservesGitHubAccounts(t *testing.T) {
 			{User: "user1", Token: "token1", Platform: "GitHub"},
 			{User: "user2", Token: "token2", Platform: "GitHub"},
 		},
-		Version: Version{
+		Version: &Version{
 			LastChecked:    "2023-01-01T00:00:00.000000Z",
 			CurrentVersion: "1.0.0",
 		},
-		Theme: ThemeConfig{Type: constants.DarkTheme},
+		Theme: &ThemeConfig{Type: constants.DarkTheme},
 	}
 
 	// Write initial config to file
@@ -79,11 +79,11 @@ func TestUpdateVersion_PreservesGitHubAccounts(t *testing.T) {
 			{User: "user1", Token: "token1", Platform: "GitHub"},
 			{User: "user2", Token: "token2", Platform: "GitHub"},
 		},
-		Version: Version{
+		Version: &Version{
 			LastChecked:    "2023-01-01T00:00:00.000000Z",
 			CurrentVersion: "1.0.0",
 		},
-		Theme: ThemeConfig{Type: constants.DarkTheme},
+		Theme: &ThemeConfig{Type: constants.DarkTheme},
 	}
 
 	// Write initial config to file

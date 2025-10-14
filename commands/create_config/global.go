@@ -9,7 +9,6 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
@@ -36,9 +35,9 @@ func (svc globalCommand) Command() *cobra.Command {
 		Short:              "generate global config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			configPath, err := svc.configManager.GetGlobalConfigPath()
+			_, err := svc.configManager.GetGlobalConfigPath()
 			if errors.Is(err, os.ErrNotExist) {
-				err = svc.createGlobalConfig(configPath)
+				err = svc.createGlobalConfig()
 				if err != nil {
 					return err
 				}
@@ -55,7 +54,7 @@ func (svc globalCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc globalCommand) createGlobalConfig(configPath string) error {
+func (svc globalCommand) createGlobalConfig() error {
 
 	accounts, err := HandleAddAccunts()
 	if err != nil {
@@ -74,12 +73,12 @@ func (svc globalCommand) createGlobalConfig(configPath string) error {
 
 	globalConfig := config.GlobalConfigStruct{
 		Accounts: accounts,
-		Version: config.Version{
+		Version: &config.Version{
 			LastChecked:    timeutils.Now().Format(timeutils.LayoutISOWithTime),
 			CurrentVersion: latestVersion,
 		},
-		ActiveAccount: config.Account{},
-		Theme:         pointer.Deref(theme),
+		ActiveAccount: &config.Account{},
+		Theme:         theme,
 	}
 
 	err = svc.configManager.SaveGlobalConfig(globalConfig)
