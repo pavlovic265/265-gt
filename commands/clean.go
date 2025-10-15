@@ -119,8 +119,8 @@ func (svc cleanCommand) cleanBranches() error {
 		deletedCount++
 	}
 
-	fmt.Printf("\n%s %s\n",
-		constants.SuccessIcon,
+	fmt.Printf("%s %s\n",
+		successIconStyle.Render(constants.SuccessIcon),
 		successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
 	return nil
 }
