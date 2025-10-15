@@ -38,6 +38,10 @@ var (
 			Foreground(constants.Yellow).
 			Bold(true)
 
+	quitKeyStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow).
+			Bold(true)
+
 	// Canceled message style
 	canceledStyle = lipgloss.NewStyle().
 			Foreground(constants.Red)
@@ -99,8 +103,11 @@ func (m YesNoPrompt) View() string {
 	content.WriteString(yesKeyStyle.Render("Yes (Y)"))
 	content.WriteString(optionsStyle.Render(", "))
 	content.WriteString(noKeyStyle.Render("No (N)"))
-	content.WriteString(optionsStyle.Render(", or "))
+	content.WriteString(optionsStyle.Render(", "))
 	content.WriteString(enterKeyStyle.Render("ENTER (Yes)"))
+	content.WriteString(optionsStyle.Render(", or "))
+	content.WriteString(quitKeyStyle.Render("Ctrl+Q"))
+	content.WriteString(optionsStyle.Render(" to quit"))
 
 	return content.String()
 }

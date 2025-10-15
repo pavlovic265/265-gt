@@ -32,19 +32,14 @@ var (
 
 	// Success styles
 	successStyle = lipgloss.NewStyle().
-			Foreground(constants.Green)
+			Foreground(constants.White)
+
+	successIconStyle = lipgloss.NewStyle().
+				Foreground(constants.Red)
 
 	// Error styles
 	errorStyle = lipgloss.NewStyle().
 			Foreground(constants.Red)
-
-	// Options styles
-	optionsStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
-
-	keyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
-			Bold(true)
 
 	// Branch info styles
 	branchStyle = lipgloss.NewStyle().
@@ -175,8 +170,8 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("%s %s",
-				constants.SuccessIcon,
+			fmt.Printf("   %s %s\n",
+				successIconStyle.Render(constants.SuccessIcon),
 				successStyle.Render(gitOutput))
 		}
 	}
