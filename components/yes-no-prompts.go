@@ -2,8 +2,11 @@ package components
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 type YesNoPrompt struct {
@@ -11,6 +14,34 @@ type YesNoPrompt struct {
 	answer   string
 	Quitting bool
 }
+
+// Styling definitions for yes/no prompt
+var (
+	// Question style
+	questionStyle = lipgloss.NewStyle().
+			Foreground(constants.Blue)
+
+	// Options style
+	optionsStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+
+	// Key styles
+	yesKeyStyle = lipgloss.NewStyle().
+			Foreground(constants.Green).
+			Bold(true)
+
+	noKeyStyle = lipgloss.NewStyle().
+			Foreground(constants.Red).
+			Bold(true)
+
+	enterKeyStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow).
+			Bold(true)
+
+	// Canceled message style
+	canceledStyle = lipgloss.NewStyle().
+			Foreground(constants.Red)
+)
 
 func (m YesNoPrompt) IsYes() bool {
 	if m.answer != "" && m.answer == "Yes" {
@@ -52,21 +83,24 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
-		return fmt.Sprintf("\n✗ %s\n",
-			"Operation canceled by user")
+		return fmt.Sprintf("\n%s %s\n",
+			constants.ErrorIcon,
+			canceledStyle.Render("Operation canceled by user"))
 	}
 
-	// Style the question with options
-	s := fmt.Sprintf("%s\n", m.question)
-	s += fmt.Sprintf("%s %s %s %s\n",
-		"Press",
-		"Y",
-		"for Yes,",
-		"N")
-	s += fmt.Sprintf("%s %s %s\n",
-		"for No, or",
-		"ENTER",
-		"for Yes.")
+	var content strings.Builder
 
-	return s
+	// Question
+	content.WriteString(questionStyle.Render(m.question))
+	content.WriteString("\n\n")
+
+	// Options with styled keys
+	content.WriteString(optionsStyle.Render("Press "))
+	content.WriteString(yesKeyStyle.Render("Yes (Y)"))
+	content.WriteString(optionsStyle.Render(", "))
+	content.WriteString(noKeyStyle.Render("No (N)"))
+	content.WriteString(optionsStyle.Render(", or "))
+	content.WriteString(enterKeyStyle.Render("ENTER (Yes)"))
+
+	return content.String()
 }

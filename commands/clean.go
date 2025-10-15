@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/components"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
@@ -16,6 +18,41 @@ type cleanCommand struct {
 	exe       executor.Executor
 	gitHelper helpers.GitHelper
 }
+
+// Styling definitions for clean command
+var (
+	// Header styles
+	headerStyle = lipgloss.NewStyle().
+			Foreground(constants.Blue).
+			Bold(true)
+
+	// Info styles
+	infoStyle = lipgloss.NewStyle().
+			Foreground(constants.Cyan)
+
+	// Success styles
+	successStyle = lipgloss.NewStyle().
+			Foreground(constants.Green)
+
+	// Error styles
+	errorStyle = lipgloss.NewStyle().
+			Foreground(constants.Red)
+
+	// Options styles
+	optionsStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+
+	keyStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow).
+			Bold(true)
+
+	// Branch info styles
+	branchStyle = lipgloss.NewStyle().
+			Foreground(constants.Magenta)
+
+	parentStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+)
 
 func NewCleanCommand(
 	exe executor.Executor,
@@ -50,7 +87,8 @@ func (svc cleanCommand) cleanBranches() error {
 		return fmt.Errorf("failed to get branches: %w", err)
 	}
 
-	fmt.Println("🧹 Branch Cleanup")
+	// Styled header
+	fmt.Println(headerStyle.Render("Branch Cleanup"))
 	fmt.Println()
 
 	cleanableCount := 0
@@ -61,14 +99,9 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	if cleanableCount == 0 {
-		fmt.Println("No branches to clean up!")
+		fmt.Println(infoStyle.Render("No branches to clean up!"))
 		return nil
 	}
-
-	// Show options once at the top
-	fmt.Printf("   %s [Y] Yes  [N] No  [Ctrl+Q] Cancel\n", "Options:")
-	fmt.Printf("   %s Default: Yes (press Enter)\n", "💡")
-	fmt.Println()
 
 	deletedCount := 0
 	for _, branch := range branches {
@@ -78,7 +111,9 @@ func (svc cleanCommand) cleanBranches() error {
 
 		shouldBreak, err := svc.deleteBranch(branch)
 		if err != nil {
-			fmt.Printf("✗ Error: %v\n", err)
+			fmt.Printf("%s %s\n",
+				constants.ErrorIcon,
+				errorStyle.Render(fmt.Sprintf("Error: %v", err)))
 			continue
 		}
 
@@ -89,19 +124,29 @@ func (svc cleanCommand) cleanBranches() error {
 		deletedCount++
 	}
 
-	fmt.Printf("\n✓ Cleaned up %d branches\n", deletedCount)
+	fmt.Printf("\n%s %s\n",
+		constants.SuccessIcon,
+		successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
 	return nil
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 	parent := svc.gitHelper.GetParent(branch)
 
-	promptMsg := fmt.Sprintf("🗑️  Delete branch '%s'?", branch)
+	// Create styled prompt message
+	var promptMsg strings.Builder
+	promptMsg.WriteString("Delete branch ")
+	promptMsg.WriteString(branchStyle.Render("'" + branch + "'"))
+	promptMsg.WriteString("?")
+
 	if parent != "" {
-		promptMsg += fmt.Sprintf(" (parent: %s)", parent)
+		promptMsg.WriteString(" (")
+		promptMsg.WriteString(parentStyle.Render("parent: "))
+		promptMsg.WriteString(branchStyle.Render(parent))
+		promptMsg.WriteString(")")
 	}
 
-	initialModel := components.NewYesNoPrompt(promptMsg)
+	initialModel := components.NewYesNoPrompt(promptMsg.String())
 	program := tea.NewProgram(initialModel)
 
 	m, err := program.Run()
@@ -130,7 +175,9 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   ✓ %s\n", gitOutput)
+			fmt.Printf("   %s %s\n",
+				constants.SuccessIcon,
+				successStyle.Render(gitOutput))
 		}
 	}
 
