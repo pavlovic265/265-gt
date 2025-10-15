@@ -43,8 +43,10 @@ var (
 			Bold(true)
 
 	// Canceled message style
+	canceledIconStyle = lipgloss.NewStyle().
+				Foreground(constants.Red)
 	canceledStyle = lipgloss.NewStyle().
-			Foreground(constants.Red)
+			Foreground(constants.White)
 )
 
 func (m YesNoPrompt) IsYes() bool {
@@ -88,7 +90,7 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
 		return fmt.Sprintf("\n%s %s\n",
-			constants.ErrorIcon,
+			canceledIconStyle.Render(constants.ErrorIcon),
 			canceledStyle.Render("Operation canceled by user"))
 	}
 

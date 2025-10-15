@@ -35,7 +35,7 @@ var (
 			Foreground(constants.White)
 
 	successIconStyle = lipgloss.NewStyle().
-				Foreground(constants.Red)
+				Foreground(constants.Green)
 
 	// Error styles
 	errorStyle = lipgloss.NewStyle().
