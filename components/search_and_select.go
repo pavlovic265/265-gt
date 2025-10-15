@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 type ListModel struct {
@@ -18,6 +20,34 @@ type ListModel struct {
 	URLs       []string
 	Yanked     bool
 }
+
+// Styling definitions
+var (
+	// Search input styles
+	searchLabelStyle = lipgloss.NewStyle().
+				Foreground(constants.Blue)
+
+	// List item styles
+	cursorStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow)
+
+	itemStyle = lipgloss.NewStyle().
+			Foreground(constants.Foreground)
+
+	selectedItemStyle = lipgloss.NewStyle().
+				Foreground(constants.Green)
+
+	// Empty state style
+	emptyStateStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+
+	// Footer styles
+	footerStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+
+	keyStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow)
+)
 
 func (m ListModel) Init() tea.Cmd {
 	return nil
@@ -75,47 +105,77 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ListModel) View() string {
-	s := fmt.Sprintf("%s %s\n\n",
-		"Search:",
-		m.Query)
+	var content strings.Builder
 
+	// Search input
+	searchLabel := searchLabelStyle.Render("Search:")
+	content.WriteString(fmt.Sprintf("%s %s\n\n", searchLabel, m.Query))
+
+	// List items
 	if len(m.Choices) == 0 {
-		s += "No items found" + "\n"
+		content.WriteString(emptyStateStyle.Render("No items found"))
+		content.WriteString("\n")
 	} else {
 		for i, choice := range m.Choices {
-			cursor := " "
+			var cursor, styledChoice string
+
+			// Highlight search matches
+			highlightedChoice := highlightMatch(choice, m.Query)
+
 			if m.Cursor == i {
-				cursor = ">"
+				cursor = cursorStyle.Render(">")
+				styledChoice = selectedItemStyle.Render(highlightedChoice)
+			} else {
+				cursor = " "
+				styledChoice = itemStyle.Render(highlightedChoice)
 			}
 
-			styledChoice := choice
-			if m.Cursor == i {
-				styledChoice = choice
-			}
-
-			line := fmt.Sprintf("%s %s", cursor, styledChoice)
-			s += line + "\n"
+			content.WriteString(fmt.Sprintf("%s %s\n", cursor, styledChoice))
 		}
 	}
 
+	// Footer with instructions
+	content.WriteString("\n")
+
+	content.WriteString(footerStyle.Render("Press "))
+	content.WriteString(keyStyle.Render("CTRL+Q"))
+	content.WriteString(footerStyle.Render(" to quit"))
+
 	// Only show yank option if there are URLs available
 	if len(m.URLs) > 0 && m.YankURL != "" {
-		s += fmt.Sprintf("\n%s %s %s\n",
-			"Press",
-			"CTRL+q",
-			"to quit,")
-		s += fmt.Sprintf("%s %s %s\n",
-			"Press",
-			"CTRL+y",
-			"to yank URL.")
-	} else {
-		s += fmt.Sprintf("\n%s %s %s\n",
-			"Press",
-			"CTRL+q",
-			"to quit.")
+		content.WriteString(footerStyle.Render(", "))
+		content.WriteString(keyStyle.Render("CTRL+Y"))
+		content.WriteString(footerStyle.Render(" to yank URL"))
 	}
 
-	return s
+	return content.String()
+}
+
+// highlightMatch highlights the search query in the text
+func highlightMatch(text, query string) string {
+	if query == "" {
+		return text
+	}
+
+	// Find the match and highlight it
+	lowerText := strings.ToLower(text)
+	lowerQuery := strings.ToLower(query)
+
+	index := strings.Index(lowerText, lowerQuery)
+	if index == -1 {
+		return text
+	}
+
+	// Split the text and highlight the match
+	before := text[:index]
+	match := text[index : index+len(query)]
+	after := text[index+len(query):]
+
+	highlightStyle := lipgloss.NewStyle().
+		Foreground(constants.Yellow).
+		Background(constants.BrightBlack)
+
+	return before + highlightStyle.Render(match) + after
 }
 
 func (m *ListModel) filterChoices() {
