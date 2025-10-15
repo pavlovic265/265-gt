@@ -119,9 +119,11 @@ func (svc cleanCommand) cleanBranches() error {
 		deletedCount++
 	}
 
-	fmt.Printf("%s %s\n",
-		successIconStyle.Render(constants.SuccessIcon),
-		successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
+	if deletedCount > 0 {
+		fmt.Printf("%s %s",
+			successIconStyle.Render(constants.SuccessIcon),
+			successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
+	}
 	return nil
 }
 
@@ -170,7 +172,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   %s %s\n",
+			fmt.Printf("   %s %s\n\n",
 				successIconStyle.Render(constants.SuccessIcon),
 				successStyle.Render(gitOutput))
 		}
