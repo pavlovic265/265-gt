@@ -92,7 +92,7 @@ func (m YesNoPrompt) View() string {
 
 	// Question
 	content.WriteString(questionStyle.Render(m.question))
-	content.WriteString("\n\n")
+	content.WriteString("\n")
 
 	// Options with styled keys
 	content.WriteString(optionsStyle.Render("Press "))

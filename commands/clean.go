@@ -175,7 +175,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   %s %s\n",
+			fmt.Printf("%s %s",
 				constants.SuccessIcon,
 				successStyle.Render(gitOutput))
 		}
