@@ -1,0 +1,4 @@
+This is the initial content of the test file.
+Line 2: Some important information
+Line 3: More content here
+Line 4: Final line of content
