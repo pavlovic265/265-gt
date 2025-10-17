@@ -14,15 +14,13 @@ type Executor interface {
 	WithName(name string) Executor
 	WithArgs(args []string) Executor
 	WithStdin(stdin string) Executor
-	WithGitEditor(value string) Executor
 	Run() error
 	RunWithOutput() (bytes.Buffer, error)
 	RunSilent() error
 }
 
 type exe struct {
-	Name      string
-	GitEditor string
+	Name string
 
 	Args  []string
 	Stdin string
@@ -30,10 +28,9 @@ type exe struct {
 
 func NewExe() Executor {
 	return exe{
-		Name:      "",
-		GitEditor: "",
-		Args:      []string{},
-		Stdin:     "",
+		Name:  "",
+		Args:  []string{},
+		Stdin: "",
 	}
 }
 
@@ -72,11 +69,6 @@ func (exe exe) Run() error {
 		cmd.Stdin = os.Stdin
 	}
 
-	// Set GIT_EDITOR to true to prevent interactive editor from opening
-	if exe.GitEditor != "" {
-		cmd.Env = append(os.Environ(), "GIT_EDITOR="+exe.GitEditor)
-	}
-
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -94,11 +86,6 @@ func (exe exe) RunWithOutput() (bytes.Buffer, error) {
 
 	if exe.Stdin != "" {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
-	}
-
-	// Set GIT_EDITOR to true to prevent interactive editor from opening
-	if exe.GitEditor != "" {
-		cmd.Env = append(os.Environ(), "GIT_EDITOR="+exe.GitEditor)
 	}
 
 	cmd.Stdout = &output
@@ -130,9 +117,4 @@ func (exe exe) RunSilent() error {
 	}
 
 	return nil
-}
-
-func (exe exe) WithGitEditor(value string) Executor {
-	exe.GitEditor = value
-	return exe
 }
