@@ -67,6 +67,9 @@ func (exe exe) Run() error {
 
 	if exe.Stdin != "" {
 		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	} else {
+		// Connect to terminal stdin for interactive commands
+		cmd.Stdin = os.Stdin
 	}
 
 	// Set GIT_EDITOR to true to prevent interactive editor from opening
