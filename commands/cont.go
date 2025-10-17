@@ -25,7 +25,7 @@ func (svc contCommand) Command() *cobra.Command {
 		Short: "short for rebase --continue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := []string{"-c", "core.editor=vim -f", "rebase", "--continue"}
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+			err := svc.exe.WithGit().WithArgs(exeArgs).WithGitEditor("vim -f").Run()
 			if err != nil {
 				return err
 			}
