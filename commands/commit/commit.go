@@ -3,9 +3,26 @@ package commit
 import (
 	"fmt"
 
+	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
+)
+
+// Styling definitions for commit command
+var (
+	// Success styles
+	successIconStyle = lipgloss.NewStyle().
+				Foreground(constants.Green)
+
+	// Error styles
+	errorIconStyle = lipgloss.NewStyle().
+			Foreground(constants.Red)
+
+	// Message styles
+	messageStyle = lipgloss.NewStyle().
+			Foreground(constants.White)
 )
 
 type commitCommand struct {
@@ -33,7 +50,9 @@ func (svc commitCommand) Command() *cobra.Command {
 			}
 
 			if len(args) == 0 {
-				return fmt.Errorf("no message provided")
+				return fmt.Errorf("%s %s",
+					errorIconStyle.Render(constants.ErrorIcon),
+					messageStyle.Render("No commit message provided"))
 			}
 			message := string(args[0])
 			return svc.handleCommit(message)
@@ -51,9 +70,14 @@ func (svc commitCommand) handleEmptyCommit() error {
 	exeArgs := []string{"commit", "--allow-empty", "-m", message}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return fmt.Errorf("%s %s",
+			errorIconStyle.Render(constants.ErrorIcon),
+			messageStyle.Render(fmt.Sprintf("Failed to create empty commit: %v", err)))
 	}
-	fmt.Println("Empty commit created with message: '" + message + "'")
+
+	fmt.Printf("%s %s\n",
+		successIconStyle.Render(constants.SuccessIcon),
+		messageStyle.Render(fmt.Sprintf("Empty commit created '%s'", message)))
 	return nil
 }
 
@@ -61,8 +85,13 @@ func (svc commitCommand) handleCommit(message string) error {
 	exeArgs := []string{"commit", "-m", message}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return fmt.Errorf("%s %s",
+			errorIconStyle.Render(constants.ErrorIcon),
+			messageStyle.Render(fmt.Sprintf("Failed to create commit: %v", err)))
 	}
-	fmt.Println("Commit created with message: '" + message + "'")
+
+	fmt.Printf("%s %s\n",
+		successIconStyle.Render(constants.SuccessIcon),
+		messageStyle.Render(fmt.Sprintf("Commit created '%s'", message)))
 	return nil
 }
