@@ -28,32 +28,41 @@ func (svc commitCommand) Command() *cobra.Command {
 		Aliases: []string{"cm"},
 		Short:   "create commit",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			message := timeutils.Now().Format(timeutils.LayoutUserFriendly)
-			if len(args) != 0 {
-				message = string(args[0])
-			}
-
-			exeArgs := []string{"commit", "-m", message}
 			if empty {
-				exeArgs = []string{"commit", "--allow-empty", "-m", message}
-				message = "empty commit - " + message
+				return svc.handleEmptyCommit()
 			}
 
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
-				return err
+			if len(args) == 0 {
+				return fmt.Errorf("no message provided")
 			}
+			message := string(args[0])
+			return svc.handleCommit(message)
 
-			if empty {
-				fmt.Println("Empty commit created with message: '" + message + "'")
-			} else {
-				fmt.Println("Commit created with message: '" + message + "'")
-			}
-			return nil
 		},
 	}
 
 	commitCmd.Flags().BoolVarP(&empty, "empty", "e", false, "create an empty commit")
 
 	return commitCmd
+}
+
+func (svc commitCommand) handleEmptyCommit() error {
+	message := timeutils.Now().Format(timeutils.LayoutUserFriendly)
+	exeArgs := []string{"commit", "--allow-empty", "-m", message}
+	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+	fmt.Println("Empty commit created with message: '" + message + "'")
+	return nil
+}
+
+func (svc commitCommand) handleCommit(message string) error {
+	exeArgs := []string{"commit", "-m", message}
+	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+	fmt.Println("Commit created with message: '" + message + "'")
+	return nil
 }
