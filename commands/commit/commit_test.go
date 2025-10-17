@@ -68,23 +68,29 @@ func TestCommitCommand_RunE_WithEmptyFlag(t *testing.T) {
 	err := cmd.Flags().Set("empty", "true")
 	require.NoError(t, err)
 
-	// Set up expectations for empty commit
-	// Note: The exeArgs contains the original message, not the modified one
-	expectedArgs := []string{"commit", "--allow-empty", "-m", "test message"}
-
+	// Set up expectations for empty commit with timestamp message
 	mockExecutor.EXPECT().
 		WithGit().
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs(expectedArgs).
-		Return(mockExecutor)
+		WithArgs(gomock.Any()).
+		DoAndReturn(func(args []string) executor.Executor {
+			// Verify the args structure
+			assert.Equal(t, 4, len(args), "Expected 4 args for empty commit")
+			assert.Equal(t, "commit", args[0])
+			assert.Equal(t, "--allow-empty", args[1])
+			assert.Equal(t, "-m", args[2])
+			// The fourth arg should be a timestamp, so we just verify it's not empty
+			assert.NotEmpty(t, args[3], "Expected timestamp message")
+			return mockExecutor
+		})
 
 	mockExecutor.EXPECT().
 		Run().
 		Return(nil)
 
-	// Execute the command with arguments
+	// Execute the command with arguments (empty flag ignores the message and uses timestamp)
 	err = cmd.RunE(cmd, []string{"test message"})
 	assert.NoError(t, err)
 }
@@ -128,35 +134,15 @@ func TestCommitCommand_RunE_WithEmptyFlag_NoMessage(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_NoMessage(t *testing.T) {
-	mockExecutor, ctrl, commitCmd := createCommitCommandWithMock(t)
+	_, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
 
-	// Set up expectations for commit with timestamp message
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor)
-
-	mockExecutor.EXPECT().
-		WithArgs(gomock.Any()).
-		DoAndReturn(func(args []string) executor.Executor {
-			// Verify the args structure
-			assert.Equal(t, 3, len(args), "Expected 3 args for regular commit")
-			assert.Equal(t, "commit", args[0])
-			assert.Equal(t, "-m", args[1])
-			// The third arg should be a timestamp, so we just verify it's not empty
-			assert.NotEmpty(t, args[2], "Expected timestamp message")
-			return mockExecutor
-		})
-
-	mockExecutor.EXPECT().
-		Run().
-		Return(nil)
-
-	// Execute the command without arguments (will use timestamp)
+	// Execute the command without arguments - should return an error
 	err := cmd.RunE(cmd, []string{})
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "No commit message provided")
 }
 
 func TestCommitCommand_RunE_ExecutorError(t *testing.T) {
@@ -182,7 +168,8 @@ func TestCommitCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{"test message"})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to create commit")
+	assert.Contains(t, err.Error(), "git commit failed")
 }
 
 func TestCommitCommand_EmptyFlag(t *testing.T) {
