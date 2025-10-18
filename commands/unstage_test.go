@@ -101,7 +101,8 @@ func TestUnstageCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to unstage files")
+	assert.Contains(t, err.Error(), "git restore failed")
 }
 
 func TestNewUnstageCommand(t *testing.T) {
