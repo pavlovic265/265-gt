@@ -138,7 +138,8 @@ func TestPullCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to pull branch from remote")
+	assert.Contains(t, err.Error(), "git pull failed")
 }
 
 func TestNewPullCommand(t *testing.T) {

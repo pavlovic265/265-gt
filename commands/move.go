@@ -1,14 +1,13 @@
 package commands
 
 import (
-	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
@@ -36,20 +35,22 @@ func (svc moveCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
-				return err
+				return log.Error("Failed to get current branch name", err)
 			}
+
+			currentBranchName := pointer.Deref(currentBranch)
 
 			if len(args) > 0 {
 				parentBranch := args[0]
-				if err := svc.rebaseBranchOnto(parentBranch, pointer.Deref(currentBranch)); err != nil {
+				if err := svc.rebaseBranchOnto(parentBranch, currentBranchName); err != nil {
 					return err
 				}
 			} else {
-				branchs, err := svc.gitHelper.GetBranches()
+				branches, err := svc.gitHelper.GetBranches()
 				if err != nil {
-					return err
+					return log.Error("Failed to get branch list", err)
 				}
-				if err := svc.rebaseBranch(pointer.Deref(currentBranch), branchs); err != nil {
+				if err := svc.rebaseBranch(currentBranchName, branches); err != nil {
 					return err
 				}
 			}
@@ -63,23 +64,24 @@ func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) erro
 	exeArgs := []string{"checkout", currentBranch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return log.Error("Failed to checkout current branch", err)
 	}
 
 	exeArgs = []string{"rebase", parentBranch}
 	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return log.Error("Failed to rebase branch", err)
 	}
+
 	if err := svc.gitHelper.SetParent(parentBranch, currentBranch); err != nil {
-		return err
+		return log.Error("Failed to set parent branch relationship", err)
 	}
 
 	if err := svc.setChildrenBranch(parentBranch, currentBranch); err != nil {
-		return err
+		return log.Error("Failed to update parent's children list", err)
 	}
 
-	fmt.Println(constants.SuccessIcon + " Branch '" + currentBranch + "' rebased onto '" + parentBranch + "' successfully")
+	log.Success("Branch '" + currentBranch + "' rebased onto '" + parentBranch + "' successfully")
 	return nil
 }
 
@@ -120,9 +122,11 @@ func (svc moveCommand) rebaseBranch(
 			if err := svc.rebaseBranchOnto(m.Selected, currentBranch); err != nil {
 				return err
 			}
+		} else {
+			return log.ErrorMsg("No target branch selected for rebase")
 		}
 	} else {
-		return err
+		return log.Error("Failed to display branch selection menu", err)
 	}
 	return nil
 }

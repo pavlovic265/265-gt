@@ -1,10 +1,9 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
@@ -32,16 +31,18 @@ func (svc pullCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
-				return err
+				return log.Error("Failed to get current branch name", err)
 			}
 
-			exeArgs := []string{"pull", "origin", pointer.Deref(currentBranch)}
+			currentBranchName := pointer.Deref(currentBranch)
+
+			exeArgs := []string{"pull", "origin", currentBranchName}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				return err
+				return log.Error("Failed to pull branch from remote", err)
 			}
 
-			fmt.Println("Branch '" + pointer.Deref(currentBranch) + "' pulled successfully")
+			log.Success("Branch '" + currentBranchName + "' pulled successfully")
 			return nil
 		},
 	}

@@ -75,7 +75,8 @@ func TestContCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to continue rebase")
+	assert.Contains(t, err.Error(), "git rebase failed")
 }
 
 func TestNewContCommand(t *testing.T) {

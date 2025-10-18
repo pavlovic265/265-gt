@@ -49,6 +49,11 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 		GetCurrentBranchName().
 		Return(&branchName, nil)
 
+	// Set up expectations for IsProtectedBranch
+	mockGitHelper.EXPECT().
+		IsProtectedBranch("test-branch").
+		Return(false)
+
 	// Set up expectations for GetParent
 	mockGitHelper.EXPECT().
 		GetParent("test-branch").

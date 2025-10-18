@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +26,7 @@ func (svc contCommand) Command() *cobra.Command {
 			exeArgs := []string{"rebase", "--continue"}
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				return err
+				return log.Error("Failed to continue rebase", err)
 			}
 
 			// Run stty sane to fix any terminal issues that might have occurred
@@ -36,7 +35,6 @@ func (svc contCommand) Command() *cobra.Command {
 			// Side effects: Resets any custom terminal settings to standard defaults
 			// _ = exec.Command("stty", "sane").Run() // Ignore stty errors as they're not critical
 
-			fmt.Println("Rebase continued successfully")
 			return nil
 		},
 	}

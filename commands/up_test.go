@@ -98,10 +98,10 @@ func TestUpCommand_RunE_NoChildren(t *testing.T) {
 		UnmarshalChildren("").
 		Return([]string{})
 
-	// Execute the command - should return error about TTY (interactive interface)
+	// Execute the command - should return error about no child branches
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "could not open a new TTY")
+	assert.Contains(t, err.Error(), "Cannot move up - no child branches available")
 }
 
 func TestUpCommand_RunE_ExecutorError(t *testing.T) {
@@ -146,7 +146,8 @@ func TestUpCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to checkout branch")
+	assert.Contains(t, err.Error(), "git checkout failed")
 }
 
 func TestNewUpCommand(t *testing.T) {

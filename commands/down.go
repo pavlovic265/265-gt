@@ -1,10 +1,9 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
@@ -31,17 +30,23 @@ func (svc downCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			branch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
-				return err
+				return log.Error("Failed to get current branch name", err)
 			}
-			parent := svc.gitHelper.GetParent(pointer.Deref(branch))
+
+			currentBranch := pointer.Deref(branch)
+			parent := svc.gitHelper.GetParent(currentBranch)
+
+			if parent == "" {
+				return log.ErrorMsg("Cannot move down - no parent branch available")
+			}
 
 			exeArgs := []string{"checkout", parent}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				return err
+				return log.Error("Failed to checkout parent branch", err)
 			}
 
-			fmt.Println("Moved down to branch '" + parent + "'")
+			log.Success("Moved down to branch '" + parent + "'")
 			return nil
 		},
 	}

@@ -1,13 +1,12 @@
 package commands
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
+	"github.com/pavlovic265/265-gt/utils/log"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -33,10 +32,17 @@ func (svc upCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			branch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
-				return err
+				return log.Error("Failed to get current branch name", err)
 			}
-			childrenStr := svc.gitHelper.GetChildren(pointer.Deref(branch))
+
+			currentBranch := pointer.Deref(branch)
+
+			childrenStr := svc.gitHelper.GetChildren(currentBranch)
 			children := svc.gitHelper.UnmarshalChildren(childrenStr)
+
+			if len(children) == 0 {
+				return log.ErrorMsg("Cannot move up - no child branches available")
+			}
 
 			if len(children) == 1 {
 				err := svc.checkoutBranch(children[0])
@@ -58,9 +64,9 @@ func (svc upCommand) checkoutBranch(
 	exeArgs := []string{"checkout", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return log.Error("Failed to checkout branch", err)
 	}
-	fmt.Println("Moved up to branch '" + branch + "'")
+	log.Success("Moved up to branch '" + branch + "'")
 	return nil
 }
 
@@ -82,9 +88,11 @@ func (svc upCommand) selectAndCheckoutBranch(
 			if err != nil {
 				return err
 			}
+		} else {
+			return log.ErrorMsg("No branch selected for checkout")
 		}
 	} else {
-		return err
+		return log.Error("Failed to display branch selection menu", err)
 	}
 	return nil
 }

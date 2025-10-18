@@ -76,7 +76,8 @@ func TestSwitchCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to switch to previous branch")
+	assert.Contains(t, err.Error(), "git checkout failed")
 }
 
 func TestNewSwitchCommand(t *testing.T) {

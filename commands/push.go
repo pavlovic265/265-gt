@@ -1,11 +1,10 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
+	"github.com/pavlovic265/265-gt/utils/log"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -32,16 +31,19 @@ func (svc pushCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
-				return err
+				return log.Error("Failed to get current branch name", err)
 			}
 
-			exeArgs := []string{"push", "--force", "origin", pointer.Deref(currentBranch)}
+			currentBranchName := pointer.Deref(currentBranch)
+			log.Warning("Using force push - this will overwrite remote changes")
+
+			exeArgs := []string{"push", "--force", "origin", currentBranchName}
 			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				return err
+				return log.Error("Failed to push branch to remote", err)
 			}
 
-			fmt.Println("Branch '" + pointer.Deref(currentBranch) + "' pushed successfully")
+			log.Success("Branch '" + currentBranchName + "' pushed successfully")
 			return nil
 		},
 	}
