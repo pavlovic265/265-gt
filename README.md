@@ -350,12 +350,17 @@ gt auth status
 
 ## 🚧 Planned Features
 
-- [ ] `sync` - Sync local/remote branches
-- [ ] `submit` - Submit changes for review
-- [ ] Enhanced branch visualization
-- [ ] Integration with more Git platforms
-- [ ] Theme customization options
-- [ ] Additional color schemes
+## 🚧 Planned Features
+
+- [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.  
+- [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.  
+- [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.  
+- [ ] **Multi-Platform Git Integration** — Support for additional Git platforms beyond GitHub (e.g., GitLab, Bitbucket).  
+- [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.  
+- [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.  
+- [ ] **Git Config Profiles** — Dynamic `.gitconfig` management tied to SSH hosts or environments (e.g., personal vs. work).  
+- [ ] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
+
 
 ## 🤝 Contributing
 
