@@ -6,6 +6,9 @@ import "github.com/charmbracelet/lipgloss"
 const (
 	SuccessIcon    = "✓"
 	ErrorIcon      = "✗"
+	InfoIcon       = "ℹ"
+	WarningIcon    = "⚠"
+	DebugIcon      = "[D]"
 	ArrowRightIcon = "→"
 )
 

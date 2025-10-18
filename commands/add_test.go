@@ -173,7 +173,8 @@ func TestAddCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{"file.txt"})
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err)
+	assert.Contains(t, err.Error(), "Failed to stage files")
+	assert.Contains(t, err.Error(), "git add failed")
 }
 
 func TestAddCommand_RunE_ArgsPassing(t *testing.T) {

@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -29,12 +28,13 @@ func (svc addCommand) Command() *cobra.Command {
 			exeArgs := append([]string{"add"}, args...)
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
-				return err
+				return log.Error("Failed to stage files", err)
 			}
+
 			if len(args) == 0 {
-				fmt.Println("All changes staged")
+				log.Success("All changes staged")
 			} else {
-				fmt.Println("Files staged successfully")
+				log.Success("Files staged successfully")
 			}
 			return nil
 		},

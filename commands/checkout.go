@@ -7,6 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -54,15 +55,20 @@ func (svc checkoutCommand) checkoutBranch(
 	exeArgs := []string{"checkout", branch}
 	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return log.Error(fmt.Sprintf("Failed to checkout branch '%s'", branch), err)
 	}
-	fmt.Println("Switched to branch '" + branch + "'")
+
+	log.Success(fmt.Sprintf("Switched to branch '%s'", branch))
 	return nil
 }
 
 func (svc checkoutCommand) selectAndCheckoutBranch(
 	choices []string,
 ) error {
+	if len(choices) == 0 {
+		return log.ErrorMsg("No branches available to checkout")
+	}
+
 	initialModel := components.ListModel{
 		AllChoices: choices,
 		Choices:    choices,
@@ -78,9 +84,12 @@ func (svc checkoutCommand) selectAndCheckoutBranch(
 			if err != nil {
 				return err
 			}
+		} else {
+			// User cancelled or no selection made
+			return log.ErrorMsg("No branch selected")
 		}
 	} else {
-		return err
+		return log.Error("Failed to display branch selection", err)
 	}
 	return nil
 }
