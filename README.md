@@ -23,6 +23,8 @@
 - **Authentication Management**: Easy account switching and token management
 - **Interactive UI**: Beautiful terminal interface with search and selection capabilities
 - **Panda Syntax Theme**: Stunning color scheme with dark/light theme support
+- **Styled Output**: Consistent, beautiful error and success messages with icons
+- **Enhanced Logging**: Centralized logging utility with styled output
 - **Version Management**: Automatic version checking and upgrade notifications
 
 ## 🛠️ Installation
@@ -114,16 +116,6 @@ Unknown command, passing to git: git [command]
 
 This means you can use gt as a drop-in replacement for git while getting the benefits of gt's enhanced commands.
 
-## ⚠️ Known Issues
-
-### Terminal Display Issues with Rebase
-
-When using `gt cont` (which runs `git rebase --continue`), the terminal display may become corrupted if your git editor is set to vim. This is a known issue with vim's terminal handling during rebase operations.
-
-**Automatic Fix:**
-`gt cont` automatically runs `stty sane` after the rebase operation to reset terminal settings and fix display issues. This means you don't need to manually reset your terminal after using `gt cont`.
-
-The issue occurs because vim changes terminal settings during the rebase process and doesn't restore them properly when exiting.
 
 ## 📖 Command Reference
 
@@ -262,18 +254,21 @@ The tool uses beautiful ASCII icons and Panda Syntax colors to show operation st
 gt create feature/new-feature
 # ✓ Branch 'feature/new-feature' created and switched to successfully
 
-gt auth login
-# ✓ Successfully authenticated with username
+gt add
+# ✓ All changes staged
 
-gt auth status
-# ✓ Authentication successful
+gt commit "Add new feature"
+# ✓ Commit created 'Add new feature'
+
+gt checkout main
+# ✓ Switched to branch 'main'
 
 # Error indicators (✗) - Red
-gt auth status
-# ✗ Authentication failed
-
 gt delete main
-# ✗ Error: Cannot delete protected branch
+# ✗ Failed to delete branch: Cannot delete protected branch
+
+gt checkout nonexistent
+# ✗ Failed to checkout branch 'nonexistent': branch not found
 
 # Version notifications - Blue with colored version numbers
 gt status
