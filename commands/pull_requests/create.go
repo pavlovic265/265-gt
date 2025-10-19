@@ -1,11 +1,10 @@
 package pullrequests
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -37,14 +36,14 @@ func (svc createCommand) Command() *cobra.Command {
 			}
 			account := svc.configManager.GetActiveAccount()
 			if !svc.configManager.HasActiveAccount() {
-				return fmt.Errorf("no active account found")
+				return log.ErrorMsg("No active account found")
 			}
 
 			err := client.Client[account.Platform].CreatePullRequest(args)
 			if err != nil {
-				return err
+				return log.Error("Failed to create pull request", err)
 			}
-			fmt.Println("Pull request created successfully")
+			log.Success("Pull request created successfully")
 			return nil
 		},
 	}

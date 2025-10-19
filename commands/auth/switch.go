@@ -1,12 +1,11 @@
 package auth
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
@@ -56,20 +55,22 @@ func (svc switchCommand) switchUser(user string) error {
 		}
 	}
 	if account == nil {
-		return fmt.Errorf("user (%s) does not exits in config", user)
+		log.Warning("User '" + user + "' does not exist in config")
+		return nil
 	}
 
 	exeArgs := []string{"auth", "switch", "--user", account.User}
 	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
 	if err != nil {
-		return err
+		return log.Error("Failed to switch account", err)
 	}
 
 	err = svc.configManager.SetActiveAccount(pointer.Deref(account))
 	if err != nil {
-		return err
+		return log.Error("Failed to update active account", err)
 	}
 
+	log.Success("Switched to account: " + account.User)
 	return nil
 }
 
@@ -95,9 +96,11 @@ func (svc switchCommand) selectAndswitchUser() error {
 			if err != nil {
 				return err
 			}
+		} else {
+			return log.ErrorMsg("No user selected for switching")
 		}
 	} else {
-		return err
+		return log.Error("Failed to display user selection menu", err)
 	}
 	return nil
 }

@@ -1,13 +1,12 @@
 package auth
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -51,7 +50,6 @@ func (svc loginCommand) Command() *cobra.Command {
 
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-					fmt.Println("Authentication started for", m.Selected)
 					var account config.Account
 					for _, acc := range accounts {
 						if acc.User == m.Selected {
@@ -60,13 +58,15 @@ func (svc loginCommand) Command() *cobra.Command {
 						}
 					}
 					if err := client.Client[account.Platform].AuthLogin(account.User); err != nil {
-						return err
+						return log.Error("Authentication failed", err)
 					}
 
-					fmt.Println("Successfully authenticated with " + m.Selected)
+					log.Success("Successfully authenticated with " + m.Selected)
+				} else {
+					return log.ErrorMsg("No user selected for authentication")
 				}
 			} else {
-				return err
+				return log.Error("Failed to display user selection menu", err)
 			}
 			return nil
 		},

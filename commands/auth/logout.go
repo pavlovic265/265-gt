@@ -1,11 +1,10 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -33,17 +32,14 @@ func (svc logoutCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			account := svc.configManager.GetActiveAccount()
 			if !svc.configManager.HasActiveAccount() {
-				return fmt.Errorf("no active account found")
+				return log.ErrorMsg("No active account found")
 			}
-
-			fmt.Println("Unauthentication started for", account.User)
 
 			if err := client.Client[account.Platform].AuthLogout(account.User); err != nil {
-				return err
+				return log.Error("Logout failed", err)
 			}
 
-			fmt.Println("Successfully unauthenticated with", account.User)
-
+			log.Success("Successfully logged out from " + account.User)
 			return nil
 		},
 	}

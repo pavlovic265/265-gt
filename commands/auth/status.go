@@ -1,11 +1,10 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -31,20 +30,16 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "see status of current auth user",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Checking status...")
 			if !svc.configManager.HasActiveAccount() {
-				fmt.Println("No active account found")
-				return nil
+				return log.ErrorMsg("No active account found")
 			}
 			account := svc.configManager.GetActiveAccount()
 
 			err := client.Client[account.Platform].AuthStatus()
 			if err != nil {
-				fmt.Println("Authentication failed")
-				return err
+				return log.Error("Authentication failed", err)
 			}
 
-			fmt.Println("Authentication successful")
 			return nil
 		},
 	}

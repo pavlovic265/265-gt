@@ -12,6 +12,7 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -37,13 +38,13 @@ func (svc listCommand) Command() *cobra.Command {
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !svc.configManager.HasActiveAccount() {
-				return fmt.Errorf("no active account found")
+				return log.ErrorMsg("No active account found")
 			}
 			account := svc.configManager.GetActiveAccount()
 
 			prs, err := client.Client[account.Platform].ListPullRequests(args)
 			if err != nil {
-				return err
+				return log.Error("Failed to list pull requests", err)
 			}
 			return svc.selectPullRequest(prs)
 		},
@@ -80,16 +81,14 @@ func (svc listCommand) selectPullRequest(
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok {
 			if m.Yanked {
-				fmt.Printf("✓ %s %s\n",
-					"URL yanked to clipboard:",
-					currentURL)
+				log.Success("URL yanked to clipboard: " + currentURL)
 				return nil
 			}
 			if m.Selected != "" {
 				splited := strings.Split(m.Selected, ":")
 				prNumber, err := strconv.Atoi(splited[0])
 				if err != nil {
-					return fmt.Errorf("faild to get pr number id")
+					return log.ErrorMsg("Failed to get PR number ID")
 				}
 
 				for _, pr := range prs {
@@ -100,7 +99,7 @@ func (svc listCommand) selectPullRequest(
 			}
 		}
 	} else {
-		return err
+		return log.Error("Failed to display pull request selection menu", err)
 	}
 	return nil
 }
