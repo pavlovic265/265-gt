@@ -21,7 +21,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.24'
+        go-version: '1.23'
         
     - name: Cache Go modules
       uses: actions/cache@v4
@@ -57,6 +57,6 @@ jobs:
       with:
         distribution: goreleaser
         version: "~> v2"
-        args: release --clean --config .goreleaser.yml
+        args: release --clean --config .goreleaser.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
