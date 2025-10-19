@@ -46,17 +46,17 @@ func (svc unstageCommand) Command() *cobra.Command {
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return fmt.Errorf("%s %s",
-					unstageErrorIconStyle.Render(constants.ErrorIcon),
+					unstageErrorIconStyle.Render(constants.CrossIcon),
 					unstageMessageStyle.Render(fmt.Sprintf("Failed to unstage files: %v", err)))
 			}
 
 			if len(args) == 0 {
 				fmt.Printf("%s %s\n",
-					unstageSuccessIconStyle.Render(constants.SuccessIcon),
+					unstageSuccessIconStyle.Render(constants.CheckIcon),
 					unstageMessageStyle.Render("All staged changes unstaged"))
 			} else {
 				fmt.Printf("%s %s\n",
-					unstageSuccessIconStyle.Render(constants.SuccessIcon),
+					unstageSuccessIconStyle.Render(constants.CheckIcon),
 					unstageMessageStyle.Render("Files unstaged successfully"))
 			}
 			return nil

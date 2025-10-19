@@ -4,12 +4,13 @@ import "github.com/charmbracelet/lipgloss"
 
 // Status indicators with ASCII icons
 const (
-	SuccessIcon    = "✓"
-	ErrorIcon      = "✗"
+	CheckIcon      = "✓"
+	CrossIcon      = "✗"
 	InfoIcon       = "ℹ"
 	WarningIcon    = "⚠"
 	DebugIcon      = "[D]"
 	ArrowRightIcon = "→"
+	PlusIcon       = "+"
 )
 
 // Panda Terminal Theme Colors

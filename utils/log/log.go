@@ -38,20 +38,20 @@ func Info(message string) {
 
 func Error(message string, err error) error {
 	return fmt.Errorf("%s %s: %w",
-		errorIconStyle.Render(constants.ErrorIcon),
+		errorIconStyle.Render(constants.CrossIcon),
 		messageStyle.Render(message),
 		err)
 }
 
 func ErrorMsg(message string) error {
 	return fmt.Errorf("%s %s",
-		errorIconStyle.Render(constants.ErrorIcon),
+		errorIconStyle.Render(constants.CrossIcon),
 		messageStyle.Render(message))
 }
 
 func Success(message string) {
 	fmt.Printf("%s %s\n",
-		successIconStyle.Render(constants.SuccessIcon),
+		successIconStyle.Render(constants.CheckIcon),
 		messageStyle.Render(message))
 }
 
@@ -65,7 +65,7 @@ func Warning(message string) {
 func Errorf(format string, args ...interface{}) error {
 	message := fmt.Sprintf(format, args...)
 	fmt.Printf("%s %s\n",
-		errorIconStyle.Render(constants.ErrorIcon),
+		errorIconStyle.Render(constants.CrossIcon),
 		messageStyle.Render(message))
 	return fmt.Errorf("%s", message)
 }

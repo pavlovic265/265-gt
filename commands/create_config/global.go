@@ -2,13 +2,12 @@ package createconfig
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
@@ -39,15 +38,15 @@ func (svc globalCommand) Command() *cobra.Command {
 			if errors.Is(err, os.ErrNotExist) {
 				err = svc.createGlobalConfig()
 				if err != nil {
-					return err
+					return log.Error("Failed to create global configuration", err)
 				}
 				return nil
 			}
 
 			if err != nil {
-				return fmt.Errorf("error checking file: %w", err)
+				return log.Error("Error checking global config file", err)
 			}
-			fmt.Printf("File '%s' exists.\n", constants.FileName)
+			log.Warning("Global config file already exists")
 
 			return nil
 		},
@@ -55,20 +54,19 @@ func (svc globalCommand) Command() *cobra.Command {
 }
 
 func (svc globalCommand) createGlobalConfig() error {
-
 	accounts, err := HandleAddAccunts()
 	if err != nil {
-		return err
+		return log.Error("Failed to configure accounts", err)
 	}
 
 	theme, err := HandleSelectTheme()
 	if err != nil {
-		return err
+		return log.Error("Failed to configure theme", err)
 	}
 
 	latestVersion, err := helpers.GetLatestVersion()
 	if err != nil {
-		return err
+		return log.Error("Failed to get latest version", err)
 	}
 
 	globalConfig := config.GlobalConfigStruct{
@@ -83,8 +81,9 @@ func (svc globalCommand) createGlobalConfig() error {
 
 	err = svc.configManager.SaveGlobalConfig(globalConfig)
 	if err != nil {
-		return err
+		return log.Error("Failed to save global configuration", err)
 	}
 
+	log.Success("Global configuration created successfully")
 	return nil
 }

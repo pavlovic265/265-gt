@@ -2,13 +2,13 @@ package createconfig
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -38,13 +38,13 @@ func (svc localCommand) Command() *cobra.Command {
 			if errors.Is(err, os.ErrNotExist) {
 				file, err := os.Create(filePath)
 				if err != nil {
-					return err
+					return log.Error("Failed to create local config file", err)
 				}
 				defer func() { _ = file.Close() }()
 
 				branches, err := HandleAddProtectedBranch()
 				if err != nil {
-					return err
+					return log.Error("Failed to configure protected branches", err)
 				}
 
 				// add branch to skip for deletions
@@ -56,15 +56,16 @@ func (svc localCommand) Command() *cobra.Command {
 				encoder.SetIndent(2)
 				err = encoder.Encode(&localConfg)
 				if err != nil {
-					return err
+					return log.Error("Failed to encode local configuration", err)
 				}
 				defer func() { _ = encoder.Close() }()
 
+				log.Success("Local configuration created successfully")
 				return nil
 			} else if err != nil {
-				return fmt.Errorf("error checking file: %w", err)
+				return log.Error("Error checking local config file", err)
 			} else {
-				fmt.Printf("File '%s' exists.\n", constants.FileName)
+				log.Warning("Local config file already exists")
 			}
 
 			return nil

@@ -90,7 +90,7 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
 		return fmt.Sprintf("%s %s\n",
-			canceledIconStyle.Render(constants.ErrorIcon),
+			canceledIconStyle.Render(constants.CrossIcon),
 			canceledStyle.Render("Operation canceled by user"))
 	}
 

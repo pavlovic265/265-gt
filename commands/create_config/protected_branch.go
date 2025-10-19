@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 func HandleAddProtectedBranch() ([]string, error) {
@@ -14,14 +15,14 @@ func HandleAddProtectedBranch() ([]string, error) {
 	protectedBranchProgram := tea.NewProgram(protectedBranch)
 	m, err := protectedBranchProgram.Run()
 	if err != nil {
-		return nil, err
+		return nil, log.Error("Failed to run protected branch interface", err)
 	}
 
 	if m, ok := m.(protectedBranchModele); ok {
 		return m.branches, nil
 	}
 
-	return nil, fmt.Errorf("faild to read accounts")
+	return nil, log.ErrorMsg("Failed to read protected branch configuration")
 }
 
 type protectedBranchModele struct {
@@ -63,26 +64,29 @@ func (pbm protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC.String(), tea.KeyEsc.String(), tea.KeyCtrlQ.String():
 			return pbm, tea.Quit
 		case tea.KeyTab.String(), tea.KeyShiftTab.String(),
-			tea.KeyEnter.String(), tea.KeyUp.String(), tea.KeyDown.String(),
+			tea.KeyUp.String(), tea.KeyDown.String(),
 			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
 			key := msg.String()
-
-			// Handle Enter key separately for buttons.
-			if key == tea.KeyEnter.String() {
-				switch pbm.focusIndex {
-				case 1:
-					return pbm.handleDone()
-				case 2:
-					return pbm.handleAdd()
-				}
-			}
-
 			// Cycle indexes
 			return pbm.handleCycle(key)
+		case tea.KeyEnter.String():
+			// Handle Enter key for buttons only
+			switch pbm.focusIndex {
+			case 1:
+				return pbm.handleDone()
+			case 2:
+				return pbm.handleAdd()
+			default:
+				// If focus is on input field, cycle to next element
+				return pbm.handleCycle(tea.KeyTab.String())
+			}
 		}
 	}
 
-	pbm.branch, cmd = pbm.branch.Update(msg)
+	// Only update the text input if focus is on it (index 0)
+	if pbm.focusIndex == 0 {
+		pbm.branch, cmd = pbm.branch.Update(msg)
+	}
 	return pbm, cmd
 }
 
@@ -109,10 +113,11 @@ func (pbm protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
 		pbm.focusIndex++
 	}
 
+	// Proper cycling: 0 (input) -> 1 (done) -> 2 (add) -> 0 (input)
 	if pbm.focusIndex > 2 {
 		pbm.focusIndex = 0
 	} else if pbm.focusIndex < 0 {
-		pbm.focusIndex = 0
+		pbm.focusIndex = 2
 	}
 
 	return pbm, nil
@@ -125,16 +130,16 @@ func (pbm protectedBranchModele) View() string {
 
 	var doneButton string
 	if pbm.focusIndex == 1 {
-		doneButton = "[ Done ]"
+		doneButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s Done ]", constants.CheckIcon))
 	} else {
-		doneButton = "[ Done ]"
+		doneButton = fmt.Sprintf("[ %s Done ]", constants.CheckIcon)
 	}
 
 	var addButton string
 	if pbm.focusIndex == 2 {
-		addButton = "[ Add ]"
+		addButton = constants.GetInfoAnsiStyle().Render(fmt.Sprintf("[ %s Add ]", constants.PlusIcon))
 	} else {
-		addButton = "[ Add ]"
+		addButton = fmt.Sprintf("[ %s Add ]", constants.PlusIcon)
 	}
 
 	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton, addButton)

@@ -107,7 +107,7 @@ func (svc cleanCommand) cleanBranches() error {
 		shouldBreak, err := svc.deleteBranch(branch)
 		if err != nil {
 			fmt.Printf("%s %s\n",
-				constants.ErrorIcon,
+				constants.CrossIcon,
 				errorStyle.Render(fmt.Sprintf("Error: %v", err)))
 			continue
 		}
@@ -121,7 +121,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	if deletedCount > 0 {
 		fmt.Printf("%s %s",
-			successIconStyle.Render(constants.SuccessIcon),
+			successIconStyle.Render(constants.CheckIcon),
 			successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
 	}
 	return nil
@@ -173,7 +173,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 
 			gitOutput := strings.TrimSpace(output.String())
 			fmt.Printf("   %s %s\n\n",
-				successIconStyle.Render(constants.SuccessIcon),
+				successIconStyle.Render(constants.CheckIcon),
 				successStyle.Render(gitOutput))
 		}
 	}
