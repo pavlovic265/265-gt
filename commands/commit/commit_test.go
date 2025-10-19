@@ -134,9 +134,11 @@ func TestCommitCommand_RunE_WithEmptyFlag_NoMessage(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_NoMessage(t *testing.T) {
-	_, ctrl, commitCmd := createCommitCommandWithMock(t)
+	// No mock executor needed since we return error before calling it
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	commitCmd := NewCommitCommand(nil) // Pass nil since we won't use it
 	cmd := commitCmd.Command()
 
 	// Execute the command without arguments - should return an error
@@ -168,8 +170,11 @@ func TestCommitCommand_RunE_ExecutorError(t *testing.T) {
 	// Execute the command
 	err := cmd.RunE(cmd, []string{"test message"})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Failed to create commit")
-	assert.Contains(t, err.Error(), "git commit failed")
+	// Check that the error contains the expected message parts
+	// The error message will include styling, but we can check for the core content
+	errorMsg := err.Error()
+	assert.Contains(t, errorMsg, "Failed to create commit", "Error should contain 'Failed to create commit'")
+	assert.Contains(t, errorMsg, "git commit failed", "Error should contain the underlying error 'git commit failed'")
 }
 
 func TestCommitCommand_EmptyFlag(t *testing.T) {
