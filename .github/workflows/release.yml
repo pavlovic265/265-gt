@@ -53,10 +53,10 @@ jobs:
       run: make build
       
     - name: Install GoReleaser
-      uses: goreleaser/goreleaser-action@v5
+      uses: goreleaser/goreleaser-action@v6
       with:
-        version: v2.0.0
-        args: release --clean
+        distribution: goreleaser
+        version: "~> v2"
+        args: release --clean --config .goreleaser.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GT_REPOSITORY: pavlovic265/265-gt
