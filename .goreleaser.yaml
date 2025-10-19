@@ -62,6 +62,7 @@ brews:
       owner: pavlovic265
       name: homebrew-265-gt
       branch: main
+    directory: Formula
     commit_author:
       name: Marko Pavlovic
       email: pavlovic265@gmail.com
