@@ -84,7 +84,8 @@ func TestCommitCommand_RunE_WithEmptyFlag(t *testing.T) {
 			// The fourth arg should be a timestamp, so we just verify it's not empty
 			assert.NotEmpty(t, args[3], "Expected timestamp message")
 			// Verify it's in the expected format (DD-MMM-YYYY HH:MM:SS)
-			assert.Regexp(t, `^\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}$`, args[3], "Expected timestamp in format DD-MMM-YYYY HH:MM:SS")
+			assert.Regexp(t, `^\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}$`, args[3],
+				"Expected timestamp in format DD-MMM-YYYY HH:MM:SS")
 			return mockExecutor
 		})
 
@@ -124,7 +125,8 @@ func TestCommitCommand_RunE_WithEmptyFlag_NoMessage(t *testing.T) {
 			// The fourth arg should be a timestamp, so we just verify it's not empty
 			assert.NotEmpty(t, args[3], "Expected timestamp message")
 			// Verify it's in the expected format (DD-MMM-YYYY HH:MM:SS)
-			assert.Regexp(t, `^\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}$`, args[3], "Expected timestamp in format DD-MMM-YYYY HH:MM:SS")
+			assert.Regexp(t, `^\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2}$`, args[3],
+				"Expected timestamp in format DD-MMM-YYYY HH:MM:SS")
 			return mockExecutor
 		})
 
