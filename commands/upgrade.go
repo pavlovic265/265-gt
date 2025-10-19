@@ -77,8 +77,8 @@ const (
 )
 
 func (svc UpgradeCommand) checkWhichBinary() *Binary {
-	exeArgs := []string{"which", "gt"}
-	out, err := svc.exe.WithName("bash").WithArgs(exeArgs).RunWithOutput()
+	exeArgs := []string{"gt"}
+	out, err := svc.exe.WithName("which").WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		fmt.Printf("Warning: Failed to check if homebrew is installed: %v\n", err)
 		return nil
