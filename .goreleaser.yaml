@@ -56,6 +56,22 @@ nfpms:
       - gt
     bindir: /usr/local/bin
 
+brews:
+  - name: gt
+    tap:
+      owner: pavlovic265
+      name: homebrew-265-gt
+    commit_author:
+      name: Marko Pavlovic
+      email: pavlovic265@gmail.com
+    description: "Git workflow utility with intelligent branch management and automation"
+    homepage: "https://github.com/pavlovic265/265-gt"
+    license: "MIT"
+    install: |
+      bin.install "gt"
+    test: |
+      system "#{bin}/gt", "--version"
+
 changelog:
   sort: asc
   filters:
