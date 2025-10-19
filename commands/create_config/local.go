@@ -36,16 +36,17 @@ func (svc localCommand) Command() *cobra.Command {
 
 			_, err := os.Stat(filePath)
 			if errors.Is(err, os.ErrNotExist) {
+
+				branches, err := HandleAddProtectedBranch()
+				if err != nil {
+					return err
+				}
+
 				file, err := os.Create(filePath)
 				if err != nil {
 					return log.Error("Failed to create local config file", err)
 				}
 				defer func() { _ = file.Close() }()
-
-				branches, err := HandleAddProtectedBranch()
-				if err != nil {
-					return log.Error("Failed to configure protected branches", err)
-				}
 
 				// add branch to skip for deletions
 				localConfg := config.LocalConfigStruct{
@@ -71,4 +72,12 @@ func (svc localCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
+}
+
+func (svc localCommand) createLocalConfig() error {
+
+}
+
+func (svc localCommand) updateLocalConfig() error {
+
 }

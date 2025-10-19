@@ -62,7 +62,7 @@ func Warning(message string) {
 }
 
 // Errorf creates a formatted error message and logs it
-func Errorf(format string, args ...interface{}) error {
+func Errorf(format string, args ...any) error {
 	message := fmt.Sprintf(format, args...)
 	fmt.Printf("%s %s\n",
 		errorIconStyle.Render(constants.CrossIcon),
@@ -71,19 +71,19 @@ func Errorf(format string, args ...interface{}) error {
 }
 
 // Infof creates a formatted info message and logs it
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Info(message)
 }
 
 // Successf creates a formatted success message and logs it
-func Successf(format string, args ...interface{}) {
+func Successf(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Success(message)
 }
 
 // Warningf creates a formatted warning message and logs it
-func Warningf(format string, args ...interface{}) {
+func Warningf(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Warning(message)
 }

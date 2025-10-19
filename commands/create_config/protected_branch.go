@@ -6,19 +6,33 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
+// Styling definitions for protected branch interface
+var (
+	optionsStyle = lipgloss.NewStyle().
+			Foreground(constants.BrightBlack)
+	quitKeyStyle = lipgloss.NewStyle().
+			Foreground(constants.Yellow).
+			Bold(true)
+)
+
 func HandleAddProtectedBranch() ([]string, error) {
 	protectedBranch := newProtectedBranchModel()
-	protectedBranchProgram := tea.NewProgram(protectedBranch)
+	protectedBranchProgram := tea.NewProgram(&protectedBranch)
 	m, err := protectedBranchProgram.Run()
 	if err != nil {
 		return nil, log.Error("Failed to run protected branch interface", err)
 	}
 
 	if m, ok := m.(protectedBranchModele); ok {
+		// If user quit without clicking quitting, return error
+		if m.quitting {
+			return nil, nil
+		}
 		return m.branches, nil
 	}
 
@@ -29,120 +43,137 @@ type protectedBranchModele struct {
 	focusIndex int
 	branch     textinput.Model
 	branches   []string
+	quitting   bool
 }
 
 func newProtectedBranchModel() protectedBranchModele {
 	return protectedBranchModele{
 		branch:     buildTextInput(),
 		focusIndex: 0,
+		quitting:   false,
 	}
 }
 
 func buildTextInput() textinput.Model {
-	pbm := textinput.New()
-	pbm.Placeholder = "Branch"
-	pbm.Focus()
-	pbm.CharLimit = 256
-	pbm.Width = 20
-	pbm.Cursor.Style = constants.GetSuccessAnsiStyle()
-	pbm.PromptStyle = constants.GetSuccessAnsiStyle()
-	pbm.TextStyle = constants.GetSuccessAnsiStyle()
+	m := textinput.New()
+	m.Placeholder = "Branch"
+	m.CharLimit = 256
+	m.Width = 20
+	m.Cursor.Style = constants.GetWarningAnsiStyle() // Yellow cursor
+	m.PromptStyle = constants.GetSuccessAnsiStyle()
+	m.TextStyle = constants.GetAnsiStyle(constants.White) // White text
 
-	return pbm
+	return m
 }
 
 func (m protectedBranchModele) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (pbm protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case tea.KeyCtrlC.String(), tea.KeyEsc.String(), tea.KeyCtrlQ.String():
-			return pbm, tea.Quit
+			return m, tea.Quit
 		case tea.KeyTab.String(), tea.KeyShiftTab.String(),
 			tea.KeyUp.String(), tea.KeyDown.String(),
 			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
 			key := msg.String()
 			// Cycle indexes
-			return pbm.handleCycle(key)
+			return m.handleCycle(key)
 		case tea.KeyEnter.String():
 			// Handle Enter key for buttons only
-			switch pbm.focusIndex {
+			switch m.focusIndex {
 			case 1:
-				return pbm.handleDone()
+				return m.handlequitting()
 			case 2:
-				return pbm.handleAdd()
+				return m.handleAdd()
 			default:
 				// If focus is on input field, cycle to next element
-				return pbm.handleCycle(tea.KeyTab.String())
+				return m.handleCycle(tea.KeyTab.String())
 			}
+		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
+			m.quitting = true
+			return m, tea.Quit
 		}
 	}
 
 	// Only update the text input if focus is on it (index 0)
-	if pbm.focusIndex == 0 {
-		pbm.branch, cmd = pbm.branch.Update(msg)
+	if m.focusIndex == 0 {
+		m.branch, cmd = m.branch.Update(msg)
 	}
-	return pbm, cmd
+	return m, cmd
 }
 
-func (pbm protectedBranchModele) handleDone() (tea.Model, tea.Cmd) {
-	if pbm.branch.Value() != "" {
-		pbm.branches = append(pbm.branches, pbm.branch.Value())
+func (m protectedBranchModele) handlequitting() (tea.Model, tea.Cmd) {
+	if m.branch.Value() != "" {
+		m.branches = append(m.branches, m.branch.Value())
 	}
-	return pbm, tea.Quit
+	return m, tea.Quit
 }
 
-func (pbm protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
-	pbm.branches = append(pbm.branches, pbm.branch.Value())
+func (m protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
+	m.branches = append(m.branches, m.branch.Value())
 
-	pbm.branch = buildTextInput()
-	pbm.focusIndex = 0
+	m.branch = buildTextInput()
+	m.focusIndex = 0
 
-	return pbm, nil
+	return m, nil
 }
 
-func (pbm protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
+func (m protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
 	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() {
-		pbm.focusIndex--
+		m.focusIndex--
 	} else {
-		pbm.focusIndex++
+		m.focusIndex++
 	}
 
-	// Proper cycling: 0 (input) -> 1 (done) -> 2 (add) -> 0 (input)
-	if pbm.focusIndex > 2 {
-		pbm.focusIndex = 0
-	} else if pbm.focusIndex < 0 {
-		pbm.focusIndex = 2
+	// Proper cycling: 0 (input) -> 1 (quitting) -> 2 (add) -> 0 (input)
+	if m.focusIndex > 2 {
+		m.focusIndex = 0
+	} else if m.focusIndex < 0 {
+		m.focusIndex = 2
 	}
 
-	return pbm, nil
+	return m, nil
 }
 
-func (pbm protectedBranchModele) View() string {
+func (m protectedBranchModele) View() string {
 	var b strings.Builder
-	b.WriteString(pbm.branch.View())
+
+	// Only show cursor when input field is focused
+	if m.focusIndex == 0 {
+		m.branch.Focus()
+	} else {
+		m.branch.Blur()
+	}
+
+	b.WriteString(m.branch.View())
 	b.WriteRune('\n')
 
-	var doneButton string
-	if pbm.focusIndex == 1 {
-		doneButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s Done ]", constants.CheckIcon))
+	var quittingButton string
+	if m.focusIndex == 1 {
+		quittingButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s quitting ]", constants.CheckIcon))
 	} else {
-		doneButton = fmt.Sprintf("[ %s Done ]", constants.CheckIcon)
+		quittingButton = fmt.Sprintf("[ %s quitting ]", constants.CheckIcon)
 	}
 
 	var addButton string
-	if pbm.focusIndex == 2 {
+	if m.focusIndex == 2 {
 		addButton = constants.GetInfoAnsiStyle().Render(fmt.Sprintf("[ %s Add ]", constants.PlusIcon))
 	} else {
 		addButton = fmt.Sprintf("[ %s Add ]", constants.PlusIcon)
 	}
 
-	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton, addButton)
+	fmt.Fprintf(&b, "\n%s  %s\n\n", quittingButton, addButton)
+
+	// Add quit instruction
+	b.WriteString(optionsStyle.Render("Press "))
+	b.WriteString(quitKeyStyle.Render("Ctrl+Q"))
+	b.WriteString(optionsStyle.Render(" to quit"))
 
 	return b.String()
 }
