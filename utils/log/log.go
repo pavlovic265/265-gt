@@ -37,7 +37,7 @@ func Info(message string) {
 }
 
 func Error(message string, err error) error {
-	return fmt.Errorf("%s %s: %v",
+	return fmt.Errorf("%s %s: %w",
 		errorIconStyle.Render(constants.ErrorIcon),
 		messageStyle.Render(message),
 		err)
