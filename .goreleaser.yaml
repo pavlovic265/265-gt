@@ -62,7 +62,7 @@ brews:
       owner: pavlovic265
       name: homebrew-265-gt
       branch: main
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      # token: "{{ .Env.GITHUB_TOKEN }}"
     commit_author:
       name: Marko Pavlovic
       email: pavlovic265@gmail.com
