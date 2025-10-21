@@ -36,6 +36,7 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    ids: [gt]
     files:
       - LICENSE
       - README.md
@@ -44,22 +45,22 @@ nfpms:
   - id: gtpkg
     package_name: gt
     file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    builds:
-      - gt
     formats: ["deb", "rpm"]
     maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
     homepage: "https://github.com/pavlovic265/265-gt"
     description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
-    bindir: /usr/local/bin
+    contents:
+      - src: gt
+        dst: /usr/local/bin/gt
 
-homebrew:
+homebrew_casks:
   - name: gt
     repository:
       owner: pavlovic265
       name: homebrew-265-gt
       branch: main
-    directory: Formula
+    directory: Casks
     commit_author:
       name: Marko Pavlovic
       email: pavlovic265@gmail.com
