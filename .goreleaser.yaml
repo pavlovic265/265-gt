@@ -67,10 +67,6 @@ homebrew_casks:
     description: "Git workflow utility with intelligent branch management and automation"
     homepage: "https://github.com/pavlovic265/265-gt"
     license: "MIT"
-    install: |
-      bin.install "gt"
-    test: |
-      system "#{bin}/gt", "--version"
 
 changelog:
   sort: asc
