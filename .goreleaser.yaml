@@ -50,9 +50,12 @@ nfpms:
     homepage: "https://github.com/pavlovic265/265-gt"
     description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
-    contents:
-      - src: gt
-        dst: /usr/local/bin/gt
+
+    # ✅ replace deprecated 'builds' with 'ids'
+    ids: [gt]
+
+    # ✅ where the binary lands inside the package
+    bindir: /usr/local/bin
 
 homebrew_casks:
   - name: gt
