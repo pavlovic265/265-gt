@@ -53,6 +53,12 @@ jobs:
     - name: Build
       run: make build
       
+    - name: GoReleaser config check
+      run: goreleaser check --config .goreleaser.yaml
+
+    - name: Dry run (snapshot, no publish)
+      run: goreleaser release --snapshot --clean --skip=publish
+
     - name: Install GoReleaser
       id: goreleaser
       uses: goreleaser/goreleaser-action@v6
@@ -63,3 +69,19 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PAT }}
 
+    - name: Upload dist on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-failed
+        path: dist/**
+
+    - name: Cleanup tag & release on failure
+      if: failure()
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        echo "Cleaning up $TAG due to failure"
+        gh release delete "$TAG" -y || true
+        git push origin --delete "$TAG" || true
+      env:
+        GH_TOKEN: ${{ secrets.MY_RELEASE_PAT }}

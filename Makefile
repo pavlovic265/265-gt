@@ -92,6 +92,10 @@ release: build
 		exit 1; \
 	fi; \
 	echo "🚀 Creating release tag: $$NEW_TAG"; \
+	if git rev-parse $$NEW_TAG >/dev/null 2>&1; then \
+		echo "⚠️  Tag $$NEW_TAG already exists locally, deleting..."; \
+		git tag -d $$NEW_TAG; \
+	fi; \
 	git tag $$NEW_TAG; \
 	git push origin $$NEW_TAG; \
 	echo "✅ Release $$NEW_TAG created and pushed!"; \
