@@ -20,9 +20,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var exe = executor.NewExe()
-var configManager = config.NewDefaultConfigManager(exe)
-var gitHelper = helpers.NewGitHelper(exe, configManager)
+var (
+	exe           = executor.NewExe()
+	configManager = config.NewDefaultConfigManager(exe)
+	gitHelper     = helpers.NewGitHelper(exe, configManager)
+)
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
 
@@ -31,8 +33,6 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		client.InitCliClient(exe, configManager, gitHelper)
 
-		fmt.Println("cmd.Args", cmd.Parent().Args)
-		//isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
 		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
 		isVersion := cmd.Name() == "version"
 		isCompletion := cmd.Name() == "completion"
