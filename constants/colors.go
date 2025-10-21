@@ -23,7 +23,7 @@ var (
 
 	// Panda Theme colors
 	Black   = lipgloss.Color("#000000") // black
-	Red     = lipgloss.Color("#EC2864") // red
+	Red     = lipgloss.Color("#B81E4A") // red (darker)
 	Green   = lipgloss.Color("#13FFDC") // green
 	Yellow  = lipgloss.Color("#FFB86C") // yellow
 	Blue    = lipgloss.Color("#7DC1FF") // blue

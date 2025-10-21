@@ -28,7 +28,7 @@ builds:
       - arm64
 
 archives:
-  - format: tar.gz
+  - id: default
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -36,9 +36,9 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
+    builds:
+      - gt
+    rlcp: true
     files:
       - LICENSE
       - README.md
@@ -52,11 +52,11 @@ nfpms:
     homepage: "https://github.com/pavlovic265/265-gt"
     description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
-    builds:
-      - gt
-    bindir: /usr/local/bin
+    contents:
+      - src: gt
+        dst: /usr/local/bin/gt
 
-brews:
+homebrew:
   - name: gt
     repository:
       owner: pavlovic265

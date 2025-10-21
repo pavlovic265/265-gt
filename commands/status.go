@@ -58,6 +58,14 @@ func (svc statusCommand) styleGitStatus(output string) string {
 		Foreground(constants.Magenta).
 		Bold(true)
 
+	stagedHeaderStyle := lipgloss.NewStyle().
+		Foreground(constants.Green).
+		Bold(true)
+
+	untrackedHeaderStyle := lipgloss.NewStyle().
+		Foreground(constants.Red).
+		Bold(true)
+
 	modifiedStyle := lipgloss.NewStyle().
 		Foreground(constants.Yellow)
 
@@ -92,11 +100,11 @@ func (svc statusCommand) styleGitStatus(output string) string {
 		} else if strings.Contains(line, "nothing to commit, working tree clean") {
 			styledLine = cleanStyle.Render(line)
 		} else if strings.Contains(line, "Changes to be committed") {
-			styledLine = headerStyle.Render(line)
+			styledLine = stagedHeaderStyle.Render(line)
 		} else if strings.Contains(line, "Changes not staged for commit") {
 			styledLine = headerStyle.Render(line)
 		} else if strings.Contains(line, "Untracked files") {
-			styledLine = headerStyle.Render(line)
+			styledLine = untrackedHeaderStyle.Render(line)
 		} else if strings.Contains(line, "modified:") {
 			parts := strings.Split(line, ":")
 			if len(parts) >= 2 {
