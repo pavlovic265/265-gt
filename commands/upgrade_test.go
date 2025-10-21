@@ -114,22 +114,18 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 		RunWithOutput().
 		Return(*bytes.NewBufferString("homebrew"), nil)
 
-	// Set up expectations for the executor calls that will happen if an upgrade is needed
-	// We use Any() to be flexible about the exact arguments since we can't easily mock the HTTP call
+	// Set up expectations for upgrade process that will fail
 	mockExecutor.EXPECT().
 		WithName("bash").
-		Return(mockExecutor).
-		AnyTimes()
+		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
 		WithArgs(gomock.Any()).
-		Return(mockExecutor).
-		AnyTimes()
+		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
 		Run().
-		Return(fmt.Errorf("executor failed")). // Return error for this test
-		AnyTimes()
+		Return(fmt.Errorf("executor failed")) // Return error for this test
 
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
