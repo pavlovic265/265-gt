@@ -174,6 +174,21 @@ func (mr *MockConfigManagerMockRecorder) LoadGlobalConfig() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadGlobalConfig", reflect.TypeOf((*MockConfigManager)(nil).LoadGlobalConfig))
 }
 
+// LoadLocalConfig mocks base method.
+func (m *MockConfigManager) LoadLocalConfig() (*config.LocalConfigStruct, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadLocalConfig")
+	ret0, _ := ret[0].(*config.LocalConfigStruct)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadLocalConfig indicates an expected call of LoadLocalConfig.
+func (mr *MockConfigManagerMockRecorder) LoadLocalConfig() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadLocalConfig", reflect.TypeOf((*MockConfigManager)(nil).LoadLocalConfig))
+}
+
 // SaveActiveAccount mocks base method.
 func (m *MockConfigManager) SaveActiveAccount(account config.Account) error {
 	m.ctrl.T.Helper()
@@ -228,6 +243,20 @@ func (m *MockConfigManager) SaveLocalConfig(configToSave config.LocalConfigStruc
 func (mr *MockConfigManagerMockRecorder) SaveLocalConfig(configToSave interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLocalConfig", reflect.TypeOf((*MockConfigManager)(nil).SaveLocalConfig), configToSave)
+}
+
+// SaveProtectedBranches mocks base method.
+func (m *MockConfigManager) SaveProtectedBranches(branches []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveProtectedBranches", branches)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveProtectedBranches indicates an expected call of SaveProtectedBranches.
+func (mr *MockConfigManagerMockRecorder) SaveProtectedBranches(branches interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveProtectedBranches", reflect.TypeOf((*MockConfigManager)(nil).SaveProtectedBranches), branches)
 }
 
 // SaveVersion mocks base method.

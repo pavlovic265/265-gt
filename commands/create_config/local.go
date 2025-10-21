@@ -1,27 +1,26 @@
 package createconfig
 
 import (
-	"errors"
-	"os"
-	"path/filepath"
+	"fmt"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 type localCommand struct {
-	exe executor.Executor
+	exe           executor.Executor
+	configManager config.ConfigManager
 }
 
 func NewLocalCommand(
 	exe executor.Executor,
+	configManager config.ConfigManager,
 ) localCommand {
 	return localCommand{
-		exe: exe,
+		exe:           exe,
+		configManager: configManager,
 	}
 }
 
@@ -32,52 +31,21 @@ func (svc localCommand) Command() *cobra.Command {
 		Short:              "generate local config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filePath := filepath.Join(".", constants.FileName)
+			// filePath := filepath.Join(".", constants.FileName)
 
-			_, err := os.Stat(filePath)
-			if errors.Is(err, os.ErrNotExist) {
-
-				branches, err := HandleAddProtectedBranch()
-				if err != nil {
-					return err
-				}
-
-				file, err := os.Create(filePath)
-				if err != nil {
-					return log.Error("Failed to create local config file", err)
-				}
-				defer func() { _ = file.Close() }()
-
-				// add branch to skip for deletions
-				localConfg := config.LocalConfigStruct{
-					Protected: branches,
-				}
-
-				encoder := yaml.NewEncoder(file)
-				encoder.SetIndent(2)
-				err = encoder.Encode(&localConfg)
-				if err != nil {
-					return log.Error("Failed to encode local configuration", err)
-				}
-				defer func() { _ = encoder.Close() }()
-
-				log.Success("Local configuration created successfully")
-				return nil
-			} else if err != nil {
-				return log.Error("Error checking local config file", err)
-			} else {
-				log.Warning("Local config file already exists")
+			branches, err := HandleAddProtectedBranch()
+			if err != nil {
+				return err
 			}
 
+			fmt.Println("branches", branches)
+			err = svc.configManager.SaveProtectedBranches(branches)
+			if err != nil {
+				return log.Error("Failed to save local configuration", err)
+			}
+
+			log.Success("Local configuration updated successfully")
 			return nil
 		},
 	}
-}
-
-func (svc localCommand) createLocalConfig() error {
-
-}
-
-func (svc localCommand) updateLocalConfig() error {
-
 }

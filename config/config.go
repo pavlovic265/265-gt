@@ -61,6 +61,7 @@ type ConfigManager interface {
 	GetGlobalConfigPath() (string, error)
 	LoadGlobalConfig() (*GlobalConfigStruct, error)
 	SaveGlobalConfig(configToSave GlobalConfigStruct) error
+	LoadLocalConfig() (*LocalConfigStruct, error)
 	SaveLocalConfig(configToSave LocalConfigStruct) error
 	SaveLastChecked() error
 	SaveVersion(version string) error
@@ -75,6 +76,9 @@ type ConfigManager interface {
 	GetProtectedBranches() []string
 	ClearActiveAccount() error
 	HasActiveAccount() bool
+
+	// Local config operations
+	SaveProtectedBranches(branches []string) error
 }
 
 // ============================================================================
@@ -137,6 +141,14 @@ func (d *DefaultConfigManager) LoadGlobalConfig() (*GlobalConfigStruct, error) {
 		return nil, err
 	}
 	return readConfig[GlobalConfigStruct](configPath)
+}
+
+func (d *DefaultConfigManager) LoadLocalConfig() (*LocalConfigStruct, error) {
+	configPath, err := d.getLocalConfigPath()
+	if err != nil {
+		return nil, err
+	}
+	return readConfig[LocalConfigStruct](configPath)
 }
 
 func (d *DefaultConfigManager) SaveGlobalConfig(configToSave GlobalConfigStruct) error {
@@ -230,6 +242,17 @@ func (d *DefaultConfigManager) GetProtectedBranches() []string {
 	return localConfig.Protected
 }
 
+func (d *DefaultConfigManager) SaveProtectedBranches(branches []string) error {
+	fmt.Println("SaveProtectedBranches")
+	fmt.Println("localConfig.Protected", localConfig.Protected)
+	fmt.Println("branches", branches)
+	localConfig.Protected = append(localConfig.Protected, branches...)
+
+	fmt.Println("localConfig.Protected", localConfig.Protected)
+
+	return d.SaveLocalConfig(localConfig)
+}
+
 // ============================================================================
 // FUNCTIONS NOT CONNECTED TO STRUCT (standalone functions)
 // ============================================================================
@@ -299,11 +322,10 @@ func (d *DefaultConfigManager) getLocalConfigPath() (string, error) {
 	localConfig := strings.TrimSpace(output.String())
 
 	configPath := filepath.Join(localConfig, ".gtconfig.yaml")
-
-	_, err = os.Stat(configPath)
-	if errors.Is(err, os.ErrNotExist) {
-		return "", nil
-	}
+	// _, err = os.Stat(configPath)
+	// if errors.Is(err, os.ErrNotExist) {
+	// 	return "", nil
+	// }
 
 	return configPath, nil
 }

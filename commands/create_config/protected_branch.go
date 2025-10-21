@@ -73,10 +73,18 @@ func (m protectedBranchModele) Init() tea.Cmd {
 func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
+	// Handle focus based on focusIndex
+	if m.focusIndex == 0 {
+		m.branch.Focus()
+	} else {
+		m.branch.Blur()
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case tea.KeyCtrlC.String(), tea.KeyEsc.String(), tea.KeyCtrlQ.String():
+			m.quitting = true
 			return m, tea.Quit
 		case tea.KeyTab.String(), tea.KeyShiftTab.String(),
 			tea.KeyUp.String(), tea.KeyDown.String(),
@@ -95,9 +103,6 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// If focus is on input field, cycle to next element
 				return m.handleCycle(tea.KeyTab.String())
 			}
-		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
-			m.quitting = true
-			return m, tea.Quit
 		}
 	}
 
@@ -144,21 +149,14 @@ func (m protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
 func (m protectedBranchModele) View() string {
 	var b strings.Builder
 
-	// Only show cursor when input field is focused
-	if m.focusIndex == 0 {
-		m.branch.Focus()
-	} else {
-		m.branch.Blur()
-	}
-
 	b.WriteString(m.branch.View())
 	b.WriteRune('\n')
 
 	var quittingButton string
 	if m.focusIndex == 1 {
-		quittingButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s quitting ]", constants.CheckIcon))
+		quittingButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s Done ]", constants.CheckIcon))
 	} else {
-		quittingButton = fmt.Sprintf("[ %s quitting ]", constants.CheckIcon)
+		quittingButton = fmt.Sprintf("[ %s Done ]", constants.CheckIcon)
 	}
 
 	var addButton string

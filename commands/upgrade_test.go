@@ -51,16 +51,16 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 
 	// Set up expectations for checkWhichBinary() call
 	mockExecutor.EXPECT().
-		WithName("bash").
+		WithName("command").
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"which", "gt"}).
+		WithArgs([]string{"-v", "gt"}).
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
 		RunWithOutput().
-		Return(*bytes.NewBufferString("/usr/local/bin/gt"), nil)
+		Return(*bytes.NewBufferString("homebrew"), nil)
 
 	// Set up expectations for upgrade process
 	mockExecutor.EXPECT().
@@ -103,16 +103,16 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 
 	// Set up expectations for checkWhichBinary() call
 	mockExecutor.EXPECT().
-		WithName("bash").
+		WithName("command").
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"which", "gt"}).
+		WithArgs([]string{"-v", "gt"}).
 		Return(mockExecutor)
 
 	mockExecutor.EXPECT().
 		RunWithOutput().
-		Return(*bytes.NewBufferString("/usr/local/bin/gt"), nil)
+		Return(*bytes.NewBufferString("homebrew"), nil)
 
 	// Set up expectations for the executor calls that will happen if an upgrade is needed
 	// We use Any() to be flexible about the exact arguments since we can't easily mock the HTTP call

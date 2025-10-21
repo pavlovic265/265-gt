@@ -31,13 +31,14 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		client.InitCliClient(exe, configManager, gitHelper)
 
-		isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
+		fmt.Println("cmd.Args", cmd.Parent().Args)
+		//isConfig := cmd.Parent() != nil && cmd.Parent().Name() == "config"
 		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
 		isVersion := cmd.Name() == "version"
 		isCompletion := cmd.Name() == "completion"
 
 		loadLocalConfig := false
-		if isVersion || isCompletion || isConfig || isAuth {
+		if isVersion || isCompletion || isAuth {
 			configManager.InitConfig(loadLocalConfig) // Don't load local config for these commands
 			return
 		}
