@@ -8,11 +8,12 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
-type UpgradeCommand struct {
+type upgradeCommand struct {
 	exe           executor.Executor
 	configManager config.ConfigManager
 }
@@ -20,14 +21,14 @@ type UpgradeCommand struct {
 func NewUpgradeCommand(
 	exe executor.Executor,
 	configManager config.ConfigManager,
-) UpgradeCommand {
-	return UpgradeCommand{
+) upgradeCommand {
+	return upgradeCommand{
 		exe:           exe,
 		configManager: configManager,
 	}
 }
 
-func (svc UpgradeCommand) Command() *cobra.Command {
+func (svc upgradeCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "upgrade",
 		Short: "upgrade of current build",
@@ -37,13 +38,13 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 				return err
 			}
 			if isLatest {
-				fmt.Printf("You are already on the latest version: %s\n", pointer.Deref(version))
-				return nil // silently fail if version is not found
+				log.Infof("You are already on the latest version: %s", pointer.Deref(version))
+				return nil
 			}
 
 			binary := svc.checkWhichBinary()
 			if binary == nil {
-				return fmt.Errorf("failed to check if homebrew is installed")
+				return log.ErrorMsg("Failed to check if homebrew is installed")
 			}
 
 			switch pointer.Deref(binary) {
@@ -58,12 +59,11 @@ func (svc UpgradeCommand) Command() *cobra.Command {
 			}
 
 			if err := svc.configManager.SaveVersion(pointer.Deref(version)); err != nil {
-				fmt.Printf("Warning: Failed to update version in config: %v\n", err)
+				log.Warningf("Failed to update version in config: %v", err)
 				return err
 			}
 
-			fmt.Printf("✓ %s\n",
-				"Tool upgraded successfully")
+			log.Success("Tool upgraded successfully")
 			return nil
 		},
 	}
@@ -76,11 +76,11 @@ const (
 	BinaryScript   Binary = "script"
 )
 
-func (svc UpgradeCommand) checkWhichBinary() *Binary {
+func (svc upgradeCommand) checkWhichBinary() *Binary {
 	exeArgs := []string{"-v", "gt"}
 	out, err := svc.exe.WithName("command").WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
-		fmt.Printf("Warning: Failed to check if homebrew is installed: %v\n", err)
+		log.Warningf("Failed to check if homebrew is installed: %v", err)
 		return nil
 	}
 	if strings.Contains(out.String(), "homebrew") {
@@ -90,7 +90,7 @@ func (svc UpgradeCommand) checkWhichBinary() *Binary {
 	return pointer.From(BinaryScript)
 }
 
-func (svc UpgradeCommand) upgradeWithHomebrew() error {
+func (svc upgradeCommand) upgradeWithHomebrew() error {
 	exeArgs := []string{"brew", "upgrade", "gt"}
 	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
 	if err != nil {
@@ -100,7 +100,7 @@ func (svc UpgradeCommand) upgradeWithHomebrew() error {
 	return nil
 }
 
-func (svc UpgradeCommand) upgradeWithScript() error {
+func (svc upgradeCommand) upgradeWithScript() error {
 	installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
 	exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
 	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
@@ -111,7 +111,7 @@ func (svc UpgradeCommand) upgradeWithScript() error {
 	return nil
 }
 
-func (svc UpgradeCommand) isLatestVersion() (*string, bool, error) {
+func (svc upgradeCommand) isLatestVersion() (*string, bool, error) {
 	// Get latest version from GitHub API
 	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 	resp, err := http.Get(url)
