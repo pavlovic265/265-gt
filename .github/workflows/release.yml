@@ -63,13 +63,3 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PAT }}
 
-    - name: Delete tag on failure
-      if: failure()
-      run: |
-        TAG_NAME=${GITHUB_REF#refs/tags/}
-        echo "Deleting tag $TAG_NAME due to release failure"
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git push origin --delete $TAG_NAME || echo "Failed to delete remote tag"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
