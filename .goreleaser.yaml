@@ -38,7 +38,6 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     builds:
       - gt
-    rlcp: true
     files:
       - LICENSE
       - README.md
@@ -56,7 +55,7 @@ nfpms:
       - src: gt
         dst: /usr/local/bin/gt
 
-homebrew:
+brews:
   - name: gt
     repository:
       owner: pavlovic265
