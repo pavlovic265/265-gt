@@ -36,8 +36,6 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    builds:
-      - gt
     files:
       - LICENSE
       - README.md
@@ -46,16 +44,16 @@ nfpms:
   - id: gtpkg
     package_name: gt
     file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    builds:
+      - gt
     formats: ["deb", "rpm"]
     maintainer: "Marko Pavlovic <pavlovic265@gmail.com>"
     homepage: "https://github.com/pavlovic265/265-gt"
     description: "Git workflow utility with intelligent branch management and automation."
     license: "MIT"
-    contents:
-      - src: gt
-        dst: /usr/local/bin/gt
+    bindir: /usr/local/bin
 
-brews:
+homebrew:
   - name: gt
     repository:
       owner: pavlovic265
