@@ -1,0 +1,34 @@
+package stack
+
+import (
+	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
+	"github.com/spf13/cobra"
+)
+
+type stackCommand struct {
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
+}
+
+func NewStackCommand(
+	exe executor.Executor,
+	gitHelper helpers.GitHelper,
+) stackCommand {
+	return stackCommand{
+		exe:       exe,
+		gitHelper: gitHelper,
+	}
+}
+
+func (svc stackCommand) Command() *cobra.Command {
+	stackCmd := &cobra.Command{
+		Use:     "stack",
+		Short:   "commands for pull request",
+		Aliases: []string{"s"},
+	}
+
+	stackCmd.AddCommand(NewRestackCommand(svc.exe, svc.gitHelper).Command())
+
+	return stackCmd
+}

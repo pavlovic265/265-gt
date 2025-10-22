@@ -13,6 +13,7 @@ import (
 	"github.com/pavlovic265/265-gt/commands/commit"
 	createconfig "github.com/pavlovic265/265-gt/commands/create_config"
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
+	"github.com/pavlovic265/265-gt/commands/stack"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
@@ -93,6 +94,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
+	rootCmd.AddCommand(stack.NewStackCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())

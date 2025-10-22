@@ -82,7 +82,6 @@ func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
 	parent := svc.gitHelper.GetParent(branch)
-	parentChildren := svc.gitHelper.GetChildren(parent)
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
 	exeArgs := []string{"branch", "-D", branch}
@@ -91,7 +90,7 @@ func (svc deleteCommand) deleteBranch(
 		return log.Error("Failed to delete branch", err)
 	}
 
-	err = svc.gitHelper.RelinkParentChildren(parent, parentChildren, branch, branchChildren)
+	err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
 	if err != nil {
 		return log.Error("Failed to update branch relationships", err)
 	}

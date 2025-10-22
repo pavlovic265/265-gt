@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"strings"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
@@ -38,11 +36,11 @@ func (svc moveCommand) Command() *cobra.Command {
 				return log.Error("Failed to get current branch name", err)
 			}
 
-			currentBranchName := pointer.Deref(currentBranch)
+			branch := pointer.Deref(currentBranch)
 
 			if len(args) > 0 {
-				parentBranch := args[0]
-				if err := svc.rebaseBranchOnto(parentBranch, currentBranchName); err != nil {
+				parent := args[0]
+				if err := svc.gitHelper.RebaseBranch(branch, parent); err != nil {
 					return err
 				}
 			} else {
@@ -50,7 +48,7 @@ func (svc moveCommand) Command() *cobra.Command {
 				if err != nil {
 					return log.Error("Failed to get branch list", err)
 				}
-				if err := svc.rebaseBranch(currentBranchName, branches); err != nil {
+				if err := svc.rebaseBranch(branch, branches); err != nil {
 					return err
 				}
 			}
@@ -60,52 +58,8 @@ func (svc moveCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc moveCommand) rebaseBranchOnto(parentBranch, currentBranch string) error {
-	exeArgs := []string{"checkout", currentBranch}
-	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
-		return log.Error("Failed to checkout current branch", err)
-	}
-
-	exeArgs = []string{"rebase", parentBranch}
-	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
-		return log.Error("Failed to rebase branch", err)
-	}
-
-	if err := svc.gitHelper.SetParent(parentBranch, currentBranch); err != nil {
-		return log.Error("Failed to set parent branch relationship", err)
-	}
-
-	if err := svc.setChildrenBranch(parentBranch, currentBranch); err != nil {
-		return log.Error("Failed to update parent's children list", err)
-	}
-
-	log.Success("Branch '" + currentBranch + "' rebased onto '" + parentBranch + "' successfully")
-	return nil
-}
-
-func (svc moveCommand) setChildrenBranch(parent, child string) error {
-	parentChildren := svc.gitHelper.GetChildren(parent)
-
-	var children string
-	if len(parentChildren) > 0 {
-		splitedParentChildren := strings.Split(parentChildren, " ")
-		splitedParentChildren = append(splitedParentChildren, child)
-		children = strings.Join(splitedParentChildren, " ")
-
-	} else {
-		children = child
-	}
-
-	if err := svc.gitHelper.SetChildren(children, parent); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (svc moveCommand) rebaseBranch(
-	currentBranch string,
+	branch string,
 	choices []string,
 ) error {
 	initialModel := components.ListModel{
@@ -119,7 +73,7 @@ func (svc moveCommand) rebaseBranch(
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
-			if err := svc.rebaseBranchOnto(m.Selected, currentBranch); err != nil {
+			if err := svc.gitHelper.RebaseBranch(branch, m.Selected); err != nil {
 				return err
 			}
 		} else {

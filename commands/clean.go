@@ -157,7 +157,6 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 		}
 
 		if model.IsYes() {
-			parentChildren := svc.gitHelper.GetChildren(parent)
 			branchChildren := svc.gitHelper.GetChildren(branch)
 
 			exeArgs := []string{"branch", "-D", branch}
@@ -166,7 +165,7 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 				return false, err
 			}
 
-			err = svc.gitHelper.RelinkParentChildren(parent, parentChildren, branch, branchChildren)
+			err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
 			if err != nil {
 				return false, err
 			}

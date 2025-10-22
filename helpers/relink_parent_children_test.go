@@ -18,9 +18,7 @@ func TestRelinkParentChildren(t *testing.T) {
 
 	// Test data
 	parent := "main"
-	parentChildren := "feature1 feature2"
-	branch := "feature1"
-	branchChildren := "feature1.1 feature1.2"
+	branchChildren := []string{"feature1.1", "feature1.2"}
 
 	// Set up expectations for SetParent calls
 	mockExecutor.EXPECT().
@@ -43,29 +41,8 @@ func TestRelinkParentChildren(t *testing.T) {
 		Return(nil).
 		Times(2)
 
-	// Set up expectations for SetChildren call
-	mockExecutor.EXPECT().
-		WithGit().
-		Return(mockExecutor).
-		Times(1)
-
-	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.main.children", "feature2 feature1.1 feature1.2"}).
-		Return(mockExecutor).
-		Times(1)
-
-	mockExecutor.EXPECT().
-		Run().
-		Return(nil).
-		Times(1)
-
 	// Execute the function
-	err := gitHelper.RelinkParentChildren(
-		parent,
-		parentChildren,
-		branch,
-		branchChildren,
-	)
+	err := gitHelper.RelinkParentChildren(parent, branchChildren)
 
 	// Assertions
 	if err != nil {
@@ -82,19 +59,12 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 
 	// Test data with empty parent
 	parent := ""
-	parentChildren := ""
-	branch := "feature1"
-	branchChildren := "feature1.1"
+	branchChildren := []string{"feature1.1"}
 
 	// No expectations needed since function should return early
 
 	// Execute the function
-	err := gitHelper.RelinkParentChildren(
-		parent,
-		parentChildren,
-		branch,
-		branchChildren,
-	)
+	err := gitHelper.RelinkParentChildren(parent, branchChildren)
 
 	// Assertions
 	if err != nil {
@@ -112,9 +82,7 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 
 	// Test data
 	parent := "main"
-	parentChildren := "feature1"
-	branch := "feature1"
-	branchChildren := "feature1.1"
+	branchChildren := []string{"feature1.1"}
 
 	// Set up expectation for error
 	expectedError := errors.New("git config error")
@@ -134,12 +102,7 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	err := gitHelper.RelinkParentChildren(
-		parent,
-		parentChildren,
-		branch,
-		branchChildren,
-	)
+	err := gitHelper.RelinkParentChildren(parent, branchChildren)
 
 	// Assertions
 	if err == nil {

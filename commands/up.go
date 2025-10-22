@@ -37,8 +37,7 @@ func (svc upCommand) Command() *cobra.Command {
 
 			currentBranch := pointer.Deref(branch)
 
-			childrenStr := svc.gitHelper.GetChildren(currentBranch)
-			children := svc.gitHelper.UnmarshalChildren(childrenStr)
+			children := svc.gitHelper.GetChildren(currentBranch)
 
 			if len(children) == 0 {
 				return log.ErrorMsg("Cannot move up - no child branches available")

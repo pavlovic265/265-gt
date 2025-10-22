@@ -51,11 +51,6 @@ func TestUpCommand_RunE_Success(t *testing.T) {
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().
 		GetChildren("main").
-		Return("feature-branch")
-
-	// Set up expectations for UnmarshalChildren
-	mockGitHelper.EXPECT().
-		UnmarshalChildren("feature-branch").
 		Return([]string{"feature-branch"})
 
 	// Set up expectations for git checkout
@@ -91,11 +86,6 @@ func TestUpCommand_RunE_NoChildren(t *testing.T) {
 	// Set up expectations for GetChildren (no children)
 	mockGitHelper.EXPECT().
 		GetChildren("main").
-		Return("")
-
-	// Set up expectations for UnmarshalChildren
-	mockGitHelper.EXPECT().
-		UnmarshalChildren("").
 		Return([]string{})
 
 	// Execute the command - should return error about no child branches
@@ -124,11 +114,6 @@ func TestUpCommand_RunE_ExecutorError(t *testing.T) {
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().
 		GetChildren("main").
-		Return("feature-branch")
-
-	// Set up expectations for UnmarshalChildren
-	mockGitHelper.EXPECT().
-		UnmarshalChildren("feature-branch").
 		Return([]string{"feature-branch"})
 
 	mockExecutor.EXPECT().

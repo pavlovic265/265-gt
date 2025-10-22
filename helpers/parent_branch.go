@@ -31,29 +31,3 @@ func (gh *GitHelperImpl) DeleteParent(branch string) error {
 	}
 	return nil
 }
-
-// DeleteFromParentChildren removes a branch from its parent's children list
-func (gh *GitHelperImpl) DeleteFromParentChildren(parent, branch string) error {
-	children := gh.GetChildren(parent)
-	splitChildren := strings.Split(children, " ")
-	if len(splitChildren) == 0 {
-		return nil
-	}
-
-	var newChildren []string
-
-	for _, child := range splitChildren {
-		if child != branch {
-			newChildren = append(newChildren, child)
-		}
-	}
-	if len(newChildren) > 0 {
-		joinChildren := strings.TrimSpace(strings.Join(newChildren, " "))
-		if err := gh.SetChildren(parent, joinChildren); err != nil {
-			return err
-		}
-	} else {
-		_ = gh.DeleteChildren(parent)
-	}
-	return nil
-}

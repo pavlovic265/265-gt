@@ -84,11 +84,11 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 
 	mockGitHelper.EXPECT().
 		GetChildren(gomock.Any()).
-		Return("").
+		Return([]string{}).
 		AnyTimes()
 
 	mockGitHelper.EXPECT().
-		RelinkParentChildren(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		RelinkParentChildren(gomock.Any(), gomock.Any()).
 		Return(nil).
 		AnyTimes()
 

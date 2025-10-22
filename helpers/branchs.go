@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"strings"
+
+	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 // GetCurrentBranchName gets the current branch name
@@ -34,4 +36,26 @@ func (gh *GitHelperImpl) GetBranches() ([]string, error) {
 		}
 	}
 	return branches, nil
+}
+
+func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
+	exeArgs := []string{"checkout", branch}
+	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
+	if err != nil {
+		return log.Error("Failed to checkout current branch", err)
+	}
+
+	exeArgs = []string{"rebase", parent}
+	err = gh.exe.WithGit().WithArgs(exeArgs).Run()
+	if err != nil {
+		return log.Error("Failed to rebase branch", err)
+	}
+
+	if err := gh.SetParent(parent, branch); err != nil {
+		return log.Error("Failed to set parent branch relationship", err)
+	}
+
+	log.Success("Branch '" + branch + "' rebased onto '" + parent + "' successfully")
+
+	return nil
 }

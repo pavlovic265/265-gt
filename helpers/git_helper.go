@@ -7,18 +7,18 @@ import (
 
 // GitHelper defines the interface for all git-related helper operations
 type GitHelper interface {
-	// Parent/Children operations
+	// Parent operations
 	SetParent(parent string, child string) error
-	SetChildren(parent string, children string) error
 	GetParent(branch string) string
-	GetChildren(branch string) string
 	DeleteParent(branch string) error
-	DeleteChildren(branch string) error
-	DeleteFromParentChildren(parent, branch string) error
+
+	// Children operations
+	GetChildren(branch string) []string
 
 	// Branch operations
 	GetCurrentBranchName() (*string, error)
 	GetBranches() ([]string, error)
+	RebaseBranch(branch string, parent string) error
 
 	// Repository operations
 	IsGitRepository() error
@@ -29,10 +29,7 @@ type GitHelper interface {
 	IsProtectedBranch(branch string) bool
 
 	// Utility functions
-	RelinkParentChildren(
-		parent string, parentChildren string, branch string, branchChildren string,
-	) error
-	UnmarshalChildren(children string) []string
+	RelinkParentChildren(parent string, branchChildren []string) error
 
 	// Version check
 	CheckGTVersion()

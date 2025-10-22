@@ -281,3 +281,226 @@ func TestGetBranches_Error(t *testing.T) {
 		t.Error("Expected nil result on error")
 	}
 }
+
+func TestRebaseBranch(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
+
+	branch := "feature1"
+	parent := "main"
+
+	// Set up expectations for checkout
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"checkout", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for rebase
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"rebase", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for SetParent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch." + branch + ".parent", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Execute the function
+	err := gitHelper.RebaseBranch(branch, parent)
+
+	// Assertions
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+}
+
+func TestRebaseBranch_CheckoutError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
+
+	branch := "feature1"
+	parent := "main"
+	expectedError := errors.New("checkout failed")
+
+	// Set up expectations for checkout error
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"checkout", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(expectedError).
+		Times(1)
+
+	// Execute the function
+	err := gitHelper.RebaseBranch(branch, parent)
+
+	// Assertions
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+}
+
+func TestRebaseBranch_RebaseError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
+
+	branch := "feature1"
+	parent := "main"
+	expectedError := errors.New("rebase failed")
+
+	// Set up expectations for checkout (success)
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"checkout", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for rebase (error)
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"rebase", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(expectedError).
+		Times(1)
+
+	// Execute the function
+	err := gitHelper.RebaseBranch(branch, parent)
+
+	// Assertions
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+}
+
+func TestRebaseBranch_SetParentError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockExecutor := mocks.NewMockExecutor(ctrl)
+	gitHelper := &GitHelperImpl{exe: mockExecutor}
+
+	branch := "feature1"
+	parent := "main"
+	expectedError := errors.New("set parent failed")
+
+	// Set up expectations for checkout (success)
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"checkout", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for rebase (success)
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"rebase", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for SetParent (error)
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "branch." + branch + ".parent", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(expectedError).
+		Times(1)
+
+	// Execute the function
+	err := gitHelper.RebaseBranch(branch, parent)
+
+	// Assertions
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+}

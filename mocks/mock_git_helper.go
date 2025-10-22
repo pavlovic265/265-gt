@@ -45,34 +45,6 @@ func (mr *MockGitHelperMockRecorder) CheckGTVersion() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckGTVersion", reflect.TypeOf((*MockGitHelper)(nil).CheckGTVersion))
 }
 
-// DeleteChildren mocks base method.
-func (m *MockGitHelper) DeleteChildren(branch string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteChildren", branch)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteChildren indicates an expected call of DeleteChildren.
-func (mr *MockGitHelperMockRecorder) DeleteChildren(branch interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteChildren", reflect.TypeOf((*MockGitHelper)(nil).DeleteChildren), branch)
-}
-
-// DeleteFromParentChildren mocks base method.
-func (m *MockGitHelper) DeleteFromParentChildren(parent, branch string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteFromParentChildren", parent, branch)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteFromParentChildren indicates an expected call of DeleteFromParentChildren.
-func (mr *MockGitHelperMockRecorder) DeleteFromParentChildren(parent, branch interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFromParentChildren", reflect.TypeOf((*MockGitHelper)(nil).DeleteFromParentChildren), parent, branch)
-}
-
 // DeleteParent mocks base method.
 func (m *MockGitHelper) DeleteParent(branch string) error {
 	m.ctrl.T.Helper()
@@ -117,10 +89,10 @@ func (mr *MockGitHelperMockRecorder) GetBranches() *gomock.Call {
 }
 
 // GetChildren mocks base method.
-func (m *MockGitHelper) GetChildren(branch string) string {
+func (m *MockGitHelper) GetChildren(branch string) []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetChildren", branch)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].([]string)
 	return ret0
 }
 
@@ -202,32 +174,32 @@ func (mr *MockGitHelperMockRecorder) IsProtectedBranch(branch interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsProtectedBranch", reflect.TypeOf((*MockGitHelper)(nil).IsProtectedBranch), branch)
 }
 
-// RelinkParentChildren mocks base method.
-func (m *MockGitHelper) RelinkParentChildren(parent, parentChildren, branch, branchChildren string) error {
+// RebaseBranch mocks base method.
+func (m *MockGitHelper) RebaseBranch(branch, parent string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RelinkParentChildren", parent, parentChildren, branch, branchChildren)
+	ret := m.ctrl.Call(m, "RebaseBranch", branch, parent)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RebaseBranch indicates an expected call of RebaseBranch.
+func (mr *MockGitHelperMockRecorder) RebaseBranch(branch, parent interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RebaseBranch", reflect.TypeOf((*MockGitHelper)(nil).RebaseBranch), branch, parent)
+}
+
+// RelinkParentChildren mocks base method.
+func (m *MockGitHelper) RelinkParentChildren(parent string, branchChildren []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RelinkParentChildren", parent, branchChildren)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RelinkParentChildren indicates an expected call of RelinkParentChildren.
-func (mr *MockGitHelperMockRecorder) RelinkParentChildren(parent, parentChildren, branch, branchChildren interface{}) *gomock.Call {
+func (mr *MockGitHelperMockRecorder) RelinkParentChildren(parent, branchChildren interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RelinkParentChildren", reflect.TypeOf((*MockGitHelper)(nil).RelinkParentChildren), parent, parentChildren, branch, branchChildren)
-}
-
-// SetChildren mocks base method.
-func (m *MockGitHelper) SetChildren(parent, children string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetChildren", parent, children)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetChildren indicates an expected call of SetChildren.
-func (mr *MockGitHelperMockRecorder) SetChildren(parent, children interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetChildren", reflect.TypeOf((*MockGitHelper)(nil).SetChildren), parent, children)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RelinkParentChildren", reflect.TypeOf((*MockGitHelper)(nil).RelinkParentChildren), parent, branchChildren)
 }
 
 // SetParent mocks base method.
@@ -242,18 +214,4 @@ func (m *MockGitHelper) SetParent(parent, child string) error {
 func (mr *MockGitHelperMockRecorder) SetParent(parent, child interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetParent", reflect.TypeOf((*MockGitHelper)(nil).SetParent), parent, child)
-}
-
-// UnmarshalChildren mocks base method.
-func (m *MockGitHelper) UnmarshalChildren(children string) []string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UnmarshalChildren", children)
-	ret0, _ := ret[0].([]string)
-	return ret0
-}
-
-// UnmarshalChildren indicates an expected call of UnmarshalChildren.
-func (mr *MockGitHelperMockRecorder) UnmarshalChildren(children interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmarshalChildren", reflect.TypeOf((*MockGitHelper)(nil).UnmarshalChildren), children)
 }
