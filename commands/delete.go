@@ -8,7 +8,6 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
-	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -34,12 +33,10 @@ func (svc deleteCommand) Command() *cobra.Command {
 		Short:              "delete branch",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
+			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
-
-			currentBranchName := pointer.Deref(currentBranch)
 
 			if len(args) > 0 {
 				branch := strings.TrimSpace(args[0])

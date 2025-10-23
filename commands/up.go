@@ -6,7 +6,6 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
-	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -30,12 +29,10 @@ func (svc upCommand) Command() *cobra.Command {
 		Use:   "up",
 		Short: "move to brunch up in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := svc.gitHelper.GetCurrentBranchName()
+			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
-
-			currentBranch := pointer.Deref(branch)
 
 			children := svc.gitHelper.GetChildren(currentBranch)
 

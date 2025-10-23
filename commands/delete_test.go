@@ -43,11 +43,11 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 	deleteCmd := commands.NewDeleteCommand(mockExecutor, mockGitHelper)
 	cmd := deleteCmd.Command()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for IsProtectedBranch
 	mockGitHelper.EXPECT().
@@ -87,14 +87,14 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestDeleteCommand_RunE_GetCurrentBranchNameError(t *testing.T) {
+func TestDeleteCommand_RunE_GetCurrentBranchError(t *testing.T) {
 	mockGitHelper, ctrl, cmd := createDeleteCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for GetCurrentBranchName to return error
+	// Set up expectations for GetCurrentBranch to return error
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(nil, errors.New("git error"))
+		GetCurrentBranch().
+		Return("", errors.New("git error"))
 
 	// Execute the command
 	err := cmd.RunE(cmd, []string{"test-branch"})
@@ -106,11 +106,11 @@ func TestDeleteCommand_RunE_WithoutBranchName(t *testing.T) {
 	mockGitHelper, ctrl, cmd := createDeleteCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetBranches
 	mockGitHelper.EXPECT().

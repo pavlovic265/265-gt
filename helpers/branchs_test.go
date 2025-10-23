@@ -9,7 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/mocks"
 )
 
-func TestGetCurrentBranchName(t *testing.T) {
+func TestGetCurrentBranch(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -39,22 +39,18 @@ func TestGetCurrentBranchName(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetCurrentBranchName()
+	result, err := gitHelper.GetCurrentBranch()
 
 	// Assertions
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
-	if result == nil {
-		t.Error("Expected non-nil result")
-		return
-	}
-	if *result != expectedBranch {
-		t.Errorf("Expected '%s', got '%s'", expectedBranch, *result)
+	if result != expectedBranch {
+		t.Errorf("Expected '%s', got '%s'", expectedBranch, result)
 	}
 }
 
-func TestGetCurrentBranchName_Error(t *testing.T) {
+func TestGetCurrentBranch_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -80,7 +76,7 @@ func TestGetCurrentBranchName_Error(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result, err := gitHelper.GetCurrentBranchName()
+	result, err := gitHelper.GetCurrentBranch()
 
 	// Assertions
 	if err == nil {
@@ -89,8 +85,8 @@ func TestGetCurrentBranchName_Error(t *testing.T) {
 	if err.Error() != expectedError.Error() {
 		t.Errorf("Expected error '%v', got '%v'", expectedError, err)
 	}
-	if result != nil {
-		t.Error("Expected nil result on error")
+	if result != "" {
+		t.Error("Expected empty string result on error")
 	}
 }
 

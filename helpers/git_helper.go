@@ -17,7 +17,7 @@ type GitHelper interface {
 	GetChildren(branch string) []string
 
 	// Branch operations
-	GetCurrentBranchName() (*string, error)
+	GetCurrentBranch() (string, error)
 	GetBranches() ([]string, error)
 	RebaseBranch(branch string, parent string) error
 

@@ -10,7 +10,6 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -72,7 +71,7 @@ func (svc cleanCommand) Command() *cobra.Command {
 }
 
 func (svc cleanCommand) cleanBranches() error {
-	currentBranch, err := svc.gitHelper.GetCurrentBranchName()
+	currentBranch, err := svc.gitHelper.GetCurrentBranch()
 	if err != nil {
 		return fmt.Errorf("failed to get current branch: %w", err)
 	}
@@ -88,7 +87,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	cleanableCount := 0
 	for _, branch := range branches {
-		if branch != pointer.Deref(currentBranch) && !svc.gitHelper.IsProtectedBranch(branch) {
+		if branch != currentBranch && !svc.gitHelper.IsProtectedBranch(branch) {
 			cleanableCount++
 		}
 	}
@@ -100,7 +99,7 @@ func (svc cleanCommand) cleanBranches() error {
 
 	deletedCount := 0
 	for _, branch := range branches {
-		if branch == pointer.Deref(currentBranch) || svc.gitHelper.IsProtectedBranch(branch) {
+		if branch == currentBranch || svc.gitHelper.IsProtectedBranch(branch) {
 			continue
 		}
 

@@ -42,11 +42,11 @@ func TestUpCommand_RunE_Success(t *testing.T) {
 	upCmd := commands.NewUpCommand(mockExecutor, mockGitHelper)
 	cmd := upCmd.Command()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().
@@ -77,11 +77,11 @@ func TestUpCommand_RunE_NoChildren(t *testing.T) {
 	mockGitHelper, ctrl, cmd := createUpCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetChildren (no children)
 	mockGitHelper.EXPECT().
@@ -105,11 +105,11 @@ func TestUpCommand_RunE_ExecutorError(t *testing.T) {
 
 	expectedError := errors.New("git checkout failed")
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetChildren
 	mockGitHelper.EXPECT().

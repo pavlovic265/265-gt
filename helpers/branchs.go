@@ -7,17 +7,15 @@ import (
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
-// GetCurrentBranchName gets the current branch name
-func (gh *GitHelperImpl) GetCurrentBranchName() (*string, error) {
+// GetCurrentBranch gets the current branch name
+func (gh *GitHelperImpl) GetCurrentBranch() (string, error) {
 	exeArgs := []string{"rev-parse", "--abbrev-ref", "HEAD"}
 	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	strOutput := output.String()
-	currentBranch := strOutput[:len(strOutput)-1]
-
-	return &currentBranch, nil
+	currentBranch := strings.TrimSpace(output.String())
+	return currentBranch, nil
 }
 
 // GetBranches gets all local branches

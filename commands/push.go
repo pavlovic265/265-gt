@@ -4,7 +4,6 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
-	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -29,12 +28,11 @@ func (svc pushCommand) Command() *cobra.Command {
 		Aliases: []string{"pu"},
 		Short:   "push branch always froce",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
+			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
 
-			currentBranchName := pointer.Deref(currentBranch)
 			log.Warning("Using force push - this will overwrite remote changes")
 
 			exeArgs := []string{"push", "--force", "origin", currentBranchName}

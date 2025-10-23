@@ -4,7 +4,6 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +32,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return log.ErrorMsg("Branch name is required")
 			}
 			branch := args[0]
-			parent, err := svc.gitHelper.GetCurrentBranchName()
+			parent, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
@@ -44,7 +43,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return log.Error("Failed to create and checkout branch", err)
 			}
 
-			if err := svc.gitHelper.SetParent(pointer.Deref(parent), branch); err != nil {
+			if err := svc.gitHelper.SetParent(parent, branch); err != nil {
 				return log.Error("Failed to set parent branch relationship", err)
 			}
 

@@ -117,19 +117,19 @@ func (mr *MockGitHelperMockRecorder) GetChildren(branch interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChildren", reflect.TypeOf((*MockGitHelper)(nil).GetChildren), branch)
 }
 
-// GetCurrentBranchName mocks base method.
-func (m *MockGitHelper) GetCurrentBranchName() (*string, error) {
+// GetCurrentBranch mocks base method.
+func (m *MockGitHelper) GetCurrentBranch() (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCurrentBranchName")
-	ret0, _ := ret[0].(*string)
+	ret := m.ctrl.Call(m, "GetCurrentBranch")
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetCurrentBranchName indicates an expected call of GetCurrentBranchName.
-func (mr *MockGitHelperMockRecorder) GetCurrentBranchName() *gomock.Call {
+// GetCurrentBranch indicates an expected call of GetCurrentBranch.
+func (mr *MockGitHelperMockRecorder) GetCurrentBranch() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentBranchName", reflect.TypeOf((*MockGitHelper)(nil).GetCurrentBranchName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentBranch", reflect.TypeOf((*MockGitHelper)(nil).GetCurrentBranch))
 }
 
 // GetGitRoot mocks base method.

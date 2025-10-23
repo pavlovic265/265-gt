@@ -9,7 +9,6 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 )
 
 type gitHubCli struct {
@@ -140,11 +139,11 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		return err
 	}
 
-	branch, err := svc.gitHelper.GetCurrentBranchName()
+	branch, err := svc.gitHelper.GetCurrentBranch()
 	if err != nil {
 		return err
 	}
-	parent, err := svc.gitHelper.GetParent(pointer.Deref(branch))
+	parent, err := svc.gitHelper.GetParent(branch)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,6 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
-	pointer "github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
@@ -35,12 +34,10 @@ func (svc moveCommand) Command() *cobra.Command {
 				return log.ErrorMsg("A rebase is already in progress. Resolve it, then run `gt cont` or abort.")
 			}
 
-			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
+			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
-
-			branch := pointer.Deref(currentBranch)
 
 			if len(args) > 0 {
 				parent := args[0]

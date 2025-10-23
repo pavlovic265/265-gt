@@ -38,11 +38,11 @@ func TestCleanCommand_RunE_NoBranchesToClean(t *testing.T) {
 	mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetBranches
 	mockGitHelper.EXPECT().
@@ -58,11 +58,11 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 	mockGitHelper, ctrl, cmd := createCleanCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for GetCurrentBranchName
+	// Set up expectations for GetCurrentBranch
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for GetBranches
 	mockGitHelper.EXPECT().

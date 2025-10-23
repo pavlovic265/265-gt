@@ -33,8 +33,8 @@ if [ -f "test_file.txt" ]; then
     git commit -m "Remove test file" 2>/dev/null || true
 fi
 
-# Reset to clean state
-echo "Resetting to clean state..."
-git reset --hard HEAD
+# Note: We do NOT reset uncommitted changes as they may be unrelated work
+# If you have uncommitted test changes, manually discard them with: git checkout -- test_file.txt
 
-echo "✅ Cleanup completed! Repository is back to clean state."
+echo "✅ Cleanup completed! Test branches removed."
+echo "ℹ️  Note: Any uncommitted changes have been preserved."

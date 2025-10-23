@@ -1,11 +1,9 @@
 package stack
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/helpers"
-	"github.com/pavlovic265/265-gt/utils/pointer"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -30,16 +28,33 @@ func (svc restackCommand) Command() *cobra.Command {
 		Aliases: []string{"r"},
 		Short:   "Restack branches",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			branch, err := svc.gitHelper.GetCurrentBranchName()
+			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return err
 			}
-			parent, err := svc.gitHelper.GetParent(pointer.Deref(branch))
-			if err != nil {
-				return err
+			queue := []string{branch}
+			for len(queue) > 0 {
+				parent := queue[0]
+				queue := queue[1:]
+
+				children := svc.gitHelper.GetChildren(parent)
+
+				for _, child := range children {
+					if child == parent {
+						continue
+					}
+
+					if err := svc.gitHelper.RebaseBranch(child, parent); err != nil {
+						return err
+					}
+
+					queue = append(queue, child)
+
+				}
+
 			}
 
-			fmt.Println(branch, parent)
+			log.Success("Restack completed")
 			return nil
 		},
 	}

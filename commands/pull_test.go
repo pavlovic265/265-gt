@@ -44,11 +44,11 @@ func TestPullCommand_RunE_NoArgs(t *testing.T) {
 	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
 	cmd := pullCmd.Command()
 
-	// Set up expectations for GetCurrentBranchName call
+	// Set up expectations for GetCurrentBranch call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for git pull
 	expectedArgs := []string{"pull", "origin", "main"}
@@ -79,11 +79,11 @@ func TestPullCommand_RunE_WithArgs(t *testing.T) {
 	pullCmd := commands.NewPullCommand(mockExecutor, mockGitHelper)
 	cmd := pullCmd.Command()
 
-	// Set up expectations for GetCurrentBranchName call
+	// Set up expectations for GetCurrentBranch call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for git pull (ignores arguments, always pulls origin <current-branch>)
 	expectedArgs := []string{"pull", "origin", "main"}
@@ -116,11 +116,11 @@ func TestPullCommand_RunE_ExecutorError(t *testing.T) {
 
 	expectedError := errors.New("git pull failed")
 
-	// Set up expectations for GetCurrentBranchName call
+	// Set up expectations for GetCurrentBranch call
 	branchName := "main"
 	mockGitHelper.EXPECT().
-		GetCurrentBranchName().
-		Return(&branchName, nil)
+		GetCurrentBranch().
+		Return(branchName, nil)
 
 	// Set up expectations for git pull that will fail
 	mockExecutor.EXPECT().
