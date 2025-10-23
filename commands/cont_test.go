@@ -13,16 +13,19 @@ import (
 )
 
 // Test helper to create a cont command with mock executor
-func createContCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createContCommandWithMock(
+	t *testing.T,
+) (*mocks.MockExecutor, *mocks.MockGitHelper, *gomock.Controller, *cobra.Command) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	contCmd := commands.NewContCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	contCmd := commands.NewContCommand(mockExecutor, mockGitHelper)
 	cmd := contCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestContCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createContCommandWithMock(t)
+	_, _, ctrl, cmd := createContCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -31,7 +34,7 @@ func TestContCommand_Command(t *testing.T) {
 }
 
 func TestContCommand_RunE_Success(t *testing.T) {
-	mockExecutor, ctrl, cmd := createContCommandWithMock(t)
+	mockExecutor, mockGitHelper, ctrl, cmd := createContCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git rebase --continue
@@ -49,13 +52,22 @@ func TestContCommand_RunE_Success(t *testing.T) {
 		Run().
 		Return(nil)
 
+	mockGitHelper.EXPECT().
+		IsRebaseInProgress().
+		Return(false)
+
+	mockGitHelper.EXPECT().
+		GetPending(gomock.Any()).
+		Return("", errors.New("no pending branch")).
+		Times(2)
+
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
 }
 
 func TestContCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createContCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createContCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git rebase failed")
@@ -84,9 +96,10 @@ func TestNewContCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
 	// Test that NewContCommand creates a command with the correct executor
-	contCmd := commands.NewContCommand(mockExecutor)
+	contCmd := commands.NewContCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := contCmd.Command()

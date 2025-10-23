@@ -144,7 +144,10 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 	if err != nil {
 		return err
 	}
-	parent := svc.gitHelper.GetParent(pointer.Deref(branch))
+	parent, err := svc.gitHelper.GetParent(pointer.Deref(branch))
+	if err != nil {
+		return err
+	}
 
 	exeArgs := []string{
 		"pr",

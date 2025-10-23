@@ -34,7 +34,10 @@ func (svc restackCommand) Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			parent := svc.gitHelper.GetParent(pointer.Deref(branch))
+			parent, err := svc.gitHelper.GetParent(pointer.Deref(branch))
+			if err != nil {
+				return err
+			}
 
 			fmt.Println(branch, parent)
 			return nil

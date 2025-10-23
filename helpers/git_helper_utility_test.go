@@ -27,12 +27,12 @@ func TestRelinkParentChildren(t *testing.T) {
 		Times(2)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.feature1.1.parent", "main"}).
+		WithArgs([]string{"config", "--local", "gt.branch.feature1.1.parent", "main"}).
 		Return(mockExecutor).
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.feature1.2.parent", "main"}).
+		WithArgs([]string{"config", "--local", "gt.branch.feature1.2.parent", "main"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -43,7 +43,6 @@ func TestRelinkParentChildren(t *testing.T) {
 
 	// Execute the function
 	err := gitHelper.RelinkParentChildren(parent, branchChildren)
-
 	// Assertions
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -65,7 +64,6 @@ func TestRelinkParentChildren_EmptyParent(t *testing.T) {
 
 	// Execute the function
 	err := gitHelper.RelinkParentChildren(parent, branchChildren)
-
 	// Assertions
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -92,7 +90,7 @@ func TestRelinkParentChildren_SetParentError(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.feature1.1.parent", "main"}).
+		WithArgs([]string{"config", "--local", "gt.branch.feature1.1.parent", "main"}).
 		Return(mockExecutor).
 		Times(1)
 

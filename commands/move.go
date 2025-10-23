@@ -31,6 +31,10 @@ func (svc moveCommand) Command() *cobra.Command {
 		Aliases: []string{"mo"},
 		Short:   "rebase branch onto other branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if svc.gitHelper.IsRebaseInProgress() {
+				return log.ErrorMsg("A rebase is already in progress. Resolve it, then run `gt cont` or abort.")
+			}
+
 			currentBranch, err := svc.gitHelper.GetCurrentBranchName()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)

@@ -79,7 +79,7 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 	// These are called during the interactive cleanup process
 	mockGitHelper.EXPECT().
 		GetParent(gomock.Any()).
-		Return("").
+		Return("", nil).
 		AnyTimes()
 
 	mockGitHelper.EXPECT().

@@ -57,7 +57,7 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 	// Set up expectations for GetParent
 	mockGitHelper.EXPECT().
 		GetParent("test-branch").
-		Return("main")
+		Return("main", nil)
 
 	// Set up expectations for GetChildren (branch)
 	mockGitHelper.EXPECT().

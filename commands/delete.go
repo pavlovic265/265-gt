@@ -81,11 +81,15 @@ func (svc deleteCommand) Command() *cobra.Command {
 func (svc deleteCommand) deleteBranch(
 	branch string,
 ) error {
-	parent := svc.gitHelper.GetParent(branch)
+	parent, err := svc.gitHelper.GetParent(branch)
+	if err != nil {
+		// If we can't get parent, just set it to empty string
+		parent = ""
+	}
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
 	exeArgs := []string{"branch", "-D", branch}
-	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
+	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return log.Error("Failed to delete branch", err)
 	}

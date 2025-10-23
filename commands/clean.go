@@ -128,7 +128,11 @@ func (svc cleanCommand) cleanBranches() error {
 }
 
 func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
-	parent := svc.gitHelper.GetParent(branch)
+	parent, err := svc.gitHelper.GetParent(branch)
+	if err != nil {
+		// If we can't get parent, just set it to empty string
+		parent = ""
+	}
 
 	// Create styled prompt message
 	var promptMsg strings.Builder

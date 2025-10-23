@@ -3,6 +3,7 @@ package helpers
 import (
 	"strings"
 
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
@@ -45,11 +46,18 @@ func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 		return log.Error("Failed to checkout current branch", err)
 	}
 
+	_ = gh.SetPending(constants.ParentBranch, parent)
+	_ = gh.SetPending(constants.ChildBranch, parent)
+
 	exeArgs = []string{"rebase", parent}
 	err = gh.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
-		return log.Error("Failed to rebase branch", err)
+		log.Warning("Rebase paused due to conflicts. Resolve them, then run `gt cont` or abort.")
+		return log.Error("Rebase paused", err)
 	}
+
+	_ = gh.DeletePending(constants.ParentBranch)
+	_ = gh.DeletePending(constants.ChildBranch)
 
 	if err := gh.SetParent(parent, branch); err != nil {
 		return log.Error("Failed to set parent branch relationship", err)

@@ -6,7 +6,7 @@ import (
 
 // SetParent sets the parent branch for a given child branch
 func (gh *GitHelperImpl) SetParent(parent string, child string) error {
-	exeArgs := []string{"config", "branch." + child + ".parent", parent}
+	exeArgs := []string{"config", "--local", "gt.branch." + child + ".parent", parent}
 	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err
@@ -15,16 +15,16 @@ func (gh *GitHelperImpl) SetParent(parent string, child string) error {
 }
 
 // GetParent gets the parent branch for a given branch
-func (gh *GitHelperImpl) GetParent(branch string) string {
-	exeArgs := []string{"config", "--get", "branch." + branch + ".parent"}
-	output, _ := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	parent := strings.TrimSuffix(output.String(), "\n")
-	return parent
+func (gh *GitHelperImpl) GetParent(branch string) (string, error) {
+	exeArgs := []string{"config", "--local", "--get", "gt.branch." + branch + ".parent"}
+	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	parent := strings.TrimSpace(output.String())
+	return parent, err
 }
 
 // DeleteParent removes the parent configuration for a given branch
 func (gh *GitHelperImpl) DeleteParent(branch string) error {
-	exeArgs := []string{"config", "--unset", "branch." + branch + ".parent"}
+	exeArgs := []string{"config", "--local", "--unset", "gt.branch." + branch + ".parent"}
 	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
 	if err != nil {
 		return err

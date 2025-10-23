@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 )
 
@@ -9,7 +10,7 @@ import (
 type GitHelper interface {
 	// Parent operations
 	SetParent(parent string, child string) error
-	GetParent(branch string) string
+	GetParent(branch string) (string, error)
 	DeleteParent(branch string) error
 
 	// Children operations
@@ -19,6 +20,11 @@ type GitHelper interface {
 	GetCurrentBranchName() (*string, error)
 	GetBranches() ([]string, error)
 	RebaseBranch(branch string, parent string) error
+
+	// Pending branch
+	SetPending(branchType constants.Branch, branch string) error
+	GetPending(branchType constants.Branch) (string, error)
+	DeletePending(branchType constants.Branch) error
 
 	// Repository operations
 	IsGitRepository() error
@@ -30,6 +36,7 @@ type GitHelper interface {
 
 	// Utility functions
 	RelinkParentChildren(parent string, branchChildren []string) error
+	IsRebaseInProgress() bool
 
 	// Version check
 	CheckGTVersion()

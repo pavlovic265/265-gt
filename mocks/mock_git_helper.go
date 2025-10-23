@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	constants "github.com/pavlovic265/265-gt/constants"
 )
 
 // MockGitHelper is a mock of GitHelper interface.
@@ -57,6 +58,20 @@ func (m *MockGitHelper) DeleteParent(branch string) error {
 func (mr *MockGitHelperMockRecorder) DeleteParent(branch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteParent", reflect.TypeOf((*MockGitHelper)(nil).DeleteParent), branch)
+}
+
+// DeletePending mocks base method.
+func (m *MockGitHelper) DeletePending(branchType constants.Branch) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeletePending", branchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeletePending indicates an expected call of DeletePending.
+func (mr *MockGitHelperMockRecorder) DeletePending(branchType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePending", reflect.TypeOf((*MockGitHelper)(nil).DeletePending), branchType)
 }
 
 // EnsureGitRepository mocks base method.
@@ -133,17 +148,33 @@ func (mr *MockGitHelperMockRecorder) GetGitRoot() *gomock.Call {
 }
 
 // GetParent mocks base method.
-func (m *MockGitHelper) GetParent(branch string) string {
+func (m *MockGitHelper) GetParent(branch string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetParent", branch)
 	ret0, _ := ret[0].(string)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetParent indicates an expected call of GetParent.
 func (mr *MockGitHelperMockRecorder) GetParent(branch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParent", reflect.TypeOf((*MockGitHelper)(nil).GetParent), branch)
+}
+
+// GetPending mocks base method.
+func (m *MockGitHelper) GetPending(branchType constants.Branch) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPending", branchType)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPending indicates an expected call of GetPending.
+func (mr *MockGitHelperMockRecorder) GetPending(branchType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPending", reflect.TypeOf((*MockGitHelper)(nil).GetPending), branchType)
 }
 
 // IsGitRepository mocks base method.
@@ -172,6 +203,20 @@ func (m *MockGitHelper) IsProtectedBranch(branch string) bool {
 func (mr *MockGitHelperMockRecorder) IsProtectedBranch(branch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsProtectedBranch", reflect.TypeOf((*MockGitHelper)(nil).IsProtectedBranch), branch)
+}
+
+// IsRebaseInProgress mocks base method.
+func (m *MockGitHelper) IsRebaseInProgress() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsRebaseInProgress")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsRebaseInProgress indicates an expected call of IsRebaseInProgress.
+func (mr *MockGitHelperMockRecorder) IsRebaseInProgress() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsRebaseInProgress", reflect.TypeOf((*MockGitHelper)(nil).IsRebaseInProgress))
 }
 
 // RebaseBranch mocks base method.
@@ -214,4 +259,18 @@ func (m *MockGitHelper) SetParent(parent, child string) error {
 func (mr *MockGitHelperMockRecorder) SetParent(parent, child interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetParent", reflect.TypeOf((*MockGitHelper)(nil).SetParent), parent, child)
+}
+
+// SetPending mocks base method.
+func (m *MockGitHelper) SetPending(branchType constants.Branch, branch string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPending", branchType, branch)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPending indicates an expected call of SetPending.
+func (mr *MockGitHelperMockRecorder) SetPending(branchType, branch interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPending", reflect.TypeOf((*MockGitHelper)(nil).SetPending), branchType, branch)
 }

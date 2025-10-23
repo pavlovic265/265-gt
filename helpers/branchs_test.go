@@ -308,6 +308,38 @@ func TestRebaseBranch(t *testing.T) {
 		Return(nil).
 		Times(1)
 
+	// Set up expectations for setting pending parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.parent", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for setting pending child
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.child", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
 	// Set up expectations for rebase
 	mockExecutor.EXPECT().
 		WithGit().
@@ -324,6 +356,38 @@ func TestRebaseBranch(t *testing.T) {
 		Return(nil).
 		Times(1)
 
+	// Set up expectations for clearPendingMove - unsetting pending parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "--unset", "gt.pending.parent"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for clearPendingMove - unsetting pending child
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "--unset", "gt.pending.child"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
 	// Set up expectations for SetParent
 	mockExecutor.EXPECT().
 		WithGit().
@@ -331,7 +395,7 @@ func TestRebaseBranch(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch." + branch + ".parent", parent}).
+		WithArgs([]string{"config", "--local", "gt.branch." + branch + ".parent", parent}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -412,6 +476,38 @@ func TestRebaseBranch_RebaseError(t *testing.T) {
 		Return(nil).
 		Times(1)
 
+	// Set up expectations for setting pending parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.parent", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for setting pending child
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.child", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
 	// Set up expectations for rebase (error)
 	mockExecutor.EXPECT().
 		WithGit().
@@ -464,6 +560,38 @@ func TestRebaseBranch_SetParentError(t *testing.T) {
 		Return(nil).
 		Times(1)
 
+	// Set up expectations for setting pending parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.parent", parent}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for setting pending child
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "gt.pending.child", branch}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
 	// Set up expectations for rebase (success)
 	mockExecutor.EXPECT().
 		WithGit().
@@ -480,6 +608,38 @@ func TestRebaseBranch_SetParentError(t *testing.T) {
 		Return(nil).
 		Times(1)
 
+	// Set up expectations for clearPendingMove - unsetting pending parent
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "--unset", "gt.pending.parent"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
+	// Set up expectations for clearPendingMove - unsetting pending child
+	mockExecutor.EXPECT().
+		WithGit().
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		WithArgs([]string{"config", "--local", "--unset", "gt.pending.child"}).
+		Return(mockExecutor).
+		Times(1)
+
+	mockExecutor.EXPECT().
+		Run().
+		Return(nil).
+		Times(1)
+
 	// Set up expectations for SetParent (error)
 	mockExecutor.EXPECT().
 		WithGit().
@@ -487,7 +647,7 @@ func TestRebaseBranch_SetParentError(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch." + branch + ".parent", parent}).
+		WithArgs([]string{"config", "--local", "gt.branch." + branch + ".parent", parent}).
 		Return(mockExecutor).
 		Times(1)
 

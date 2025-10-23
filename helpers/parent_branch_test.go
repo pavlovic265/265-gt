@@ -26,7 +26,7 @@ func TestSetParent(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.feature1.parent", "main"}).
+		WithArgs([]string{"config", "--local", "gt.branch.feature1.parent", "main"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -62,7 +62,7 @@ func TestSetParent_Error(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "branch.feature1.parent", "main"}).
+		WithArgs([]string{"config", "--local", "gt.branch.feature1.parent", "main"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -100,7 +100,7 @@ func TestGetParent(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature1.parent"}).
+		WithArgs([]string{"config", "--local", "--get", "gt.branch.feature1.parent"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -114,7 +114,10 @@ func TestGetParent(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result := gitHelper.GetParent(branch)
+	result, err := gitHelper.GetParent(branch)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
 
 	// Assertions
 	if result != expectedParent {
@@ -138,7 +141,7 @@ func TestGetParent_Empty(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--get", "branch.feature1.parent"}).
+		WithArgs([]string{"config", "--local", "--get", "gt.branch.feature1.parent"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -152,7 +155,10 @@ func TestGetParent_Empty(t *testing.T) {
 		Times(1)
 
 	// Execute the function
-	result := gitHelper.GetParent(branch)
+	result, err := gitHelper.GetParent(branch)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
 
 	// Assertions
 	if result != "" {
@@ -176,7 +182,7 @@ func TestDeleteParent(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--unset", "branch.feature1.parent"}).
+		WithArgs([]string{"config", "--local", "--unset", "gt.branch.feature1.parent"}).
 		Return(mockExecutor).
 		Times(1)
 
@@ -211,7 +217,7 @@ func TestDeleteParent_Error(t *testing.T) {
 		Times(1)
 
 	mockExecutor.EXPECT().
-		WithArgs([]string{"config", "--unset", "branch.feature1.parent"}).
+		WithArgs([]string{"config", "--local", "--unset", "gt.branch.feature1.parent"}).
 		Return(mockExecutor).
 		Times(1)
 

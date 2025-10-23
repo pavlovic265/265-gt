@@ -34,7 +34,10 @@ func (svc downCommand) Command() *cobra.Command {
 			}
 
 			currentBranch := pointer.Deref(branch)
-			parent := svc.gitHelper.GetParent(currentBranch)
+			parent, err := svc.gitHelper.GetParent(currentBranch)
+			if err != nil {
+				return log.Error("Failed to get parent branch", err)
+			}
 
 			if parent == "" {
 				return log.ErrorMsg("Cannot move down - no parent branch available")

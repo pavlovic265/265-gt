@@ -1,20 +1,25 @@
 package commands
 
 import (
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type contCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewContCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) contCommand {
 	return contCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -27,6 +32,25 @@ func (svc contCommand) Command() *cobra.Command {
 			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
 			if err != nil {
 				return log.Error("Failed to continue rebase", err)
+			}
+
+			if svc.gitHelper.IsRebaseInProgress() {
+				return nil
+			}
+
+			parent, pErr := svc.gitHelper.GetPending(constants.ParentBranch)
+			child, cErr := svc.gitHelper.GetPending(constants.ChildBranch)
+			if pErr == nil && cErr == nil {
+				if parent != "" && child != "" {
+					if err := svc.gitHelper.SetParent(parent, child); err != nil {
+						return log.Error("Failed to set parent branch relationship", err)
+					}
+
+					_ = svc.gitHelper.DeletePending(constants.ParentBranch)
+					_ = svc.gitHelper.DeletePending(constants.ChildBranch)
+
+					log.Success("Rebase completed and metadata updated")
+				}
 			}
 
 			// Run stty sane to fix any terminal issues that might have occurred

@@ -17,3 +17,10 @@ func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []st
 
 	return nil
 }
+
+func (gh *GitHelperImpl) IsRebaseInProgress() bool {
+	// If rev-parse succeeds (no error) ⇒ rebase in progress
+	exeArgs := []string{"rev-parse", "-q", "--verify", "REBASE_HEAD"}
+	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
+	return err == nil
+}

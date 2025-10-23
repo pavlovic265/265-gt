@@ -84,7 +84,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewPushCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewPullCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewCreateCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewContCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewContCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewCheckoutCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewMoveCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewDeleteCommand(exe, gitHelper).Command())
