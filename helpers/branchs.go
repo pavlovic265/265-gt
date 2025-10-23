@@ -47,7 +47,7 @@ func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 	}
 
 	_ = gh.SetPending(constants.ParentBranch, parent)
-	_ = gh.SetPending(constants.ChildBranch, parent)
+	_ = gh.SetPending(constants.ChildBranch, branch)
 
 	exeArgs = []string{"rebase", parent}
 	err = gh.exe.WithGit().WithArgs(exeArgs).Run()

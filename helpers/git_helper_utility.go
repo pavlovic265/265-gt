@@ -1,5 +1,10 @@
 package helpers
 
+import (
+	"os"
+	"strings"
+)
+
 // RelinkParentChildren updates the parent pointers of the deleted branch's children
 // to point to the deleted branch's parent
 func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []string) error {
@@ -19,8 +24,25 @@ func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []st
 }
 
 func (gh *GitHelperImpl) IsRebaseInProgress() bool {
-	// If rev-parse succeeds (no error) ⇒ rebase in progress
-	exeArgs := []string{"rev-parse", "-q", "--verify", "REBASE_HEAD"}
-	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
-	return err == nil
+	// Check for rebase-merge directory (interactive rebase)
+	exeArgs := []string{"rev-parse", "--git-path", "rebase-merge"}
+	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	if err == nil {
+		path := strings.TrimSpace(output.String())
+		if _, err := os.Stat(path); err == nil {
+			return true
+		}
+	}
+
+	// Check for rebase-apply directory (non-interactive rebase or git am)
+	exeArgs = []string{"rev-parse", "--git-path", "rebase-apply"}
+	output, err = gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	if err == nil {
+		path := strings.TrimSpace(output.String())
+		if _, err := os.Stat(path); err == nil {
+			return true
+		}
+	}
+
+	return false
 }
