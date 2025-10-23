@@ -1,8 +1,0 @@
-Base File for Restack Testing
-==============================
-Line 1: MAIN BRANCH - Updated initial content
-Line 2: MAIN BRANCH - Updated base functionality
-Line 3: MAIN BRANCH - Updated core features
-Line 4: MAIN BRANCH - New baseline feature
-Line 5: MAIN BRANCH - Critical bug fix
-Line 6: MAIN BRANCH - Performance improvements
