@@ -35,7 +35,7 @@ func (svc restackCommand) Command() *cobra.Command {
 			queue := []string{branch}
 			for len(queue) > 0 {
 				parent := queue[0]
-				queue := queue[1:]
+				queue = queue[1:]
 
 				children := svc.gitHelper.GetChildren(parent)
 
