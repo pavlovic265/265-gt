@@ -25,7 +25,7 @@ func NewRestackCommand(
 func (svc restackCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "restack",
-		Aliases: []string{"r"},
+		Aliases: []string{"rs"},
 		Short:   "Restack branches",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			branch, err := svc.gitHelper.GetCurrentBranch()
