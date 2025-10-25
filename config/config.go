@@ -54,6 +54,8 @@ type ConfigManager interface {
 	GetGlobalConfigPath() (string, error)
 	LoadGlobalConfig() (*GlobalConfigStruct, error)
 	SaveGlobalConfig(configToSave GlobalConfigStruct) error
+
+	// Version operations
 	SaveLastChecked() error
 	SaveVersion(version string) error
 
