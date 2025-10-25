@@ -2,7 +2,7 @@ package stack
 
 import (
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/helpers"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )

@@ -8,7 +8,8 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/helpers"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 )
 
 type gitHubCli struct {
@@ -94,7 +95,7 @@ func (svc gitHubCli) AuthLogin(user string) error {
 		return err
 	}
 
-	err = svc.configManager.SetActiveAccount(account)
+	err = svc.configManager.SaveActiveAccount(account)
 	if err != nil {
 		return err
 	}
@@ -119,7 +120,7 @@ func (svc gitHubCli) AuthLogout(user string) error {
 	}
 
 	if acc != nil {
-		err = svc.configManager.SetActiveAccount(*acc)
+		err = svc.configManager.SaveActiveAccount(pointer.Deref(acc))
 		if err != nil {
 			return err
 		}

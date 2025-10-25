@@ -65,7 +65,7 @@ func (svc switchCommand) switchUser(user string) error {
 		return log.Error("Failed to switch account", err)
 	}
 
-	err = svc.configManager.SetActiveAccount(pointer.Deref(account))
+	err = svc.configManager.SaveActiveAccount(pointer.Deref(account))
 	if err != nil {
 		return log.Error("Failed to update active account", err)
 	}

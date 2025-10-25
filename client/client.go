@@ -4,7 +4,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/helpers"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 )
 
 type CliClient interface {
