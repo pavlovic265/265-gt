@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
@@ -48,22 +49,10 @@ type protectedBranchModele struct {
 
 func newProtectedBranchModel() protectedBranchModele {
 	return protectedBranchModele{
-		branch:     buildTextInput(),
+		branch:     components.NewBranchInput(),
 		focusIndex: 0,
 		quitting:   false,
 	}
-}
-
-func buildTextInput() textinput.Model {
-	m := textinput.New()
-	m.Placeholder = "Branch"
-	m.CharLimit = 256
-	m.Width = 20
-	m.Cursor.Style = constants.GetWarningAnsiStyle() // Yellow cursor
-	m.PromptStyle = constants.GetSuccessAnsiStyle()
-	m.TextStyle = constants.GetAnsiStyle(constants.White) // White text
-
-	return m
 }
 
 func (m protectedBranchModele) Init() tea.Cmd {
@@ -123,7 +112,7 @@ func (m protectedBranchModele) handlequitting() (tea.Model, tea.Cmd) {
 func (m protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
 	m.branches = append(m.branches, m.branch.Value())
 
-	m.branch = buildTextInput()
+	m.branch = components.NewBranchInput()
 	m.focusIndex = 0
 
 	return m, nil
@@ -152,21 +141,10 @@ func (m protectedBranchModele) View() string {
 	b.WriteString(m.branch.View())
 	b.WriteRune('\n')
 
-	var quittingButton string
-	if m.focusIndex == 1 {
-		quittingButton = constants.GetSuccessAnsiStyle().Render(fmt.Sprintf("[ %s Done ]", constants.CheckIcon))
-	} else {
-		quittingButton = fmt.Sprintf("[ %s Done ]", constants.CheckIcon)
-	}
+	doneButton := components.NewDoneButton(m.focusIndex == 1)
+	addButton := components.NewAddButton(m.focusIndex == 2)
 
-	var addButton string
-	if m.focusIndex == 2 {
-		addButton = constants.GetInfoAnsiStyle().Render(fmt.Sprintf("[ %s Add ]", constants.PlusIcon))
-	} else {
-		addButton = fmt.Sprintf("[ %s Add ]", constants.PlusIcon)
-	}
-
-	fmt.Fprintf(&b, "\n%s  %s\n\n", quittingButton, addButton)
+	fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton.Render(), addButton.Render())
 
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))

@@ -7,16 +7,9 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
-)
-
-var (
-	DoneButtonFocus = "[ Done ]"
-	DoneButtonBlur  = "[ Done ]"
-
-	AddButtonFocus = "[ Add ]"
-	AddButtonBlur  = "[ Add ]"
 )
 
 type accountsModel struct {
@@ -32,39 +25,13 @@ func newAccountsModel() accountsModel {
 		inputs: make([]textinput.Model, 2),
 	}
 
-	accountsModel.inputs[0] = buildUserInput()
-	accountsModel.inputs[1] = buildTokenInput()
+	accountsModel.inputs[0] = components.NewUserInput()
+	accountsModel.inputs[1] = components.NewTokenInput()
 	accountsModel.focusIndex = 0
 	accountsModel.platform = constants.GitHubPlatform // Default to GitHub
 	accountsModel.platformIndex = 0                   // Default to first platform (GitHub)
 
 	return accountsModel
-}
-
-func buildUserInput() textinput.Model {
-	t := textinput.New()
-
-	t.Cursor.Style = constants.GetSuccessAnsiStyle()
-
-	t.Placeholder = "User"
-	t.Focus()
-	t.CharLimit = 32
-	t.PromptStyle = constants.GetSuccessAnsiStyle()
-
-	t.TextStyle = constants.GetSuccessAnsiStyle()
-	return t
-}
-
-func buildTokenInput() textinput.Model {
-	t := textinput.New()
-
-	t.Cursor.Style = constants.GetSuccessAnsiStyle()
-
-	t.Placeholder = "Token"
-	t.CharLimit = 128
-	t.PromptStyle = constants.GetSuccessAnsiStyle()
-	t.TextStyle = constants.GetSuccessAnsiStyle()
-	return t
 }
 
 var platformOptions = []constants.Platform{
@@ -159,21 +126,10 @@ func (am accountsModel) View() string {
 		}
 	}
 
-	var doneButton string
-	if am.focusIndex == len(am.inputs)+1 {
-		doneButton = DoneButtonFocus
-	} else {
-		doneButton = DoneButtonBlur
-	}
+	doneButton := components.NewDoneButton(am.focusIndex == len(am.inputs)+1)
+	addButton := components.NewAddButton(am.focusIndex == len(am.inputs)+2)
 
-	var addButton string
-	if am.focusIndex == len(am.inputs)+2 {
-		addButton = AddButtonFocus
-	} else {
-		addButton = AddButtonBlur
-	}
-
-	fmt.Fprintf(&b, "\n\n%s  %s\n\n", doneButton, addButton)
+	fmt.Fprintf(&b, "\n\n%s  %s\n\n", doneButton.Render(), addButton.Render())
 
 	return b.String()
 }
@@ -198,8 +154,8 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 		Platform: platform,
 	})
 
-	am.inputs[0] = buildUserInput()
-	am.inputs[1] = buildTokenInput()
+	am.inputs[0] = components.NewUserInput()
+	am.inputs[1] = components.NewTokenInput()
 	am.focusIndex = 0
 
 	cmds := make([]tea.Cmd, len(am.inputs))
