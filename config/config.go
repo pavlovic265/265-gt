@@ -15,6 +15,8 @@ type Account struct {
 	User     string             `yaml:"user"`
 	Token    string             `yaml:"token"`
 	Platform constants.Platform `yaml:"platform"`
+	Email    string             `yaml:"email,omitempty"`
+	FullName string             `yaml:"full_name,omitempty"`
 }
 
 type Version struct {

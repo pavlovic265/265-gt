@@ -107,6 +107,24 @@ func NewTokenInput() textinput.Model {
 		Build()
 }
 
+// NewEmailInput creates a styled input for email addresses
+func NewEmailInput() textinput.Model {
+	return NewInput().
+		WithPlaceholder("Email").
+		WithCharLimit(100).
+		WithTextStyle(constants.Green).
+		Build()
+}
+
+// NewFullNameInput creates a styled input for full names
+func NewFullNameInput() textinput.Model {
+	return NewInput().
+		WithPlaceholder("Full Name").
+		WithCharLimit(100).
+		WithTextStyle(constants.Green).
+		Build()
+}
+
 // NewGenericInput creates a generic text input with custom placeholder
 func NewGenericInput(placeholder string) textinput.Model {
 	return NewInput().
