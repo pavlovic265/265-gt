@@ -12,11 +12,12 @@ import (
 // ============================================================================
 
 type Account struct {
-	User     string             `yaml:"user"`
-	Token    string             `yaml:"token"`
-	Platform constants.Platform `yaml:"platform"`
-	Email    string             `yaml:"email,omitempty"`
-	FullName string             `yaml:"full_name,omitempty"`
+	User       string             `yaml:"user"`
+	Token      string             `yaml:"token"`
+	Platform   constants.Platform `yaml:"platform"`
+	Email      string             `yaml:"email,omitempty"`
+	Name       string             `yaml:"name,omitempty"`
+	SigningKey string             `yaml:"signingkey,omitempty"`
 }
 
 type Version struct {

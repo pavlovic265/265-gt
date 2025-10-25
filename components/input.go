@@ -116,10 +116,19 @@ func NewEmailInput() textinput.Model {
 		Build()
 }
 
-// NewFullNameInput creates a styled input for full names
-func NewFullNameInput() textinput.Model {
+// NewNameInput creates a styled input for names
+func NewNameInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("Full Name").
+		WithCharLimit(100).
+		WithTextStyle(constants.Green).
+		Build()
+}
+
+// NewSigningKeyInput creates a styled input for GPG signing keys
+func NewSigningKeyInput() textinput.Model {
+	return NewInput().
+		WithPlaceholder("Signing Key (GPG)").
 		WithCharLimit(100).
 		WithTextStyle(constants.Green).
 		Build()

@@ -28,7 +28,7 @@ func newAccountsModel() accountsModel {
 	accountsModel.inputs[0] = components.NewUserInput()
 	accountsModel.inputs[1] = components.NewTokenInput()
 	accountsModel.inputs[2] = components.NewEmailInput()
-	accountsModel.inputs[3] = components.NewFullNameInput()
+	accountsModel.inputs[3] = components.NewNameInput()
 	accountsModel.focusIndex = 0
 	accountsModel.platform = constants.GitHubPlatform // Default to GitHub
 	accountsModel.platformIndex = 0                   // Default to first platform (GitHub)
@@ -144,7 +144,7 @@ func (am accountsModel) handleDone() (tea.Model, tea.Cmd) {
 			Token:    am.inputs[1].Value(),
 			Platform: platform,
 			Email:    am.inputs[2].Value(),
-			FullName: am.inputs[3].Value(),
+			Name:     am.inputs[3].Value(),
 		})
 	}
 	return am, tea.Quit
@@ -157,13 +157,13 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 		Token:    am.inputs[1].Value(),
 		Platform: platform,
 		Email:    am.inputs[2].Value(),
-		FullName: am.inputs[3].Value(),
+		Name:     am.inputs[3].Value(),
 	})
 
 	am.inputs[0] = components.NewUserInput()
 	am.inputs[1] = components.NewTokenInput()
 	am.inputs[2] = components.NewEmailInput()
-	am.inputs[3] = components.NewFullNameInput()
+	am.inputs[3] = components.NewNameInput()
 	am.focusIndex = 0
 
 	cmds := make([]tea.Cmd, len(am.inputs))
