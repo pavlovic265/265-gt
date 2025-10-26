@@ -11,7 +11,6 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
-	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
 type GitHubRelease struct {
@@ -26,8 +25,8 @@ func (gh *GitHelperImpl) CheckGTVersion() {
 		return // Silently fail if check is not needed
 	}
 
-	// Create context with timeout to avoid blocking
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Create context with timeout to avoid blocking (reduced to 1s for faster commands)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	latestVersion, latestURL, err := getLatestGTVersionWithContext(ctx)
@@ -66,14 +65,8 @@ func shouldCheckVersion(version config.Version) bool {
 		return true // If we can't parse time, check anyway
 	}
 
-	// Compare only date (day, month, year), ignore time
-	now := timeutils.Now()
-	lastCheckedDate := time.Date(lastChecked.Year(), lastChecked.Month(), lastChecked.Day(),
-		0, 0, 0, 0, lastChecked.Location())
-	currentDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-
-	// Check if it's a different day
-	return !lastCheckedDate.Equal(currentDate)
+	// Check if it's been at least 24 hours since last check
+	return time.Since(lastChecked) >= 24*time.Hour
 }
 
 func getLatestGTVersionWithContext(ctx context.Context) (string, string, error) {

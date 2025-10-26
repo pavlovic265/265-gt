@@ -42,8 +42,8 @@ func TestShouldCheckVersion(t *testing.T) {
 		{
 			name:           "Tomorrow (edge case)",
 			lastChecked:    timeutils.Now().AddDate(0, 0, 1).Format(time.RFC3339),
-			expectedResult: true,
-			description:    "Should check when last checked is in the future (different day)",
+			expectedResult: false,
+			description:    "Should not check when last checked is in the future",
 		},
 	}
 
