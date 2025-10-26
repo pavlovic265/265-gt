@@ -16,8 +16,9 @@ func NewInput() *InputBuilder {
 	m := textinput.New()
 
 	// Set default styling
+	m.Prompt = ""                                         // No prompt character
 	m.Cursor.Style = constants.GetSuccessAnsiStyle()      // Green cursor
-	m.PromptStyle = constants.GetSuccessAnsiStyle()       // Green prompt
+	m.PromptStyle = constants.GetSuccessAnsiStyle()       // Green prompt (for when prompt is set)
 	m.TextStyle = constants.GetAnsiStyle(constants.White) // White text
 	m.CharLimit = 256                                     // Default character limit
 	m.Width = 20                                          // Default width
@@ -93,8 +94,8 @@ func NewUserInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("User").
 		WithCharLimit(32).
-		WithTextStyle(constants.Green).
-		WithFocus(true).
+		WithWidth(50).
+		WithCursorStyle(constants.Yellow).
 		Build()
 }
 
@@ -103,7 +104,8 @@ func NewTokenInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("Token").
 		WithCharLimit(256).
-		WithTextStyle(constants.Green).
+		WithWidth(120).
+		WithCursorStyle(constants.Yellow).
 		Build()
 }
 
@@ -112,7 +114,8 @@ func NewEmailInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("Email").
 		WithCharLimit(100).
-		WithTextStyle(constants.Green).
+		WithWidth(60).
+		WithCursorStyle(constants.Yellow).
 		Build()
 }
 
@@ -121,7 +124,8 @@ func NewNameInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("Full Name").
 		WithCharLimit(100).
-		WithTextStyle(constants.Green).
+		WithWidth(60).
+		WithCursorStyle(constants.Yellow).
 		Build()
 }
 
@@ -131,6 +135,7 @@ func NewSigningKeyInput() textinput.Model {
 		WithPlaceholder("Signing Key (GPG)").
 		WithCharLimit(100).
 		WithTextStyle(constants.Green).
+		WithCursorStyle(constants.Yellow).
 		Build()
 }
 

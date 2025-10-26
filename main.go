@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands"
+	"github.com/pavlovic265/265-gt/commands/account"
 	"github.com/pavlovic265/265-gt/commands/auth"
 	"github.com/pavlovic265/265-gt/commands/commit"
 	createconfig "github.com/pavlovic265/265-gt/commands/create_config"
@@ -98,6 +99,7 @@ func main() {
 	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())
+	rootCmd.AddCommand(account.NewAccountCommand(exe, configManager).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
 
 	rootCmd.AddCommand(commands.NewCompletionCommand().Command())

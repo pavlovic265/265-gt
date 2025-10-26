@@ -54,11 +54,6 @@ func (svc globalCommand) Command() *cobra.Command {
 }
 
 func (svc globalCommand) createGlobalConfig() error {
-	accounts, err := HandleAddAccunts()
-	if err != nil {
-		return log.Error("Failed to configure accounts", err)
-	}
-
 	theme, err := HandleSelectTheme()
 	if err != nil {
 		return log.Error("Failed to configure theme", err)
@@ -66,11 +61,12 @@ func (svc globalCommand) createGlobalConfig() error {
 
 	latestVersion, err := helpers.GetLatestVersion()
 	if err != nil {
-		return log.Error("Failed to get latest version", err)
+		// If we can't get version, use empty string
+		latestVersion = ""
 	}
 
 	globalConfig := config.GlobalConfigStruct{
-		Accounts: accounts,
+		Accounts: []config.Account{},
 		Version: &config.Version{
 			LastChecked:    timeutils.Now().Format(timeutils.LayoutISOWithTime),
 			CurrentVersion: latestVersion,
@@ -85,5 +81,6 @@ func (svc globalCommand) createGlobalConfig() error {
 	}
 
 	log.Success("Global configuration created successfully")
+	log.Info("Run 'gt account add' to add your first account")
 	return nil
 }
