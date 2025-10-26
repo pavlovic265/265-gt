@@ -10,6 +10,7 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -28,17 +29,6 @@ var (
 	// Info styles
 	infoStyle = lipgloss.NewStyle().
 			Foreground(constants.Cyan)
-
-	// Success styles
-	successStyle = lipgloss.NewStyle().
-			Foreground(constants.White)
-
-	successIconStyle = lipgloss.NewStyle().
-				Foreground(constants.Green)
-
-	// Error styles
-	errorStyle = lipgloss.NewStyle().
-			Foreground(constants.Red)
 
 	// Branch info styles
 	branchStyle = lipgloss.NewStyle().
@@ -73,41 +63,53 @@ func (svc cleanCommand) Command() *cobra.Command {
 func (svc cleanCommand) cleanBranches() error {
 	currentBranch, err := svc.gitHelper.GetCurrentBranch()
 	if err != nil {
-		return fmt.Errorf("failed to get current branch: %w", err)
+		return log.Error("Failed to get current branch", err)
 	}
 
 	branches, err := svc.gitHelper.GetBranches()
 	if err != nil {
-		return fmt.Errorf("failed to get branches: %w", err)
+		return log.Error("Failed to get branches", err)
 	}
 
 	// Styled header
 	fmt.Println(headerStyle.Render("Branch Cleanup"))
+	log.Infof("Current branch: %s", branchStyle.Render(currentBranch))
 	fmt.Println()
 
 	cleanableCount := 0
+	protectedCount := 0
 	for _, branch := range branches {
-		if branch != currentBranch && !svc.gitHelper.IsProtectedBranch(branch) {
-			cleanableCount++
+		if branch == currentBranch {
+			continue
 		}
+		if svc.gitHelper.IsProtectedBranch(branch) {
+			protectedCount++
+			continue
+		}
+		cleanableCount++
 	}
 
+	log.Infof("Found %d branches (%d protected, %d cleanable)",
+		len(branches)-1, // -1 for current branch
+		protectedCount,
+		cleanableCount)
+	fmt.Println()
+
 	if cleanableCount == 0 {
-		fmt.Println(infoStyle.Render("No branches to clean up!"))
+		log.Info("No branches to clean up!")
 		return nil
 	}
 
 	deletedCount := 0
+	skippedCount := 0
 	for _, branch := range branches {
 		if branch == currentBranch || svc.gitHelper.IsProtectedBranch(branch) {
 			continue
 		}
 
-		shouldBreak, err := svc.deleteBranch(branch)
+		shouldBreak, deleted, err := svc.deleteBranch(branch)
 		if err != nil {
-			fmt.Printf("%s %s\n",
-				constants.CrossIcon,
-				errorStyle.Render(fmt.Sprintf("Error: %v", err)))
+			_ = log.Errorf("Failed to delete branch: %v", err)
 			continue
 		}
 
@@ -115,23 +117,32 @@ func (svc cleanCommand) cleanBranches() error {
 			break
 		}
 
-		deletedCount++
+		if deleted {
+			deletedCount++
+		} else {
+			skippedCount++
+		}
 	}
 
+	// Summary
+	fmt.Println()
 	if deletedCount > 0 {
-		fmt.Printf("%s %s",
-			successIconStyle.Render(constants.CheckIcon),
-			successStyle.Render(fmt.Sprintf("Cleaned up %d branches", deletedCount)))
+		log.Successf("Deleted %d branches", deletedCount)
+	}
+	if skippedCount > 0 {
+		log.Infof("Skipped %d branches", skippedCount)
 	}
 	return nil
 }
 
-func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
+func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted bool, err error) {
 	parent, err := svc.gitHelper.GetParent(branch)
 	if err != nil {
 		// If we can't get parent, just set it to empty string
 		parent = ""
 	}
+
+	branchChildren := svc.gitHelper.GetChildren(branch)
 
 	// Create styled prompt message
 	var promptMsg strings.Builder
@@ -140,10 +151,13 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 	promptMsg.WriteString("?")
 
 	if parent != "" {
-		promptMsg.WriteString(" (")
-		promptMsg.WriteString(parentStyle.Render("parent: "))
-		promptMsg.WriteString(branchStyle.Render(parent))
-		promptMsg.WriteString(")")
+		promptMsg.WriteString(" ")
+		promptMsg.WriteString(parentStyle.Render("(parent: " + parent + ")"))
+	}
+
+	if len(branchChildren) > 0 {
+		promptMsg.WriteString(" ")
+		promptMsg.WriteString(infoStyle.Render(fmt.Sprintf("(children: %d)", len(branchChildren))))
 	}
 
 	initialModel := components.NewYesNoPrompt(promptMsg.String())
@@ -151,34 +165,41 @@ func (svc cleanCommand) deleteBranch(branch string) (bool, error) {
 
 	m, err := program.Run()
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
 
 	if model, ok := m.(components.YesNoPrompt); ok {
 		if model.Quitting {
-			return true, nil
+			return true, false, nil
 		}
 
 		if model.IsYes() {
-			branchChildren := svc.gitHelper.GetChildren(branch)
-
+			// Delete the branch
 			exeArgs := []string{"branch", "-D", branch}
 			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
 			if err != nil {
-				return false, err
+				return false, false, err
 			}
 
-			err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
-			if err != nil {
-				return false, err
+			// Relink children to parent
+			if len(branchChildren) > 0 {
+				err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
+				if err != nil {
+					return false, false, err
+				}
+				fmt.Printf("   → Relinked %d children to %s\n",
+					len(branchChildren),
+					branchStyle.Render(parent))
 			}
 
 			gitOutput := strings.TrimSpace(output.String())
-			fmt.Printf("   %s %s\n\n",
-				successIconStyle.Render(constants.CheckIcon),
-				successStyle.Render(gitOutput))
+			fmt.Printf("   ")
+			log.Success(gitOutput)
+			fmt.Println()
+
+			return false, true, nil
 		}
 	}
 
-	return false, nil
+	return false, false, nil
 }
