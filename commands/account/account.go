@@ -32,6 +32,7 @@ func (ac accountCommand) Command() *cobra.Command {
 	accountCmd.AddCommand(NewAddCommand(ac.exe, ac.configManager).Command())
 	accountCmd.AddCommand(NewListCommand(ac.configManager).Command())
 	accountCmd.AddCommand(NewEditCommand(ac.exe, ac.configManager).Command())
+	accountCmd.AddCommand(NewRemoveCommand(ac.configManager).Command())
 
 	return accountCmd
 }

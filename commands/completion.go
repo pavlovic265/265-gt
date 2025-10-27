@@ -109,7 +109,7 @@ func installCompletion(root *cobra.Command, shell, customDir string, withDesc bo
 	}
 
 	fmt.Printf("✓ Installed %s completion to %s\n", shell, dst)
-	printPostInstallHint(shell, bin, dst, outDir)
+	printPostInstallHint(shell, dst, outDir)
 	return nil
 }
 
@@ -150,7 +150,7 @@ func defaultInstallLocation(shell, bin string) (string, string) {
 	}
 }
 
-func printPostInstallHint(shell, bin, dst, dir string) {
+func printPostInstallHint(shell, dst, dir string) {
 	switch shell {
 	case "bash":
 		fmt.Println("\nAdd this to your ~/.bashrc (if not already present):")
