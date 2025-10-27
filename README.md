@@ -17,15 +17,19 @@
 
 - **Quick Branch Operations**: Create, checkout, and switch between branches with shorthand commands
 - **Branch Stack Navigation**: Seamlessly move up and down your branch hierarchy
+- **Stack Management**: Restack branches to keep your branch hierarchy up to date
 - **Automated Git Workflows**: Simplify rebasing, syncing, and cleaning up merged branches
 - **Pull Request Management**: Create and manage pull requests directly from the command line
 - **Multi-Platform Support**: Works with GitHub and GitLab
+- **Account Management**: Add, edit, list, and remove multiple accounts with full profile information
 - **Authentication Management**: Easy account switching and token management
 - **Interactive UI**: Beautiful terminal interface with search and selection capabilities
+- **Shell Completion**: Auto-completion support for Bash, Zsh, Fish, and PowerShell
 - **Panda Syntax Theme**: Stunning color scheme with dark/light theme support
 - **Styled Output**: Consistent, beautiful error and success messages with icons
 - **Enhanced Logging**: Centralized logging utility with styled output
 - **Version Management**: Automatic version checking and upgrade notifications
+- **Git Pass-Through**: Unknown commands automatically passed to git for seamless integration
 
 ## 🛠️ Installation
 
@@ -82,12 +86,17 @@ sudo mv gt /usr/local/bin/
    gt config global
    ```
 
-2. **Authenticate with your Git platform**
+2. **Add your first account**
+   ```bash
+   gt account add
+   ```
+
+3. **Authenticate with your Git platform**
    ```bash
    gt auth login
    ```
 
-3. **Start using gt commands**
+4. **Start using gt commands**
    ```bash
    gt create feature-branch    # Create and switch to a new branch
    gt up                       # Move up in branch stack
@@ -131,11 +140,12 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 
 ### Navigation
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `up` | Move up in branch stack | `gt up` |
-| `down` | Move down in branch stack | `gt down` |
+| Command | Alias | Description | Example |
+|---------|-------|-------------|---------|
+| `up` | - | Move up in branch stack | `gt up` |
+| `down` | - | Move down in branch stack | `gt down` |
 | `switch` | `sw` | Switch to previous branch | `gt switch` |
+| `cont` | - | Continue rebase after resolving conflicts | `gt cont` |
 
 ### Commit Operations
 
@@ -161,6 +171,12 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `pull_request create -d` | `pr c -d` | Create a draft pull request | `gt pr c -d` |
 | `pull_request list` | `pr li` | List all pull requests | `gt pr li` |
 
+### Stack Management
+
+| Command | Alias | Description | Example |
+|---------|-------|-------------|---------|
+| `stack restack` | `s rs` | Restack branches from current branch downward | `gt stack restack` |
+
 ### Configuration
 
 | Command | Alias | Description | Example |
@@ -177,6 +193,15 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `auth status` | `auth st` | Show authentication status | `gt auth st` |
 | `auth switch` | `auth sw` | Switch between accounts | `gt auth sw` |
 
+### Account Management
+
+| Command | Alias | Description | Example |
+|---------|-------|-------------|---------|
+| `account add` | `acc add` | Add a new account interactively | `gt account add` |
+| `account list` | `acc ls` | List all configured accounts | `gt account list` |
+| `account edit` | `acc edit` | Edit an existing account | `gt account edit` |
+| `account remove` | `acc rm` | Remove an account | `gt account remove` |
+
 ### Utility Commands
 
 | Command | Alias | Description | Example |
@@ -185,6 +210,8 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `version --latest` | `v -l` | Get latest version from repository | `gt version --latest` |
 | `upgrade` | - | Update the CLI tool | `gt upgrade` |
 | `status` | `st` | Show current repository status | `gt status` |
+| `completion` | - | Generate shell completion scripts | `gt completion bash` |
+| `completion --install` | - | Install completion script to default location | `gt completion zsh --install` |
 
 ## 🔧 Configuration
 
@@ -193,29 +220,46 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 gt config global
 ```
 This will guide you through setting up:
-- Multiple Git platform accounts (GitHub/GitLab)
-- API tokens for each account
-- Active account selection
-- Default branch naming conventions
-- Protected branches
 - Theme preferences (dark/light)
+- Version tracking
+
+After creating the global config, add your accounts:
+```bash
+gt account add
+```
+
+The account management commands allow you to:
+- **Add accounts**: Interactively add GitHub/GitLab accounts with username, email, full name, platform, and API token
+- **List accounts**: View all configured accounts with their details
+- **Edit accounts**: Modify existing account information
+- **Remove accounts**: Delete accounts you no longer need
+- **Switch accounts**: Change between accounts using `gt auth switch`
 
 The configuration supports multiple accounts with automatic active account management:
 ```yaml
 # ~/.gtconfig.yaml
 accounts:
   - user: "username1"
+    email: "user1@example.com"
+    name: "User One"
     token: "ghp_..."
     platform: "GitHub"
-  - user: "username2" 
+  - user: "username2"
+    email: "user2@example.com"
+    name: "User Two"
     token: "glpat-..."
     platform: "GitLab"
-active_account:  # Automatically managed
+active_account:  # Automatically managed by auth commands
   user: "username1"
+  email: "user1@example.com"
+  name: "User One"
   token: "ghp_..."
   platform: "GitHub"
 theme:
   type: "dark"
+version:
+  last_checked: "2024-10-27T10:30:00Z"
+  current_version: "0.3.0"
 ```
 
 ### Local Configuration
@@ -336,7 +380,30 @@ gt down  # Move to: feature/user-auth
 
 ### Multi-Account Management
 ```bash
-# Switch between different accounts
+# Add a new account
+gt account add
+# Follow the interactive prompts to enter:
+# - Username
+# - Email
+# - Full name
+# - Platform (GitHub/GitLab)
+# - API token
+
+# List all configured accounts
+gt account list
+# * username1 (GitHub) user1@example.com - User One
+#   username2 (GitLab) user2@example.com - User Two
+# (* indicates active account)
+
+# Edit an existing account
+gt account edit
+# Select account to edit, then update any field
+
+# Remove an account
+gt account remove
+# Select account to remove
+
+# Switch between accounts
 gt auth switch
 # Select from available accounts
 
@@ -348,7 +415,46 @@ gt auth status
 # All operations use the currently active account
 ```
 
-## 🚧 Planned Features
+### Shell Completion
+```bash
+# Generate completion script for your shell
+gt completion bash    # For Bash
+gt completion zsh     # For Zsh
+gt completion fish    # For Fish
+gt completion powershell  # For PowerShell
+
+# Install to default location (recommended)
+gt completion bash --install
+gt completion zsh --install
+gt completion fish --install
+
+# Install to custom directory
+gt completion zsh --install --dir ~/.my-completions
+
+# Generate without descriptions (faster, less verbose)
+gt completion bash --no-descriptions
+```
+
+**Supported shells:**
+- **Bash**: Installs to `~/.config/bash/completion/gt.bash`
+- **Zsh**: Installs to `~/.zsh/completions/_gt`
+- **Fish**: Installs to `~/.config/fish/completions/gt.fish`
+- **PowerShell**: Installs to `~/Documents/PowerShell/gt-completion.ps1`
+
+After installation, follow the instructions displayed to activate completions in your shell.
+
+### Stack Restacking
+```bash
+# Restack all child branches from current branch
+gt stack restack
+# or use the alias
+gt s rs
+
+# This will:
+# 1. Get all children of the current branch
+# 2. Rebase each child onto its parent
+# 3. Process children recursively to maintain branch hierarchy
+```
 
 ## 🚧 Planned Features
 
