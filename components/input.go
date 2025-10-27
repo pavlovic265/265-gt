@@ -134,7 +134,7 @@ func NewSigningKeyInput() textinput.Model {
 	return NewInput().
 		WithPlaceholder("Signing Key (GPG)").
 		WithCharLimit(100).
-		WithTextStyle(constants.Green).
+		WithWidth(60).
 		WithCursorStyle(constants.Yellow).
 		Build()
 }
