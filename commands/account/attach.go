@@ -107,7 +107,7 @@ func (atc attachCommand) resolvePaths(targetDir string) (absPath string, relPath
 
 func (atc attachCommand) writeToGlobalGitConfig(gitConfigPath, dirPath string) error {
 	// Prepare the gitdir pattern and local config path
-	gitdirPattern := fmt.Sprintf("gitdir:%s/**", dirPath)
+	gitdirPattern := fmt.Sprintf("gitdir:%s/**/*", dirPath)
 	localConfigPath := filepath.Join(dirPath, ".gitconfig")
 	sectionHeader := fmt.Sprintf("[includeIf \"%s\"]", gitdirPattern)
 	pathLine := fmt.Sprintf("\tpath = %s", localConfigPath)
@@ -135,8 +135,10 @@ func (atc attachCommand) writeToGlobalGitConfig(gitConfigPath, dirPath string) e
 		newContent.WriteString("\n")
 	}
 
+	newContent.WriteString("# Added by gt\n")
 	newContent.WriteString(sectionHeader + "\n")
 	newContent.WriteString(pathLine + "\n")
+	newContent.WriteString("# End of gt additions\n")
 
 	// Write the file
 	if err := os.WriteFile(gitConfigPath, []byte(newContent.String()), 0644); err != nil {
@@ -166,6 +168,7 @@ func (atc attachCommand) writeToLocalGitConfig(gitConfigPath string, account con
 	}
 
 	// Append [user] section
+	newContent.WriteString("# Added by gt\n")
 	newContent.WriteString("[user]\n")
 	if account.Name != "" {
 		newContent.WriteString(fmt.Sprintf("\tname = %s\n", account.Name))
@@ -176,6 +179,7 @@ func (atc attachCommand) writeToLocalGitConfig(gitConfigPath string, account con
 	if account.SigningKey != "" {
 		newContent.WriteString(fmt.Sprintf("\tsigningkey = %s\n", account.SigningKey))
 	}
+	newContent.WriteString("# End of gt additions\n")
 
 	// Write the file
 	if err := os.WriteFile(gitConfigPath, []byte(newContent.String()), 0644); err != nil {
