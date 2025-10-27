@@ -201,6 +201,7 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `account list` | `acc ls` | List all configured accounts | `gt account list` |
 | `account edit` | `acc edit` | Edit an existing account | `gt account edit` |
 | `account remove` | `acc rm` | Remove an account | `gt account remove` |
+| `account attach` | `acc at` | Attach active account to a directory | `gt account attach ~/work` |
 
 ### Utility Commands
 
@@ -410,6 +411,16 @@ gt auth switch
 # Check current auth status
 gt auth status
 
+# Attach active account to a directory
+gt account attach ~/work/projects
+# This will:
+# 1. Add an includeIf section to ~/.gitconfig
+# 2. Create a .gitconfig in the target directory with active account credentials
+# 3. All git repos under that directory will use the attached account
+
+# Attach to current directory
+gt account attach .
+
 # The tool automatically manages an active account
 # When you switch accounts, the active account is updated
 # All operations use the currently active account
@@ -458,13 +469,13 @@ gt s rs
 
 ## 🚧 Planned Features
 
-- [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.  
-- [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.  
-- [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.  
-- [ ] **Multi-Platform Git Integration** — Support for additional Git platforms beyond GitHub (e.g., GitLab, Bitbucket).  
-- [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.  
-- [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.  
-- [ ] **Git Config Profiles** — Dynamic `.gitconfig` management tied to SSH hosts or environments (e.g., personal vs. work).  
+- [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
+- [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
+- [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
+- [ ] **Multi-Platform Git Integration** — Support for additional Git platforms beyond GitHub (e.g., GitLab, Bitbucket).
+- [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.
+- [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
+- [x] **Git Config Profiles** — Dynamic `.gitconfig` management tied to directories using `includeIf` (implemented via `gt account attach`).
 - [ ] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
 
 
