@@ -36,11 +36,14 @@ var rootCmd = &cobra.Command{
 		client.InitCliClient(exe, configManager, gitHelper)
 
 		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
+		isAccount := cmd.Name() == "account" || (cmd.Parent() != nil && cmd.Parent().Name() == "account")
+		isConfig := cmd.Name() == "config" || (cmd.Parent() != nil && cmd.Parent().Name() == "config")
 		isVersion := cmd.Name() == "version"
 		isCompletion := cmd.Name() == "completion"
 
 		loadLocalConfig := false
-		if isVersion || isCompletion || isAuth {
+		shouldRunCommandsOutsideOfGitRepo := isVersion || isCompletion || isAuth || isAccount || isConfig
+		if shouldRunCommandsOutsideOfGitRepo {
 			configManager.InitConfig(loadLocalConfig) // Don't load local config for these commands
 			return
 		}
