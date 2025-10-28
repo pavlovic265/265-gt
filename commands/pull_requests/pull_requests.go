@@ -34,6 +34,7 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 		Short:   "commands for pull request",
 		Aliases: []string{"pr"},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			svc.configManager.InitGlobalConfig()
 			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
 				fmt.Printf("%v\n", err)
 				os.Exit(1)

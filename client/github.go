@@ -169,10 +169,12 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 }
 
 type PullRequest struct {
-	Number int    `json:"number"`
-	Title  string `json:"title"`
-	URL    string `json:"url"`
-	Author string `json:"author"`
+	Number      int    `json:"number"`
+	Title       string `json:"title"`
+	URL         string `json:"url"`
+	Author      string `json:"author"`
+	Mergeable   string `json:"mergeable"`
+	HeadRefName string `json:"headRefName"`
 }
 
 func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
@@ -181,17 +183,19 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 		return nil, err
 	}
 
-	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author"}
+	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author,mergeable,headRefName"}
 	out, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
 	}
 
 	var rawPRs []struct {
-		Number int    `json:"number"`
-		Title  string `json:"title"`
-		URL    string `json:"url"`
-		Author struct {
+		Number      int    `json:"number"`
+		Title       string `json:"title"`
+		URL         string `json:"url"`
+		Mergeable   string `json:"mergeable"`
+		HeadRefName string `json:"headRefName"`
+		Author      struct {
 			Login string `json:"login"`
 		} `json:"author"`
 	}
@@ -203,13 +207,33 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	var prs []PullRequest
 	for _, pr := range rawPRs {
 		prs = append(prs, PullRequest{
-			Number: pr.Number,
-			Title:  pr.Title,
-			URL:    pr.URL,
-			Author: pr.Author.Login,
+			Number:      pr.Number,
+			Title:       pr.Title,
+			URL:         pr.URL,
+			Author:      pr.Author.Login,
+			Mergeable:   pr.Mergeable,
+			HeadRefName: pr.HeadRefName,
 		})
 	}
 	return prs, nil
+}
+
+func (svc *gitHubCli) MergePullRequest(prNumber int) error {
+	exeArgs := []string{"pr", "merge", fmt.Sprintf("%d", prNumber)}
+	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc *gitHubCli) UpdatePullRequestBranch(prNumber int) error {
+	exeArgs := []string{"pr", "comment", fmt.Sprintf("%d", prNumber), "--body", "@dependabot rebase"}
+	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (svc gitHubCli) displayAuthStatus(output string) {

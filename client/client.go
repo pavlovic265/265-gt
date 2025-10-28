@@ -13,6 +13,8 @@ type CliClient interface {
 	AuthLogout(user string) error
 	CreatePullRequest(args []string) error
 	ListPullRequests(args []string) ([]PullRequest, error)
+	MergePullRequest(prNumber int) error
+	UpdatePullRequestBranch(prNumber int) error
 }
 
 var Client map[constants.Platform]CliClient

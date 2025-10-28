@@ -57,7 +57,13 @@ func (svc listCommand) selectPullRequest(
 	var strPrs []string
 	var urls []string
 	for _, pr := range prs {
-		strPrs = append(strPrs, fmt.Sprintf("%d:%s", pr.Number, pr.Title))
+		mergeableStatus := ""
+		if pr.Mergeable == "MERGEABLE" {
+			mergeableStatus = " ✓"
+		} else if pr.Mergeable == "CONFLICTING" {
+			mergeableStatus = " ✗"
+		}
+		strPrs = append(strPrs, fmt.Sprintf("%d:%s%s", pr.Number, pr.Title, mergeableStatus))
 		urls = append(urls, pr.URL)
 	}
 
@@ -68,12 +74,14 @@ func (svc listCommand) selectPullRequest(
 	}
 
 	initialModel := components.ListModel{
-		AllChoices: strPrs,
-		Choices:    strPrs,
-		Cursor:     initialCursor,
-		Query:      "",
-		YankURL:    currentURL,
-		URLs:       urls,
+		AllChoices:   strPrs,
+		Choices:      strPrs,
+		Cursor:       initialCursor,
+		Query:        "",
+		YankURL:      currentURL,
+		URLs:         urls,
+		EnableMerge:  true,
+		EnableUpdate: true,
 	}
 
 	program := tea.NewProgram(initialModel)
@@ -89,6 +97,26 @@ func (svc listCommand) selectPullRequest(
 				prNumber, err := strconv.Atoi(splited[0])
 				if err != nil {
 					return log.ErrorMsg("Failed to get PR number ID")
+				}
+
+				if m.MergeAction {
+					account := svc.configManager.GetActiveAccount()
+					err := client.Client[account.Platform].MergePullRequest(prNumber)
+					if err != nil {
+						return log.Error("Failed to merge pull request", err)
+					}
+					log.Success(fmt.Sprintf("Successfully merged PR #%d", prNumber))
+					return nil
+				}
+
+				if m.UpdateAction {
+					account := svc.configManager.GetActiveAccount()
+					err := client.Client[account.Platform].UpdatePullRequestBranch(prNumber)
+					if err != nil {
+						return log.Error("Failed to update pull request branch", err)
+					}
+					log.Success(fmt.Sprintf("Successfully updated PR #%d branch", prNumber))
+					return nil
 				}
 
 				for _, pr := range prs {

@@ -11,14 +11,18 @@ import (
 )
 
 type ListModel struct {
-	AllChoices []string
-	Choices    []string
-	Cursor     int
-	Query      string
-	Selected   string
-	YankURL    string
-	URLs       []string
-	Yanked     bool
+	AllChoices   []string
+	Choices      []string
+	Cursor       int
+	Query        string
+	Selected     string
+	YankURL      string
+	URLs         []string
+	Yanked       bool
+	MergeAction  bool
+	UpdateAction bool
+	EnableMerge  bool
+	EnableUpdate bool
 }
 
 // Styling definitions
@@ -89,6 +93,18 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.yankToClipboard(m.YankURL)
 			m.Yanked = true
 			return m, tea.Quit
+		case tea.KeyCtrlM.String():
+			if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+				m.Selected = m.Choices[m.Cursor]
+				m.MergeAction = true
+				return m, tea.Quit
+			}
+		case tea.KeyCtrlU.String():
+			if m.EnableUpdate && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+				m.Selected = m.Choices[m.Cursor]
+				m.UpdateAction = true
+				return m, tea.Quit
+			}
 		case tea.KeyBackspace.String():
 			if len(m.Query) > 0 {
 				m.Query = m.Query[:len(m.Query)-1]
@@ -146,6 +162,20 @@ func (m ListModel) View() string {
 		content.WriteString(footerStyle.Render(", "))
 		content.WriteString(keyStyle.Render("CTRL+Y"))
 		content.WriteString(footerStyle.Render(" to yank URL"))
+	}
+
+	// Show merge option if enabled
+	if m.EnableMerge && len(m.Choices) > 0 {
+		content.WriteString(footerStyle.Render(", "))
+		content.WriteString(keyStyle.Render("CTRL+M"))
+		content.WriteString(footerStyle.Render(" to merge"))
+	}
+
+	// Show update option if enabled
+	if m.EnableUpdate && len(m.Choices) > 0 {
+		content.WriteString(footerStyle.Render(", "))
+		content.WriteString(keyStyle.Render("CTRL+U"))
+		content.WriteString(footerStyle.Render(" to update"))
 	}
 
 	return content.String()

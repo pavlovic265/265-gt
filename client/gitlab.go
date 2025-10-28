@@ -35,3 +35,11 @@ func (svc gitLabCli) CreatePullRequest(args []string) error {
 func (svc gitLabCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	return nil, nil
 }
+
+func (svc gitLabCli) MergePullRequest(prNumber int) error {
+	return nil
+}
+
+func (svc gitLabCli) UpdatePullRequestBranch(prNumber int) error {
+	return nil
+}
