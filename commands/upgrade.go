@@ -32,6 +32,9 @@ func (svc upgradeCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "upgrade",
 		Short: "upgrade of current build",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			svc.configManager.InitGlobalConfig()
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			version, isLatest, err := svc.isLatestVersion()
 			if err != nil {

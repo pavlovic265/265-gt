@@ -13,16 +13,22 @@ import (
 )
 
 // Test helper to create an unstage command with mock executor
-func createUnstageCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createUnstageCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor,
+	*mocks.MockGitHelper,
+	*gomock.Controller,
+	*cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	unstageCmd := commands.NewUnstageCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	unstageCmd := commands.NewUnstageCommand(mockExecutor, mockGitHelper)
 	cmd := unstageCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestUnstageCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createUnstageCommandWithMock(t)
+	_, _, ctrl, cmd := createUnstageCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -33,7 +39,7 @@ func TestUnstageCommand_Command(t *testing.T) {
 }
 
 func TestUnstageCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUnstageCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createUnstageCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git restore --staged with no arguments
@@ -57,7 +63,7 @@ func TestUnstageCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestUnstageCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUnstageCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createUnstageCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git restore --staged with arguments
@@ -81,7 +87,7 @@ func TestUnstageCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestUnstageCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createUnstageCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createUnstageCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git restore failed")
@@ -110,9 +116,10 @@ func TestNewUnstageCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
 	// Test that NewUnstageCommand creates a command with the correct executor
-	unstageCmd := commands.NewUnstageCommand(mockExecutor)
+	unstageCmd := commands.NewUnstageCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := unstageCmd.Command()

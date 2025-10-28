@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -27,6 +29,12 @@ func (svc createCommand) Command() *cobra.Command {
 		Use:     "create",
 		Aliases: []string{"c"},
 		Short:   "create branch",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return log.ErrorMsg("Branch name is required")

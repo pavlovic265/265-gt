@@ -14,16 +14,22 @@ import (
 )
 
 // Test helper to create a status command with mock executor
-func createStatusCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createStatusCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor,
+	*mocks.MockGitHelper,
+	*gomock.Controller,
+	*cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	statusCmd := commands.NewStatusCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	statusCmd := commands.NewStatusCommand(mockExecutor, mockGitHelper)
 	cmd := statusCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestStatusCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createStatusCommandWithMock(t)
+	_, _, ctrl, cmd := createStatusCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -35,7 +41,7 @@ func TestStatusCommand_Command(t *testing.T) {
 }
 
 func TestStatusCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createStatusCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createStatusCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git status with no arguments
@@ -59,7 +65,7 @@ func TestStatusCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestStatusCommand_RunE_WithArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createStatusCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createStatusCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git status with arguments
@@ -83,7 +89,7 @@ func TestStatusCommand_RunE_WithArgs(t *testing.T) {
 }
 
 func TestStatusCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createStatusCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createStatusCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git status failed")
@@ -111,9 +117,10 @@ func TestNewStatusCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
 	// Test that NewStatusCommand creates a command with the correct executor
-	statusCmd := commands.NewStatusCommand(mockExecutor)
+	statusCmd := commands.NewStatusCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := statusCmd.Command()

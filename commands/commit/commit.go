@@ -1,21 +1,27 @@
 package commit
 
 import (
+	"os"
+
 	"github.com/pavlovic265/265-gt/executor"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
 type commitCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewCommitCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) commitCommand {
 	return commitCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -26,6 +32,12 @@ func (svc commitCommand) Command() *cobra.Command {
 		Use:     "commit",
 		Aliases: []string{"cm"},
 		Short:   "create commit",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if empty {
 				return svc.handleEmptyCommit()

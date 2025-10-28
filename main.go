@@ -26,6 +26,7 @@ var (
 	exe           = executor.NewExe()
 	configManager = config.NewDefaultConfigManager(exe)
 	gitHelper     = helpers.NewGitHelper(exe, configManager)
+	_             = client.InitCliClient(exe, configManager, gitHelper)
 )
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
@@ -33,30 +34,6 @@ const UNKNOWN_COMMAND_ERROR = "unknown command"
 var rootCmd = &cobra.Command{
 	Use: "gt",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		client.InitCliClient(exe, configManager, gitHelper)
-
-		isAuth := cmd.Parent() != nil && cmd.Parent().Name() == "auth"
-		isAccount := cmd.Name() == "account" || (cmd.Parent() != nil && cmd.Parent().Name() == "account")
-		isConfig := cmd.Name() == "config" || (cmd.Parent() != nil && cmd.Parent().Name() == "config")
-		isVersion := cmd.Name() == "version"
-		isCompletion := cmd.Name() == "completion"
-
-		loadLocalConfig := false
-		shouldRunCommandsOutsideOfGitRepo := isVersion || isCompletion || isAuth || isAccount || isConfig
-		if shouldRunCommandsOutsideOfGitRepo {
-			configManager.InitConfig(loadLocalConfig) // Don't load local config for these commands
-			return
-		}
-
-		// Check if we're in a git repository
-		if err := gitHelper.EnsureGitRepository(); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		loadLocalConfig = true
-
-		configManager.InitConfig(loadLocalConfig) // Load local config for these commands
-
 		gitHelper.CheckGTVersion()
 	},
 	// Override the default error handling to pass unknown commands to git
@@ -82,9 +59,9 @@ func main() {
 	// Load .env file if it exists
 	_ = godotenv.Load() // Ignore .env loading errors as the file is optional
 
-	rootCmd.AddCommand(commands.NewAddCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewStatusCommand(exe).Command())
-	rootCmd.AddCommand(commands.NewSwitchCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewAddCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewStatusCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewSwitchCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewPushCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewPullCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewCreateCommand(exe, gitHelper).Command())
@@ -93,18 +70,18 @@ func main() {
 	rootCmd.AddCommand(commands.NewMoveCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewDeleteCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewCleanCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewVersionCommand(exe, configManager).Command())
 	rootCmd.AddCommand(commands.NewUpgradeCommand(exe, configManager).Command())
 	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewUnstageCommand(exe).Command())
+	rootCmd.AddCommand(commands.NewUnstageCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(stack.NewStackCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commit.NewCommitCommand(exe).Command())
-	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager).Command())
+	rootCmd.AddCommand(commit.NewCommitCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager, gitHelper).Command())
+
+	rootCmd.AddCommand(commands.NewVersionCommand(exe, configManager).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())
 	rootCmd.AddCommand(account.NewAccountCommand(exe, configManager).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
-
 	rootCmd.AddCommand(commands.NewCompletionCommand().Command())
 
 	// Execute the command and handle unknown commands

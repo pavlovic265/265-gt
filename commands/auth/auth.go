@@ -25,6 +25,9 @@ func (svc authCommand) Command() *cobra.Command {
 	authCmd := &cobra.Command{
 		Use:   "auth",
 		Short: "auth user",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			svc.configManager.InitGlobalConfig()
+		},
 	}
 	authCmd.AddCommand(NewStatusCommand(svc.exe, svc.configManager).Command())
 	authCmd.AddCommand(NewLoginCommand(svc.exe, svc.configManager).Command())

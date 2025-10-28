@@ -12,15 +12,21 @@ import (
 )
 
 // Test helper to create a commit command with mock executor
-func createCommitCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, commitCommand) {
+func createCommitCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor,
+	*mocks.MockGitHelper,
+	*gomock.Controller,
+	commitCommand,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	commitCmd := NewCommitCommand(mockExecutor)
-	return mockExecutor, ctrl, commitCmd
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	commitCmd := NewCommitCommand(mockExecutor, mockGitHelper)
+	return mockExecutor, mockGitHelper, ctrl, commitCmd
 }
 
 func TestCommitCommand_Command(t *testing.T) {
-	_, ctrl, commitCmd := createCommitCommandWithMock(t)
+	_, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
@@ -32,7 +38,7 @@ func TestCommitCommand_Command(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_WithMessage(t *testing.T) {
-	mockExecutor, ctrl, commitCmd := createCommitCommandWithMock(t)
+	mockExecutor, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
@@ -59,7 +65,7 @@ func TestCommitCommand_RunE_WithMessage(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_WithEmptyFlag(t *testing.T) {
-	mockExecutor, ctrl, commitCmd := createCommitCommandWithMock(t)
+	mockExecutor, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
@@ -99,7 +105,7 @@ func TestCommitCommand_RunE_WithEmptyFlag(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_WithEmptyFlag_NoMessage(t *testing.T) {
-	mockExecutor, ctrl, commitCmd := createCommitCommandWithMock(t)
+	mockExecutor, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
@@ -144,7 +150,7 @@ func TestCommitCommand_RunE_NoMessage(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	commitCmd := NewCommitCommand(nil) // Pass nil since we won't use it
+	commitCmd := NewCommitCommand(nil, nil) // Pass nil since we won't use it
 	cmd := commitCmd.Command()
 
 	// Execute the command without arguments - should return an error
@@ -154,7 +160,7 @@ func TestCommitCommand_RunE_NoMessage(t *testing.T) {
 }
 
 func TestCommitCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, commitCmd := createCommitCommandWithMock(t)
+	mockExecutor, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()
@@ -184,7 +190,7 @@ func TestCommitCommand_RunE_ExecutorError(t *testing.T) {
 }
 
 func TestCommitCommand_EmptyFlag(t *testing.T) {
-	_, ctrl, commitCmd := createCommitCommandWithMock(t)
+	_, _, ctrl, commitCmd := createCommitCommandWithMock(t)
 	defer ctrl.Finish()
 
 	cmd := commitCmd.Command()

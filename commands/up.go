@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/executor"
@@ -28,6 +30,12 @@ func (svc upCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "up",
 		Short: "move to brunch up in stack",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {

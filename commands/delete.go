@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,6 +33,12 @@ func (svc deleteCommand) Command() *cobra.Command {
 		Aliases:            []string{"dl"},
 		Short:              "delete branch",
 		DisableFlagParsing: true,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {

@@ -28,6 +28,9 @@ func (svc versionCommand) Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "version of current build",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			svc.configManager.InitGlobalConfig()
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			latest, _ := cmd.Flags().GetBool("latest")
 

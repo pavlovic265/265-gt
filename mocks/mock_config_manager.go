@@ -159,6 +159,30 @@ func (mr *MockConfigManagerMockRecorder) InitConfig(loadLocal interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitConfig", reflect.TypeOf((*MockConfigManager)(nil).InitConfig), loadLocal)
 }
 
+// InitGlobalConfig mocks base method.
+func (m *MockConfigManager) InitGlobalConfig() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "InitGlobalConfig")
+}
+
+// InitGlobalConfig indicates an expected call of InitGlobalConfig.
+func (mr *MockConfigManagerMockRecorder) InitGlobalConfig() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitGlobalConfig", reflect.TypeOf((*MockConfigManager)(nil).InitGlobalConfig))
+}
+
+// InitLocalConfig mocks base method.
+func (m *MockConfigManager) InitLocalConfig() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "InitLocalConfig")
+}
+
+// InitLocalConfig indicates an expected call of InitLocalConfig.
+func (mr *MockConfigManagerMockRecorder) InitLocalConfig() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitLocalConfig", reflect.TypeOf((*MockConfigManager)(nil).InitLocalConfig))
+}
+
 // LoadGlobalConfig mocks base method.
 func (m *MockConfigManager) LoadGlobalConfig() (*config.GlobalConfigStruct, error) {
 	m.ctrl.T.Helper()

@@ -13,16 +13,22 @@ import (
 )
 
 // Test helper to create a switch command with mock executor
-func createSwitchCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createSwitchCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor,
+	*mocks.MockGitHelper,
+	*gomock.Controller,
+	*cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	switchCmd := commands.NewSwitchCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	switchCmd := commands.NewSwitchCommand(mockExecutor, mockGitHelper)
 	cmd := switchCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestSwitchCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createSwitchCommandWithMock(t)
+	_, _, ctrl, cmd := createSwitchCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -32,7 +38,7 @@ func TestSwitchCommand_Command(t *testing.T) {
 }
 
 func TestSwitchCommand_RunE_Success(t *testing.T) {
-	mockExecutor, ctrl, cmd := createSwitchCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createSwitchCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git checkout -
@@ -56,7 +62,7 @@ func TestSwitchCommand_RunE_Success(t *testing.T) {
 }
 
 func TestSwitchCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createSwitchCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createSwitchCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git checkout failed")
@@ -85,9 +91,10 @@ func TestNewSwitchCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
 	// Test that NewSwitchCommand creates a command with the correct executor
-	switchCmd := commands.NewSwitchCommand(mockExecutor)
+	switchCmd := commands.NewSwitchCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := switchCmd.Command()

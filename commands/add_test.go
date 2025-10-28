@@ -13,16 +13,22 @@ import (
 )
 
 // Test helper to create an add command with mock executor
-func createAddCommandWithMock(t *testing.T) (*mocks.MockExecutor, *gomock.Controller, *cobra.Command) {
+func createAddCommandWithMock(t *testing.T) (
+	*mocks.MockExecutor,
+	*mocks.MockGitHelper,
+	*gomock.Controller,
+	*cobra.Command,
+) {
 	ctrl := gomock.NewController(t)
 	mockExecutor := mocks.NewMockExecutor(ctrl)
-	addCmd := commands.NewAddCommand(mockExecutor)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	addCmd := commands.NewAddCommand(mockExecutor, mockGitHelper)
 	cmd := addCmd.Command()
-	return mockExecutor, ctrl, cmd
+	return mockExecutor, mockGitHelper, ctrl, cmd
 }
 
 func TestAddCommand_Command(t *testing.T) {
-	_, ctrl, cmd := createAddCommandWithMock(t)
+	_, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that the command is properly configured
@@ -33,7 +39,7 @@ func TestAddCommand_Command(t *testing.T) {
 }
 
 func TestAddCommand_RunE_NoArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git add with no arguments
@@ -57,7 +63,7 @@ func TestAddCommand_RunE_NoArgs(t *testing.T) {
 }
 
 func TestAddCommand_RunE_WithSingleFile(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git add with single file
@@ -81,7 +87,7 @@ func TestAddCommand_RunE_WithSingleFile(t *testing.T) {
 }
 
 func TestAddCommand_RunE_WithMultipleFiles(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git add with multiple files
@@ -105,7 +111,7 @@ func TestAddCommand_RunE_WithMultipleFiles(t *testing.T) {
 }
 
 func TestAddCommand_RunE_WithGitOptions(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git add with options
@@ -129,7 +135,7 @@ func TestAddCommand_RunE_WithGitOptions(t *testing.T) {
 }
 
 func TestAddCommand_RunE_WithMixedArgs(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Set up expectations for git add with mixed arguments
@@ -153,7 +159,7 @@ func TestAddCommand_RunE_WithMixedArgs(t *testing.T) {
 }
 
 func TestAddCommand_RunE_ExecutorError(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	expectedError := errors.New("git add failed")
@@ -178,7 +184,7 @@ func TestAddCommand_RunE_ExecutorError(t *testing.T) {
 }
 
 func TestAddCommand_RunE_ArgsPassing(t *testing.T) {
-	mockExecutor, ctrl, cmd := createAddCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that all arguments are properly passed through
@@ -235,7 +241,7 @@ func TestAddCommand_RunE_ArgsPassing(t *testing.T) {
 }
 
 func TestAddCommand_DisableFlagParsing(t *testing.T) {
-	_, ctrl, cmd := createAddCommandWithMock(t)
+	_, _, ctrl, cmd := createAddCommandWithMock(t)
 	defer ctrl.Finish()
 
 	// Test that DisableFlagParsing is set to true
@@ -248,9 +254,10 @@ func TestNewAddCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
 	// Test that NewAddCommand creates a command with the correct executor
-	addCmd := commands.NewAddCommand(mockExecutor)
+	addCmd := commands.NewAddCommand(mockExecutor, mockGitHelper)
 
 	// Verify the command can be created
 	cmd := addCmd.Command()

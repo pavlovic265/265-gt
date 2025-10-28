@@ -17,9 +17,10 @@ type CliClient interface {
 
 var Client map[constants.Platform]CliClient
 
-func InitCliClient(exe executor.Executor, configManager config.ConfigManager, gitHelper helpers.GitHelper) {
+func InitCliClient(exe executor.Executor, configManager config.ConfigManager, gitHelper helpers.GitHelper) error {
 	Client = map[constants.Platform]CliClient{
 		constants.GitHubPlatform: NewGitHubCli(exe, configManager, gitHelper),
 		constants.GitLabPlatform: NewGitLabCli(exe, configManager, gitHelper),
 	}
+	return nil
 }

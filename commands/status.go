@@ -2,23 +2,28 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/spf13/cobra"
 )
 
 type statusCommand struct {
-	exe executor.Executor
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewStatusCommand(
 	exe executor.Executor,
+	gitHelper helpers.GitHelper,
 ) statusCommand {
 	return statusCommand{
-		exe: exe,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
@@ -29,6 +34,12 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "git status",
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			exeArgs := append([]string{"status"}, args...)
 

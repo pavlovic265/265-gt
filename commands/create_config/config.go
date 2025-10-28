@@ -26,6 +26,9 @@ func (svc configCommand) Command() *cobra.Command {
 		Use:     "config",
 		Aliases: []string{"conf"},
 		Short:   "create config",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			svc.configManager.InitGlobalConfig()
+		},
 	}
 	configCmd.AddCommand(NewGlobalCommand(svc.exe, svc.configManager).Command())
 	configCmd.AddCommand(NewLocalCommand(svc.exe, svc.configManager).Command())

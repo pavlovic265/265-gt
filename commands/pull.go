@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -27,6 +29,12 @@ func (svc pullCommand) Command() *cobra.Command {
 		Use:     "pull",
 		Aliases: []string{"pl"},
 		Short:   "pull branch",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {

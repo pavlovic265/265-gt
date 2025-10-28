@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -26,6 +28,12 @@ func (svc downCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "down",
 		Short: "move to brunch down in stack",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				_ = log.Error("Not in a git repository", err)
+				os.Exit(1)
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {

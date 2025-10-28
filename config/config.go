@@ -52,6 +52,8 @@ type DefaultConfigManager struct {
 type ConfigManager interface {
 	// Initialization
 	InitConfig(loadLocal bool)
+	InitLocalConfig()
+	InitGlobalConfig()
 
 	// Global config operations
 	GetGlobalConfigPath() (string, error)
@@ -109,4 +111,23 @@ func (d *DefaultConfigManager) InitConfig(loadLocal bool) {
 			localConfig = LocalConfigStruct{}
 		}
 	}
+}
+
+func (d *DefaultConfigManager) InitLocalConfig() {
+	lc, err := d.loadLocalConfig()
+	if err != nil {
+		fmt.Printf("Warning: Failed to load local config: %v\n", err)
+		lc = LocalConfigStruct{}
+	}
+	localConfig = lc
+}
+
+func (d *DefaultConfigManager) InitGlobalConfig() {
+	gc, err := d.loadGlobalConfig()
+	if err != nil {
+		fmt.Printf("Warning: Failed to load global config: %v\n", err)
+		// Use empty config as fallback, but don't overwrite existing config
+		gc = GlobalConfigStruct{}
+	}
+	globalConfig = gc
 }
