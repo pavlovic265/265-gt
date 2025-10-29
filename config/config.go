@@ -96,7 +96,7 @@ func NewDefaultConfigManager(exe executor.Executor) *DefaultConfigManager {
 func (d *DefaultConfigManager) InitLocalConfig() {
 	lc, err := d.loadLocalConfig()
 	if err != nil {
-		log.Error("Failed to load local config: %v\n", err)
+		_ = log.Error("Failed to load local config: %v\n", err)
 		return
 	}
 	localConfig = lc
@@ -105,7 +105,7 @@ func (d *DefaultConfigManager) InitLocalConfig() {
 func (d *DefaultConfigManager) InitGlobalConfig() {
 	gc, err := d.loadGlobalConfig()
 	if err != nil {
-		log.Error("Failed to load global config: %v\n", err)
+		_ = log.Error("Failed to load global config: %v\n", err)
 		return
 	}
 	globalConfig = gc
