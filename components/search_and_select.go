@@ -60,6 +60,8 @@ func (m ListModel) Init() tea.Cmd {
 func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		// fmt.Printf("DBG key: type=%v str=%q runes=%q alt=%v\n", msg.Type, msg.String(), string(msg.Runes), msg.Alt)
+
 		switch msg.String() {
 		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			return m, tea.Quit
@@ -93,7 +95,7 @@ func (m ListModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.yankToClipboard(m.YankURL)
 			m.Yanked = true
 			return m, tea.Quit
-		case tea.KeyCtrlM.String():
+		case tea.KeyCtrlO.String():
 			if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
 				m.Selected = m.Choices[m.Cursor]
 				m.MergeAction = true
@@ -167,7 +169,7 @@ func (m ListModel) View() string {
 	// Show merge option if enabled
 	if m.EnableMerge && len(m.Choices) > 0 {
 		content.WriteString(footerStyle.Render(", "))
-		content.WriteString(keyStyle.Render("CTRL+M"))
+		content.WriteString(keyStyle.Render("CTRL+O"))
 		content.WriteString(footerStyle.Render(" to merge"))
 	}
 

@@ -116,7 +116,13 @@ func (svc listCommand) selectPullRequest(
 						return log.Error("Failed to update pull request branch", err)
 					}
 					log.Success(fmt.Sprintf("Successfully updated PR #%d branch", prNumber))
-					return nil
+
+					// Refresh the PR list
+					updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+					if err != nil {
+						return log.Error("Failed to refresh pull requests", err)
+					}
+					return svc.selectPullRequest(updatedPrs)
 				}
 
 				for _, pr := range prs {
