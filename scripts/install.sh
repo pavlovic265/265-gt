@@ -5,15 +5,21 @@ REPO="github.com/pavlovic265/265-gt"
 BINARY="gt"
 GITHUB_API_URL="https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 
-# Fetch the latest GitHub release version using curl
-LATEST_VERSION=$(curl -s $GITHUB_API_URL | grep '"tag_name"' | awk -F ': "' '{print $2}' | tr -d '",')
-
-# Fallback if no version is found
-if [ -z "$LATEST_VERSION" ]; then
-  echo "Warning: Could not fetch latest version, defaulting to @latest"
-  VERSION="@latest"
+# Check if version/tag is provided as argument
+if [ -n "$1" ]; then
+  VERSION="@$1"
+  echo "Installing specific version: $VERSION"
 else
-  VERSION="@$LATEST_VERSION"
+  # Fetch the latest GitHub release version using curl
+  LATEST_VERSION=$(curl -s $GITHUB_API_URL | grep '"tag_name"' | awk -F ': "' '{print $2}' | tr -d '",')
+
+  # Fallback if no version is found
+  if [ -z "$LATEST_VERSION" ]; then
+    echo "Warning: Could not fetch latest version, defaulting to @latest"
+    VERSION="@latest"
+  else
+    VERSION="@$LATEST_VERSION"
+  fi
 fi
 
 # Install the binary
@@ -31,17 +37,17 @@ fi
 # Add to PATH if not already there
 if [[ ":$PATH:" != *":$USER_BIN_DIR:"* ]]; then
   echo "Adding $USER_BIN_DIR to PATH..."
-  
+
   # Add to common shell config files
   for config_file in ~/.bashrc ~/.zshrc ~/.profile ~/.bash_profile; do
     if [ -f "$config_file" ]; then
       if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$config_file"; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$config_file"
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >>"$config_file"
         echo "Added to $config_file"
       fi
     fi
   done
-  
+
   echo "Please restart your shell or run: source ~/.bashrc (or ~/.zshrc)"
 fi
 
