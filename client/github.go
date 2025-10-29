@@ -175,6 +175,7 @@ type PullRequest struct {
 	Author      string `json:"author"`
 	Mergeable   string `json:"mergeable"`
 	HeadRefName string `json:"headRefName"`
+	StatusState string `json:"statusState"`
 }
 
 func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
@@ -183,7 +184,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 		return nil, err
 	}
 
-	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author,mergeable,headRefName"}
+	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author,mergeable,headRefName,statusCheckRollup"}
 	out, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
@@ -198,6 +199,9 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 		Author      struct {
 			Login string `json:"login"`
 		} `json:"author"`
+		StatusCheckRollup []struct {
+			State string `json:"state"`
+		} `json:"statusCheckRollup"`
 	}
 	err = json.Unmarshal(out.Bytes(), &rawPRs)
 	if err != nil {
@@ -206,6 +210,32 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 
 	var prs []PullRequest
 	for _, pr := range rawPRs {
+		statusState := ""
+		if len(pr.StatusCheckRollup) > 0 {
+			hasFailure := false
+			hasPending := false
+			hasSuccess := false
+
+			for _, check := range pr.StatusCheckRollup {
+				switch check.State {
+				case "FAILURE", "ERROR":
+					hasFailure = true
+				case "PENDING", "IN_PROGRESS":
+					hasPending = true
+				case "SUCCESS":
+					hasSuccess = true
+				}
+			}
+
+			if hasFailure {
+				statusState = "FAILURE"
+			} else if hasPending {
+				statusState = "PENDING"
+			} else if hasSuccess {
+				statusState = "SUCCESS"
+			}
+		}
+
 		prs = append(prs, PullRequest{
 			Number:      pr.Number,
 			Title:       pr.Title,
@@ -213,6 +243,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Author:      pr.Author.Login,
 			Mergeable:   pr.Mergeable,
 			HeadRefName: pr.HeadRefName,
+			StatusState: statusState,
 		})
 	}
 	return prs, nil

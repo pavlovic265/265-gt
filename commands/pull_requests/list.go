@@ -57,17 +57,30 @@ func (svc listCommand) selectPullRequest(
 	var strPrs []string
 	var urls []string
 	for _, pr := range prs {
-		mergeableStatus := ""
-		if pr.Mergeable == "MERGEABLE" {
+		ciStatus := ""
+		switch pr.StatusState {
+		case "SUCCESS":
+			ciStatus = " P"
+		case "FAILURE", "ERROR":
+			ciStatus = " F"
+		case "PENDING", "IN_PROGRESS":
+			ciStatus = " R"
+		}
+
+		// Mergeable status indicator
+		mergeableStatus := " -"
+		switch pr.Mergeable {
+		case "MERGEABLE":
 			mergeableStatus = " ✓"
-		} else if pr.Mergeable == "CONFLICTING" {
+		case "CONFLICTING":
 			mergeableStatus = " ✗"
 		}
-		strPrs = append(strPrs, fmt.Sprintf("%d:%s%s", pr.Number, pr.Title, mergeableStatus))
+
+		strPrs = append(strPrs, fmt.Sprintf("%s %d: %s - %s", mergeableStatus, pr.Number, pr.Title, ciStatus))
 		urls = append(urls, pr.URL)
 	}
 
-	var initialCursor = 0
+	initialCursor := 0
 	var currentURL string
 	if len(prs) > 0 {
 		currentURL = prs[initialCursor].URL
