@@ -30,7 +30,7 @@ git commit -m "Add test file 2"
 git push -u origin test-pr-2
 gh pr create --title "Test PR 2: Add test file 2" --body "This is a test PR to verify merge functionality" --base "$CURRENT_BRANCH"
 
-# Create PR 3
+# Create PR 3 (this one will need an update)
 echo "Creating PR 3..."
 git checkout "$CURRENT_BRANCH"
 git checkout -b test-pr-3
@@ -40,6 +40,15 @@ git add test-file-3.txt
 git commit -m "Add test file 3"
 git push -u origin test-pr-3
 gh pr create --title "Test PR 3: Add test file 3" --body "This is a test PR to verify update functionality" --base "$CURRENT_BRANCH"
+
+# Make a commit to base branch so PR 3 will be out of date
+echo "Making PR 3 out of date..."
+git checkout "$CURRENT_BRANCH"
+echo "# Base change" > base-change.txt
+echo "This commit makes PR 3 out of date" >> base-change.txt
+git add base-change.txt
+git commit -m "Add base change to make PR 3 out of date"
+git push origin "$CURRENT_BRANCH"
 
 # Create PR 4
 echo "Creating PR 4..."
