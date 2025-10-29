@@ -1,10 +1,9 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
+	"github.com/rs/zerolog/log"
 )
 
 // ============================================================================
@@ -51,7 +50,6 @@ type DefaultConfigManager struct {
 // ConfigManager interface defines the contract for config operations
 type ConfigManager interface {
 	// Initialization
-	InitConfig(loadLocal bool)
 	InitLocalConfig()
 	InitGlobalConfig()
 
@@ -95,29 +93,11 @@ func NewDefaultConfigManager(exe executor.Executor) *DefaultConfigManager {
 	return &DefaultConfigManager{exe: exe}
 }
 
-func (d *DefaultConfigManager) InitConfig(loadLocal bool) {
-	var err error
-	globalConfig, err = d.loadGlobalConfig()
-	if err != nil {
-		fmt.Printf("Warning: Failed to load global config: %v\n", err)
-		// Use empty config as fallback, but don't overwrite existing config
-		globalConfig = GlobalConfigStruct{}
-	}
-
-	if loadLocal {
-		localConfig, err = d.loadLocalConfig()
-		if err != nil {
-			fmt.Printf("Warning: Failed to load local config: %v\n", err)
-			localConfig = LocalConfigStruct{}
-		}
-	}
-}
-
 func (d *DefaultConfigManager) InitLocalConfig() {
 	lc, err := d.loadLocalConfig()
 	if err != nil {
-		fmt.Printf("Warning: Failed to load local config: %v\n", err)
-		lc = LocalConfigStruct{}
+		log.Error("Failed to load local config: %v\n", err)
+		return
 	}
 	localConfig = lc
 }
@@ -125,9 +105,8 @@ func (d *DefaultConfigManager) InitLocalConfig() {
 func (d *DefaultConfigManager) InitGlobalConfig() {
 	gc, err := d.loadGlobalConfig()
 	if err != nil {
-		fmt.Printf("Warning: Failed to load global config: %v\n", err)
-		// Use empty config as fallback, but don't overwrite existing config
-		gc = GlobalConfigStruct{}
+		log.Error("Failed to load global config: %v\n", err)
+		return
 	}
 	globalConfig = gc
 }
