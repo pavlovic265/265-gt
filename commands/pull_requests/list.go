@@ -3,14 +3,15 @@ package pullrequests
 import (
 	"fmt"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
@@ -51,97 +52,121 @@ func (svc listCommand) Command() *cobra.Command {
 	}
 }
 
+type pullRequest struct {
+	number int
+	title  string
+	url    string
+}
+
 func (svc listCommand) selectPullRequest(
 	prs []client.PullRequest,
 ) error {
-	var strPrs []string
-	var urls []string
+	var pullRequests []pullRequest
 	for _, pr := range prs {
 		ciStatus := ""
+		ciStatusColor := constants.White
 		switch pr.StatusState {
 		case "SUCCESS":
-			ciStatus = " P"
+			ciStatus = " *"
+			ciStatusColor = constants.Green
 		case "FAILURE", "ERROR":
-			ciStatus = " F"
+			ciStatus = " ✗"
+			ciStatusColor = constants.Red
 		case "PENDING", "IN_PROGRESS":
-			ciStatus = " R"
+			ciStatus = " ✓"
+			ciStatusColor = constants.Yellow
 		}
 
 		// Mergeable status indicator
-		mergeableStatus := " -"
+		mergeableStatus := " ●"
+		mergeableColor := constants.White
 		switch pr.Mergeable {
 		case "MERGEABLE":
-			mergeableStatus = " ✓"
+			mergeableStatus = " ●"
+			mergeableColor = constants.Green
 		case "CONFLICTING":
-			mergeableStatus = " ✗"
+			mergeableStatus = " ●"
+			mergeableColor = constants.Red
 		}
 
-		strPrs = append(strPrs, fmt.Sprintf("%s %d: %s - %s", mergeableStatus, pr.Number, pr.Title, ciStatus))
-		urls = append(urls, pr.URL)
+		// Style each component
+		styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
+		styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
+		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
+		styledMergeableStatus := lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+
+		pullRequests = append(pullRequests, pullRequest{
+			number: pr.Number,
+			title:  fmt.Sprintf("%s%s: %s - %s", styledCiStatus, styledNumber, styledTitle, styledMergeableStatus),
+			url:    pr.URL,
+		})
 	}
 
 	initialCursor := 0
-	var currentURL string
-	if len(prs) > 0 {
-		currentURL = prs[initialCursor].URL
-	}
 
-	initialModel := components.ListModel{
-		AllChoices:   strPrs,
-		Choices:      strPrs,
-		Cursor:       initialCursor,
-		Query:        "",
-		YankURL:      currentURL,
-		URLs:         urls,
-		EnableMerge:  true,
-		EnableUpdate: true,
+	initialModel := components.ListModel[pullRequest]{
+		AllChoices:    pullRequests,
+		Choices:       pullRequests,
+		Cursor:        initialCursor,
+		Query:         "",
+		EnableYank:    true,
+		EnableMerge:   true,
+		EnableUpdate:  true,
+		EnableRefresh: false,
+		Formatter:     func(pr pullRequest) string { return pr.title },
+		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel); ok {
-			if m.Yanked {
-				log.Success("URL yanked to clipboard: " + currentURL)
+		if m, ok := finalModel.(components.ListModel[pullRequest]); ok {
+			if m.RefreshAction {
+				// Refresh the PR list
+				account := svc.configManager.GetActiveAccount()
+				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+				if err != nil {
+					return log.Error("Failed to refresh pull requests", err)
+				}
+				log.Info("Pull requests refreshed")
+				return svc.selectPullRequest(updatedPrs)
+			}
+
+			if m.YankAction {
+				svc.yankToClipboard(m.Selected.url)
+				log.Success("URL yanked to clipboard: " + m.Selected.url)
 				return nil
 			}
-			if m.Selected != "" {
-				splited := strings.Split(m.Selected, ":")
-				prNumber, err := strconv.Atoi(splited[0])
+
+			if m.MergeAction {
+				account := svc.configManager.GetActiveAccount()
+				err := client.Client[account.Platform].MergePullRequest(m.Selected.number)
 				if err != nil {
-					return log.ErrorMsg("Failed to get PR number ID")
+					return log.Error("Failed to merge pull request", err)
 				}
+				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
+				return nil
+			}
 
-				if m.MergeAction {
-					account := svc.configManager.GetActiveAccount()
-					err := client.Client[account.Platform].MergePullRequest(prNumber)
-					if err != nil {
-						return log.Error("Failed to merge pull request", err)
-					}
-					log.Success(fmt.Sprintf("Successfully merged PR #%d", prNumber))
-					return nil
+			if m.UpdateAction {
+				account := svc.configManager.GetActiveAccount()
+				err := client.Client[account.Platform].UpdatePullRequestBranch(m.Selected.number)
+				if err != nil {
+					return log.Error("Failed to update pull request branch", err)
 				}
+				log.Success(fmt.Sprintf("Successfully updated PR #%d branch", m.Selected.number))
 
-				if m.UpdateAction {
-					account := svc.configManager.GetActiveAccount()
-					err := client.Client[account.Platform].UpdatePullRequestBranch(prNumber)
-					if err != nil {
-						return log.Error("Failed to update pull request branch", err)
-					}
-					log.Success(fmt.Sprintf("Successfully updated PR #%d branch", prNumber))
-
-					// Refresh the PR list
-					updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-					if err != nil {
-						return log.Error("Failed to refresh pull requests", err)
-					}
-					return svc.selectPullRequest(updatedPrs)
+				// Refresh the PR list
+				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+				if err != nil {
+					return log.Error("Failed to refresh pull requests", err)
 				}
+				return svc.selectPullRequest(updatedPrs)
+			}
 
-				for _, pr := range prs {
-					if prNumber == pr.Number {
-						_ = exec.Command("open", pr.URL).Start() // Ignore errors when opening URL
-					}
+			for _, pr := range prs {
+				if m.Selected.number == pr.Number {
+					_ = exec.Command("open", pr.URL).Start() // Ignore errors when opening URL
 				}
 			}
 		}
@@ -149,4 +174,21 @@ func (svc listCommand) selectPullRequest(
 		return log.Error("Failed to display pull request selection menu", err)
 	}
 	return nil
+}
+
+func (svc listCommand) yankToClipboard(url string) {
+	commands := [][]string{
+		{"pbcopy"},                           // macOS
+		{"xclip", "-selection", "clipboard"}, // Linux with xclip
+		{"xsel", "--clipboard", "--input"},   // Linux with xsel
+		{"clip"},                             // Windows
+	}
+
+	for _, cmd := range commands {
+		command := exec.Command(cmd[0], cmd[1:]...)
+		command.Stdin = strings.NewReader(url)
+		if err := command.Run(); err == nil {
+			return
+		}
+	}
 }

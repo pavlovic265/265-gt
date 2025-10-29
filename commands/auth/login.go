@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
@@ -39,17 +41,19 @@ func (svc loginCommand) Command() *cobra.Command {
 				users = append(users, acc.User)
 			}
 
-			initialModel := components.ListModel{
+			initialModel := components.ListModel[string]{
 				AllChoices: users,
 				Choices:    users,
 				Cursor:     0,
 				Query:      "",
+				Formatter:  func(s string) string { return s },
+				Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
 			}
 
 			program := tea.NewProgram(initialModel)
 
 			if finalModel, err := program.Run(); err == nil {
-				if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
 					var account config.Account
 					for _, acc := range accounts {
 						if acc.User == m.Selected {

@@ -2,6 +2,7 @@ package account
 
 import (
 	"fmt"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
@@ -52,10 +53,12 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			// Show account selector
-			selectModel := components.ListModel{
+			selectModel := components.ListModel[string]{
 				AllChoices: choices,
 				Choices:    choices,
 				Cursor:     0,
+				Formatter:  func(s string) string { return s },
+				Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
 			}
 
 			selectProgram := tea.NewProgram(selectModel)
@@ -65,7 +68,7 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			var selectedIndex = -1
-			if m, ok := m.(components.ListModel); ok {
+			if m, ok := m.(components.ListModel[string]); ok {
 				if m.Selected == "" {
 					log.Info("No account selected")
 					return nil

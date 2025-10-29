@@ -110,17 +110,19 @@ func (svc deleteCommand) deleteBranch(
 func (svc deleteCommand) selectAndDeleteBranch(
 	choices []string,
 ) error {
-	initialModel := components.ListModel{
+	initialModel := components.ListModel[string]{
 		AllChoices: choices,
 		Choices:    choices,
 		Cursor:     0,
 		Query:      "",
+		Formatter: func(s string) string { return s },
+		Matcher:   func(s, query string) bool { return strings.Contains(s, query) },
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
 			err := svc.deleteBranch(m.Selected)
 			if err != nil {
 				return err

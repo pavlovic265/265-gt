@@ -2,6 +2,7 @@ package commands
 
 import (
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
@@ -71,17 +72,19 @@ func (svc moveCommand) rebaseBranch(
 	branch string,
 	choices []string,
 ) error {
-	initialModel := components.ListModel{
+	initialModel := components.ListModel[string]{
 		AllChoices: choices,
 		Choices:    choices,
 		Cursor:     0,
 		Query:      "",
+		Formatter: func(s string) string { return s },
+		Matcher:   func(s, query string) bool { return strings.Contains(s, query) },
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
 			if err := svc.gitHelper.RebaseBranch(branch, m.Selected); err != nil {
 				return err
 			}

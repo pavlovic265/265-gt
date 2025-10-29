@@ -2,6 +2,7 @@ package commands
 
 import (
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
@@ -77,17 +78,19 @@ func (svc upCommand) checkoutBranch(
 func (svc upCommand) selectAndCheckoutBranch(
 	choices []string,
 ) error {
-	initialModel := components.ListModel{
+	initialModel := components.ListModel[string]{
 		AllChoices: choices,
 		Choices:    choices,
 		Cursor:     0,
 		Query:      "",
+		Formatter:  func(s string) string { return s },
+		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel); ok && m.Selected != "" {
+		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
 			err := svc.checkoutBranch(m.Selected)
 			if err != nil {
 				return err
