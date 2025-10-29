@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/rs/zerolog/log"
+	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 // ============================================================================
