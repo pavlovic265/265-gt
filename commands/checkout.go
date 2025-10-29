@@ -82,8 +82,8 @@ func (svc checkoutCommand) selectAndCheckoutBranch(
 		Choices:    choices,
 		Cursor:     0,
 		Query:      "",
-		Formatter: func(s string) string { return s },
-		Matcher:   func(s, query string) bool { return strings.Contains(s, query) },
+		Formatter:  func(s string) string { return s },
+		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
 	}
 
 	program := tea.NewProgram(initialModel)

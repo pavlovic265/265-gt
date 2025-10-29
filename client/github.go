@@ -184,7 +184,10 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 		return nil, err
 	}
 
-	exeArgs := []string{"pr", "list", "--author", acc.User, "--json", "number,title,url,author,mergeable,headRefName,statusCheckRollup"}
+	exeArgs := []string{
+		"pr", "list", "--author", acc.User, "--json",
+		"number,title,url,author,mergeable,headRefName,statusCheckRollup",
+	}
 	out, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return nil, err
