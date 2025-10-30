@@ -71,6 +71,17 @@ homebrew_casks:
     homepage: "https://github.com/pavlovic265/265-gt"
     license: "MIT"
 
+npms:
+  - id: gt-npm
+    name: "265-gt"          # npm package name (change if taken)
+    binary: "gt"            # the CLI command users will run
+    archives: ["default"]   # use the archive defined above
+    files:
+      - LICENSE
+      - README.md
+    version_template: "{{ .Version }}"
+    publish_cmd: npm publish --access public
+
 changelog:
   sort: asc
   filters:
