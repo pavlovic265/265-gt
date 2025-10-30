@@ -67,19 +67,19 @@ func (svc listCommand) selectPullRequest(
 		ciStatusColor := constants.White
 		switch pr.StatusState {
 		case "SUCCESS":
-			ciStatus = " ✓"
+			ciStatus = "✓ "
 			ciStatusColor = constants.Green
 		case "FAILURE", "ERROR":
-			ciStatus = " ✗"
+			ciStatus = "✗ "
 			ciStatusColor = constants.Red
 		case "PENDING", "IN_PROGRESS":
-			ciStatus = " *"
+			ciStatus = "* "
 			ciStatusColor = constants.Yellow
 		}
 
 		// Mergeable status indicator
 		mergeableStatus := " ●"
-		mergeableColor := constants.White
+		mergeableColor := constants.Yellow
 		switch pr.Mergeable {
 		case "MERGEABLE":
 			mergeableStatus = " ●"
@@ -95,9 +95,10 @@ func (svc listCommand) selectPullRequest(
 		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
 		styledMergeableStatus := lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
 
+		fmt.Println("ciStatus", ciStatus)
 		pullRequests = append(pullRequests, pullRequest{
 			number: pr.Number,
-			title:  fmt.Sprintf("%s%s: %s - %s", styledCiStatus, styledNumber, styledTitle, styledMergeableStatus),
+			title:  fmt.Sprintf("%s%s: %s -%s", styledCiStatus, styledNumber, styledTitle, styledMergeableStatus),
 			url:    pr.URL,
 		})
 	}

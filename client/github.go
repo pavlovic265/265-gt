@@ -203,7 +203,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Login string `json:"login"`
 		} `json:"author"`
 		StatusCheckRollup []struct {
-			State string `json:"state"`
+			Conclusion *string `json:"conclusion,omitempty"`
 		} `json:"statusCheckRollup"`
 	}
 	err = json.Unmarshal(out.Bytes(), &rawPRs)
@@ -220,7 +220,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			hasSuccess := false
 
 			for _, check := range pr.StatusCheckRollup {
-				switch check.State {
+				switch pointer.Deref(check.Conclusion) {
 				case "FAILURE", "ERROR":
 					hasFailure = true
 				case "PENDING", "IN_PROGRESS":
