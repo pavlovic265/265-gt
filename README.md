@@ -19,7 +19,7 @@
 - **Branch Stack Navigation**: Seamlessly move up and down your branch hierarchy
 - **Stack Management**: Restack branches to keep your branch hierarchy up to date
 - **Automated Git Workflows**: Simplify rebasing, syncing, and cleaning up merged branches
-- **Pull Request Management**: Create and manage pull requests directly from the command line
+- **Enhanced Pull Request Management**: Create, list, merge, and update PRs with CI/CD status indicators and mergeable state visualization
 - **Multi-Platform Support**: Works with GitHub and GitLab
 - **Account Management**: Add, edit, list, and remove multiple accounts with full profile information
 - **Authentication Management**: Easy account switching and token management
@@ -169,7 +169,21 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 |---------|-------|-------------|---------|
 | `pull_request create` | `pr c` | Create a new pull request | `gt pr c` |
 | `pull_request create -d` | `pr c -d` | Create a draft pull request | `gt pr c -d` |
-| `pull_request list` | `pr li` | List all pull requests | `gt pr li` |
+| `pull_request list` | `pr li` | List all pull requests with CI/CD status and mergeable state | `gt pr li` |
+
+**Pull Request List Features:**
+- **CI/CD Status Indicators**: View build status at a glance
+  - `*` (Green) - Success
+  - `✗` (Red) - Failure/Error
+  - `✓` (Yellow) - Pending/In Progress
+- **Mergeable Status**: See merge conflicts status
+  - `●` (Green) - Mergeable
+  - `●` (Red) - Has conflicts
+- **Interactive Actions**:
+  - Press `Enter` to open PR in browser
+  - Press `y` to yank (copy) PR URL to clipboard
+  - Press `m` to merge the pull request
+  - Press `u` to update PR branch with base branch changes
 
 ### Stack Management
 
@@ -465,6 +479,31 @@ gt s rs
 # 1. Get all children of the current branch
 # 2. Rebase each child onto its parent
 # 3. Process children recursively to maintain branch hierarchy
+```
+
+### Enhanced Pull Request Management
+```bash
+# List all pull requests with visual indicators
+gt pr li
+
+# Output shows:
+# * 123: Add authentication module - ● (CI passed, mergeable)
+# ✗ 124: Fix bug in parser - ● (CI failed, has conflicts)
+# ✓ 125: Update dependencies - ● (CI pending, mergeable)
+
+# Interactive actions in the PR list:
+# - Enter: Open selected PR in browser
+# - y: Copy PR URL to clipboard
+# - m: Merge the selected PR
+# - u: Update PR branch with latest base branch changes
+# - /: Search/filter PRs
+# - Esc/q: Exit
+
+# Quick workflow examples:
+gt pr li
+# Press 'y' on a PR to copy its URL for sharing
+# Press 'm' on a PR to merge it directly from the terminal
+# Press 'u' on a PR to update it with the latest changes from base
 ```
 
 ## 🚧 Planned Features
