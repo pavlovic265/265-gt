@@ -74,12 +74,15 @@ homebrew_casks:
 npms:
   - id: gt-npm
     name: "265-gt"          # npm package name (change if taken)
+    author:
+      name: Marko Pavlovic
+      email: pavlovic265@gmail.com
+    format: binary
     binary: "gt"            # the CLI command users will run
-    archives: ["default"]   # use the archive defined above
-    files:
-      - LICENSE
-      - README.md
-    version_template: "{{ .Version }}"
+    ids: [gt]               # reference the build ID
+    description: "Git workflow utility with intelligent branch management and automation"
+    homepage: "https://github.com/pavlovic265/265-gt"
+    license: "MIT"
     publish_cmd: npm publish --access public
 
 changelog:
