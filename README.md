@@ -33,7 +33,14 @@
 
 ## 🛠️ Installation
 
-### Homebrew (Recommended for macOS)
+### npm (Recommended for cross-platform)
+```bash
+npm install -g @pavlovic265/gt
+```
+
+Supports Linux (x64, ARM64), macOS (Intel, Apple Silicon), and Windows (x64, ARM64).
+
+### Homebrew (macOS)
 ```bash
 brew tap pavlovic265/265-gt
 brew install 265-gt
