@@ -173,9 +173,9 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 
 **Pull Request List Features:**
 - **CI/CD Status Indicators**: View build status at a glance
-  - `*` (Green) - Success
+  - `✓` (Green) - Success
   - `✗` (Red) - Failure/Error
-  - `✓` (Yellow) - Pending/In Progress
+  - `★` (Yellow) - Pending/In Progress
 - **Mergeable Status**: See merge conflicts status
   - `●` (Green) - Mergeable
   - `●` (Red) - Has conflicts
@@ -487,9 +487,9 @@ gt s rs
 gt pr li
 
 # Output shows:
-# * 123: Add authentication module - ● (CI passed, mergeable)
+# ✓ 123: Add authentication module - ● (CI passed, mergeable)
 # ✗ 124: Fix bug in parser - ● (CI failed, has conflicts)
-# ✓ 125: Update dependencies - ● (CI pending, mergeable)
+# ★ 125: Update dependencies - ● (CI pending, mergeable)
 
 # Interactive actions in the PR list:
 # - Enter: Open selected PR in browser

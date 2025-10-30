@@ -67,13 +67,13 @@ func (svc listCommand) selectPullRequest(
 		ciStatusColor := constants.White
 		switch pr.StatusState {
 		case "SUCCESS":
-			ciStatus = " *"
+			ciStatus = " ✓"
 			ciStatusColor = constants.Green
 		case "FAILURE", "ERROR":
 			ciStatus = " ✗"
 			ciStatusColor = constants.Red
 		case "PENDING", "IN_PROGRESS":
-			ciStatus = " ✓"
+			ciStatus = " *"
 			ciStatusColor = constants.Yellow
 		}
 
