@@ -178,6 +178,14 @@ type PullRequest struct {
 	StatusState string `json:"statusState"`
 }
 
+type MergeableType string
+
+var (
+	mergeable   MergeableType = "MERGEABLE"
+	conflicting MergeableType = "CONFLICTING"
+	unknown     MergeableType = "UNKNOWN"
+)
+
 func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	acc, err := svc.getActiveAccount()
 	if err != nil {
@@ -203,7 +211,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Login string `json:"login"`
 		} `json:"author"`
 		StatusCheckRollup []struct {
-			State string `json:"state"`
+			Conclusion *string `json:"conclusion,omitempty"`
 		} `json:"statusCheckRollup"`
 	}
 	err = json.Unmarshal(out.Bytes(), &rawPRs)
@@ -219,14 +227,17 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			hasPending := false
 			hasSuccess := false
 
+		loop:
 			for _, check := range pr.StatusCheckRollup {
-				switch check.State {
-				case "FAILURE", "ERROR":
-					hasFailure = true
-				case "PENDING", "IN_PROGRESS":
-					hasPending = true
+				switch pointer.Deref(check.Conclusion) {
 				case "SUCCESS":
 					hasSuccess = true
+				case "FAILURE", "TIMED_OUT", "CANCELLED":
+					hasFailure = true
+					break loop
+				default:
+					hasPending = true
+					break loop
 				}
 			}
 
