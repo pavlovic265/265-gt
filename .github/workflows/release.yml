@@ -23,6 +23,12 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://registry.npmjs.org'
         
     - name: Cache Go modules
       uses: actions/cache@v4
@@ -74,7 +80,101 @@ jobs:
         args: release --clean --config .goreleaser.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PAT }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Extract version
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Create npm package structure
+      run: |
+        mkdir -p npm-package/bin
+        cp dist/gt_linux_amd64_v1/gt npm-package/bin/gt-linux-amd64
+        cp dist/gt_darwin_amd64_v1/gt npm-package/bin/gt-darwin-amd64
+        cp dist/gt_darwin_arm64/gt npm-package/bin/gt-darwin-arm64
+        cp dist/gt_windows_amd64_v1/gt.exe npm-package/bin/gt-windows-amd64.exe
+        cp LICENSE npm-package/
+        cp README.md npm-package/
+
+    - name: Create package.json
+      run: |
+        cat > npm-package/package.json << EOF
+        {
+          "name": "@pavlovic265/gt",
+          "version": "${{ steps.get_version.outputs.VERSION }}",
+          "description": "Git workflow utility with intelligent branch management and automation",
+          "author": "Marko Pavlovic <pavlovic265@gmail.com>",
+          "license": "MIT",
+          "homepage": "https://github.com/pavlovic265/265-gt",
+          "repository": {
+            "type": "git",
+            "url": "https://github.com/pavlovic265/265-gt.git"
+          },
+          "bin": {
+            "gt": "./bin/install.js"
+          },
+          "files": [
+            "bin/**/*",
+            "LICENSE",
+            "README.md"
+          ],
+          "keywords": [
+            "git",
+            "workflow",
+            "cli",
+            "branch-management",
+            "github",
+            "gitlab"
+          ]
+        }
+        EOF
+
+    - name: Create install script
+      run: |
+        cat > npm-package/bin/install.js << 'EOF'
+        #!/usr/bin/env node
+        const { execSync } = require('child_process');
+        const fs = require('fs');
+        const path = require('path');
+
+        const platform = process.platform;
+        const arch = process.arch;
+
+        let binaryName = 'gt';
+        if (platform === 'linux' && arch === 'x64') {
+          binaryName = 'gt-linux-amd64';
+        } else if (platform === 'darwin' && arch === 'x64') {
+          binaryName = 'gt-darwin-amd64';
+        } else if (platform === 'darwin' && arch === 'arm64') {
+          binaryName = 'gt-darwin-arm64';
+        } else if (platform === 'win32' && arch === 'x64') {
+          binaryName = 'gt-windows-amd64.exe';
+        } else {
+          console.error(\`Unsupported platform: \${platform} \${arch}\`);
+          process.exit(1);
+        }
+
+        const binaryPath = path.join(__dirname, binaryName);
+        if (!fs.existsSync(binaryPath)) {
+          console.error(\`Binary not found: \${binaryPath}\`);
+          process.exit(1);
+        }
+
+        fs.chmodSync(binaryPath, '755');
+
+        try {
+          execSync(\`"\${binaryPath}" \${process.argv.slice(2).join(' ')}\`, { stdio: 'inherit' });
+        } catch (error) {
+          process.exit(error.status || 1);
+        }
+        EOF
+        chmod +x npm-package/bin/install.js
+
+    - name: Publish to npm
+      run: |
+        cd npm-package
+        npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Upload dist on failure
       if: failure()
