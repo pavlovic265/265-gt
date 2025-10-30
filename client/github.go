@@ -220,6 +220,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			hasSuccess := false
 
 			for _, check := range pr.StatusCheckRollup {
+				fmt.Println(":>>", pointer.Deref(check.Conclusion))
 				switch pointer.Deref(check.Conclusion) {
 				case "FAILURE", "ERROR":
 					hasFailure = true
