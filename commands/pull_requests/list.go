@@ -93,12 +93,12 @@ func (svc listCommand) selectPullRequest(
 		styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
 		styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
 		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-		styledMergeableStatus := lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+		_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
 
 		fmt.Println("ciStatus", ciStatus)
 		pullRequests = append(pullRequests, pullRequest{
 			number: pr.Number,
-			title:  fmt.Sprintf("%s%s: %s -%s", styledCiStatus, styledNumber, styledTitle, styledMergeableStatus),
+			title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
 			url:    pr.URL,
 		})
 	}
