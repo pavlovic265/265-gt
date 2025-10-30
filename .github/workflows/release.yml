@@ -54,7 +54,7 @@ jobs:
       run: make lint
       
     - name: Run tests
-      run: go test -v ./...
+      run: go test -v -coverprofile=coverage.txt ./...
       
     - name: Build
       run: make build
