@@ -11,10 +11,6 @@ import (
 	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
-// ============================================================================
-// GLOBAL CONFIG OPERATIONS
-// ============================================================================
-
 // GetGlobalConfigPath returns the path to the global configuration file
 func (d *DefaultConfigManager) GetGlobalConfigPath() (string, error) {
 	homeDir, err := os.UserHomeDir()
