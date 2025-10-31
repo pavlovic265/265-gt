@@ -180,12 +180,6 @@ type PullRequest struct {
 
 type MergeableType string
 
-var (
-	mergeable   MergeableType = "MERGEABLE"
-	conflicting MergeableType = "CONFLICTING"
-	unknown     MergeableType = "UNKNOWN"
-)
-
 func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	acc, err := svc.getActiveAccount()
 	if err != nil {
