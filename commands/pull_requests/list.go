@@ -95,7 +95,6 @@ func (svc listCommand) selectPullRequest(
 		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
 		_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
 
-		fmt.Println("ciStatus", ciStatus)
 		pullRequests = append(pullRequests, pullRequest{
 			number: pr.Number,
 			title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
@@ -113,7 +112,7 @@ func (svc listCommand) selectPullRequest(
 		EnableYank:    true,
 		EnableMerge:   true,
 		EnableUpdate:  true,
-		EnableRefresh: false,
+		EnableRefresh: true,
 		Formatter:     func(pr pullRequest) string { return pr.title },
 		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
 	}
