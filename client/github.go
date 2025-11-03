@@ -169,16 +169,22 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 }
 
 type PullRequest struct {
-	Number      int    `json:"number"`
-	Title       string `json:"title"`
-	URL         string `json:"url"`
-	Author      string `json:"author"`
-	Mergeable   string `json:"mergeable"`
-	HeadRefName string `json:"headRefName"`
-	StatusState string `json:"statusState"`
+	Number      int             `json:"number"`
+	Title       string          `json:"title"`
+	URL         string          `json:"url"`
+	Author      string          `json:"author"`
+	Mergeable   string          `json:"mergeable"`
+	HeadRefName string          `json:"headRefName"`
+	StatusState StatusStateType `json:"statusState"`
 }
 
-type MergeableType string
+type StatusStateType string
+
+var (
+	StatusStateTypeSucess  StatusStateType
+	StatusStateTypeFailur  StatusStateType
+	StatusStateTypePending StatusStateType
+)
 
 func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 	acc, err := svc.getActiveAccount()
@@ -205,7 +211,9 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			Login string `json:"login"`
 		} `json:"author"`
 		StatusCheckRollup []struct {
+			Typename   string  `json:"__typename"`
 			Conclusion *string `json:"conclusion,omitempty"`
+			State      *string `json:"state,omitempty"`
 		} `json:"statusCheckRollup"`
 	}
 	err = json.Unmarshal(out.Bytes(), &rawPRs)
@@ -215,7 +223,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 
 	var prs []PullRequest
 	for _, pr := range rawPRs {
-		statusState := ""
+		var statusState StatusStateType
 		if len(pr.StatusCheckRollup) > 0 {
 			hasFailure := false
 			hasPending := false
@@ -223,7 +231,17 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 
 		loop:
 			for _, check := range pr.StatusCheckRollup {
-				switch pointer.Deref(check.Conclusion) {
+				var s string
+				switch check.Typename {
+				case "StatusContext":
+					s = pointer.Deref(check.State)
+				case "CheckRun":
+					s = pointer.Deref(check.Conclusion)
+				}
+
+				switch s {
+				case "SKIPPED":
+					continue
 				case "SUCCESS":
 					hasSuccess = true
 				case "FAILURE", "TIMED_OUT", "CANCELLED":
@@ -236,11 +254,11 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			}
 
 			if hasFailure {
-				statusState = "FAILURE"
+				statusState = StatusStateTypeFailur
 			} else if hasPending {
-				statusState = "PENDING"
+				statusState = StatusStateTypePending
 			} else if hasSuccess {
-				statusState = "SUCCESS"
+				statusState = StatusStateTypeSucess
 			}
 		}
 

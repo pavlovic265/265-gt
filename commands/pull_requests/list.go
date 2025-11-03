@@ -58,49 +58,71 @@ type pullRequest struct {
 	url    string
 }
 
+func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
+	ciStatus := ""
+	ciStatusColor := constants.White
+	switch pr.StatusState {
+	case "SUCCESS":
+		ciStatus = "✓ "
+		ciStatusColor = constants.Green
+	case "FAILURE":
+		ciStatus = "✗ "
+		ciStatusColor = constants.Red
+	case "PENDING":
+		ciStatus = "* "
+		ciStatusColor = constants.Yellow
+	}
+
+	// Mergeable status indicator
+	mergeableStatus := " ●"
+	mergeableColor := constants.Yellow
+	switch pr.Mergeable {
+	case "MERGEABLE":
+		mergeableStatus = " ●"
+		mergeableColor = constants.Green
+	case "CONFLICTING":
+		mergeableStatus = " ●"
+		mergeableColor = constants.Red
+	}
+
+	// Style each component
+	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
+	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
+	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
+	_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+
+	return pullRequest{
+		number: pr.Number,
+		title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
+		url:    pr.URL,
+	}
+}
+
+func (svc listCommand) refreshFunc() tea.Msg {
+	account := svc.configManager.GetActiveAccount()
+	updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+	if err != nil {
+		return components.RefreshCompleteMsg[pullRequest]{Err: err}
+	}
+
+	var refreshedPullRequests []pullRequest
+	for _, pr := range updatedPrs {
+		refreshedPullRequests = append(refreshedPullRequests, svc.formatPullRequest(pr))
+	}
+
+	return components.RefreshCompleteMsg[pullRequest]{
+		Choices: refreshedPullRequests,
+		Err:     nil,
+	}
+}
+
 func (svc listCommand) selectPullRequest(
 	prs []client.PullRequest,
 	selectedPRNumber ...int,
 ) error {
 	var pullRequests []pullRequest
 	for _, pr := range prs {
-		ciStatus := ""
-		ciStatusColor := constants.White
-		switch pr.StatusState {
-		case "SUCCESS":
-			ciStatus = "✓ "
-			ciStatusColor = constants.Green
-		case "FAILURE", "ERROR":
-			ciStatus = "✗ "
-			ciStatusColor = constants.Red
-		case "PENDING", "IN_PROGRESS":
-			ciStatus = "* "
-			ciStatusColor = constants.Yellow
-		}
-
-		// Mergeable status indicator
-		mergeableStatus := " ●"
-		mergeableColor := constants.Yellow
-		switch pr.Mergeable {
-		case "MERGEABLE":
-			mergeableStatus = " ●"
-			mergeableColor = constants.Green
-		case "CONFLICTING":
-			mergeableStatus = " ●"
-			mergeableColor = constants.Red
-		}
-
-		// Style each component
-		styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
-		styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
-		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-		_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
-
-		pullRequests = append(pullRequests, pullRequest{
-			number: pr.Number,
-			title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
-			url:    pr.URL,
-		})
+		pullRequests = append(pullRequests, svc.formatPullRequest(pr))
 	}
 
 	initialCursor := 0
@@ -125,45 +147,7 @@ func (svc listCommand) selectPullRequest(
 		EnableRefresh: true,
 		Formatter:     func(pr pullRequest) string { return pr.title },
 		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
-		RefreshFunc: func() tea.Msg {
-			account := svc.configManager.GetActiveAccount()
-			updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-			if err != nil {
-				return components.RefreshCompleteMsg[pullRequest]{Err: err}
-			}
-
-			var refreshedPullRequests []pullRequest
-			for _, pr := range updatedPrs {
-				ciStatus := ""
-				ciStatusColor := constants.White
-				switch pr.StatusState {
-				case "SUCCESS":
-					ciStatus = "✓ "
-					ciStatusColor = constants.Green
-				case "FAILURE", "ERROR":
-					ciStatus = "✗ "
-					ciStatusColor = constants.Red
-				case "PENDING", "IN_PROGRESS":
-					ciStatus = "* "
-					ciStatusColor = constants.Yellow
-				}
-
-				styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
-				styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
-				styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-
-				refreshedPullRequests = append(refreshedPullRequests, pullRequest{
-					number: pr.Number,
-					title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
-					url:    pr.URL,
-				})
-			}
-
-			return components.RefreshCompleteMsg[pullRequest]{
-				Choices: refreshedPullRequests,
-				Err:     nil,
-			}
-		},
+		RefreshFunc:   svc.refreshFunc,
 	}
 
 	program := tea.NewProgram(initialModel)
