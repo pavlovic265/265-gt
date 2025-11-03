@@ -60,6 +60,7 @@ type pullRequest struct {
 
 func (svc listCommand) selectPullRequest(
 	prs []client.PullRequest,
+	selectedPRNumber ...int,
 ) error {
 	var pullRequests []pullRequest
 	for _, pr := range prs {
@@ -103,6 +104,15 @@ func (svc listCommand) selectPullRequest(
 	}
 
 	initialCursor := 0
+	// If a previously selected PR number is provided, find its index in the new list
+	if len(selectedPRNumber) > 0 {
+		for i, pr := range pullRequests {
+			if pr.number == selectedPRNumber[0] {
+				initialCursor = i
+				break
+			}
+		}
+	}
 
 	initialModel := components.ListModel[pullRequest]{
 		AllChoices:    pullRequests,
@@ -115,23 +125,51 @@ func (svc listCommand) selectPullRequest(
 		EnableRefresh: true,
 		Formatter:     func(pr pullRequest) string { return pr.title },
 		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
+		RefreshFunc: func() tea.Msg {
+			account := svc.configManager.GetActiveAccount()
+			updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+			if err != nil {
+				return components.RefreshCompleteMsg[pullRequest]{Err: err}
+			}
+
+			var refreshedPullRequests []pullRequest
+			for _, pr := range updatedPrs {
+				ciStatus := ""
+				ciStatusColor := constants.White
+				switch pr.StatusState {
+				case "SUCCESS":
+					ciStatus = "✓ "
+					ciStatusColor = constants.Green
+				case "FAILURE", "ERROR":
+					ciStatus = "✗ "
+					ciStatusColor = constants.Red
+				case "PENDING", "IN_PROGRESS":
+					ciStatus = "* "
+					ciStatusColor = constants.Yellow
+				}
+
+				styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
+				styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
+				styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
+
+				refreshedPullRequests = append(refreshedPullRequests, pullRequest{
+					number: pr.Number,
+					title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
+					url:    pr.URL,
+				})
+			}
+
+			return components.RefreshCompleteMsg[pullRequest]{
+				Choices: refreshedPullRequests,
+				Err:     nil,
+			}
+		},
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel[pullRequest]); ok {
-			if m.RefreshAction {
-				// Refresh the PR list
-				account := svc.configManager.GetActiveAccount()
-				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-				if err != nil {
-					return log.Error("Failed to refresh pull requests", err)
-				}
-				log.Info("Pull requests refreshed")
-				return svc.selectPullRequest(updatedPrs)
-			}
-
 			if m.YankAction {
 				svc.yankToClipboard(m.Selected.url)
 				log.Success("URL yanked to clipboard: " + m.Selected.url)
@@ -161,7 +199,7 @@ func (svc listCommand) selectPullRequest(
 				if err != nil {
 					return log.Error("Failed to refresh pull requests", err)
 				}
-				return svc.selectPullRequest(updatedPrs)
+				return svc.selectPullRequest(updatedPrs, m.Selected.number)
 			}
 
 			for _, pr := range prs {

@@ -23,10 +23,19 @@ type ListModel[T any] struct {
 	EnableMerge   bool
 	EnableUpdate  bool
 	EnableRefresh bool
+	Refreshing    bool
 	// Formatter is a function that converts T to string for display
 	Formatter func(T) string
 	// Matcher is a function that checks if T matches the query string
 	Matcher func(T, string) bool
+	// RefreshFunc is called when refresh is triggered
+	RefreshFunc func() tea.Msg
+}
+
+// RefreshCompleteMsg is sent when refresh completes
+type RefreshCompleteMsg[T any] struct {
+	Choices []T
+	Err     error
 }
 
 // Styling definitions
@@ -63,6 +72,35 @@ func (m ListModel[T]) Init() tea.Cmd {
 
 func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case RefreshCompleteMsg[T]:
+		m.Refreshing = false
+		if msg.Err == nil {
+			// Store current selected item's index to preserve cursor position
+			var selectedIndex int
+			if len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+				selectedItem := m.Choices[m.Cursor]
+				// Find the same item in the new choices
+				selectedIndex = -1
+				for i, choice := range msg.Choices {
+					if m.Formatter(choice) == m.Formatter(selectedItem) {
+						selectedIndex = i
+						break
+					}
+				}
+			}
+
+			m.AllChoices = msg.Choices
+			m.filterChoices()
+
+			// Restore cursor position if we found the item
+			if selectedIndex >= 0 && selectedIndex < len(m.Choices) {
+				m.Cursor = selectedIndex
+			} else if m.Cursor >= len(m.Choices) && len(m.Choices) > 0 {
+				m.Cursor = len(m.Choices) - 1
+			}
+		}
+		return m, nil
+
 	case tea.KeyMsg:
 		// fmt.Printf("DBG key: type=%v str=%q runes=%q alt=%v\n", msg.Type, msg.String(), string(msg.Runes), msg.Alt)
 
@@ -97,10 +135,9 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.YankAction = true
 			return m, tea.Quit
 		case tea.KeyCtrlR.String():
-			if m.EnableRefresh && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
-				m.Selected = m.Choices[m.Cursor]
-				m.RefreshAction = true
-				return m, tea.Quit
+			if m.EnableRefresh && !m.Refreshing && m.RefreshFunc != nil {
+				m.Refreshing = true
+				return m, m.RefreshFunc
 			}
 		case tea.KeyCtrlO.String():
 			if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
@@ -164,6 +201,13 @@ func (m ListModel[T]) View() string {
 
 	// Footer with instructions
 	content.WriteString("\n")
+
+	// Show refreshing indicator
+	if m.Refreshing {
+		refreshingStyle := lipgloss.NewStyle().Foreground(constants.Yellow)
+		content.WriteString(refreshingStyle.Render("⟳ Refreshing..."))
+		content.WriteString("\n\n")
+	}
 
 	content.WriteString(footerStyle.Render("Press "))
 	content.WriteString(keyStyle.Render("CTRL+Q"))
