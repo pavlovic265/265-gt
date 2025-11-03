@@ -17,11 +17,9 @@ type ListModel[T any] struct {
 	Selected      T
 	YankAction    bool
 	MergeAction   bool
-	UpdateAction  bool
 	RefreshAction bool
 	EnableYank    bool
 	EnableMerge   bool
-	EnableUpdate  bool
 	EnableRefresh bool
 	Refreshing    bool
 	// Formatter is a function that converts T to string for display
@@ -145,12 +143,6 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.MergeAction = true
 				return m, tea.Quit
 			}
-		case tea.KeyCtrlU.String():
-			if m.EnableUpdate && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
-				m.Selected = m.Choices[m.Cursor]
-				m.UpdateAction = true
-				return m, tea.Quit
-			}
 		case tea.KeyBackspace.String():
 			if len(m.Query) > 0 {
 				m.Query = m.Query[:len(m.Query)-1]
@@ -232,13 +224,6 @@ func (m ListModel[T]) View() string {
 		content.WriteString(footerStyle.Render(", "))
 		content.WriteString(keyStyle.Render("CTRL+O"))
 		content.WriteString(footerStyle.Render(" to merge"))
-	}
-
-	// Show update option if enabled
-	if m.EnableUpdate && len(m.Choices) > 0 {
-		content.WriteString(footerStyle.Render(", "))
-		content.WriteString(keyStyle.Render("CTRL+U"))
-		content.WriteString(footerStyle.Render(" to update"))
 	}
 
 	return content.String()

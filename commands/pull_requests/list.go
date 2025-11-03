@@ -143,7 +143,6 @@ func (svc listCommand) selectPullRequest(
 		Query:         "",
 		EnableYank:    true,
 		EnableMerge:   true,
-		EnableUpdate:  true,
 		EnableRefresh: true,
 		Formatter:     func(pr pullRequest) string { return pr.title },
 		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
@@ -168,22 +167,6 @@ func (svc listCommand) selectPullRequest(
 				}
 				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
 				return nil
-			}
-
-			if m.UpdateAction {
-				account := svc.configManager.GetActiveAccount()
-				err := client.Client[account.Platform].UpdatePullRequestBranch(m.Selected.number)
-				if err != nil {
-					return log.Error("Failed to update pull request branch", err)
-				}
-				log.Success(fmt.Sprintf("Successfully updated PR #%d branch", m.Selected.number))
-
-				// Refresh the PR list
-				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-				if err != nil {
-					return log.Error("Failed to refresh pull requests", err)
-				}
-				return svc.selectPullRequest(updatedPrs, m.Selected.number)
 			}
 
 			for _, pr := range prs {
