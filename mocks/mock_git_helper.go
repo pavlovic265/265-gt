@@ -103,6 +103,21 @@ func (mr *MockGitHelperMockRecorder) GetBranches() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranches", reflect.TypeOf((*MockGitHelper)(nil).GetBranches))
 }
 
+// GetBranchesWithoutCurrent mocks base method.
+func (m *MockGitHelper) GetBranchesWithoutCurrent() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBranchesWithoutCurrent")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBranchesWithoutCurrent indicates an expected call of GetBranchesWithoutCurrent.
+func (mr *MockGitHelperMockRecorder) GetBranchesWithoutCurrent() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchesWithoutCurrent", reflect.TypeOf((*MockGitHelper)(nil).GetBranchesWithoutCurrent))
+}
+
 // GetChildren mocks base method.
 func (m *MockGitHelper) GetChildren(branch string) []string {
 	m.ctrl.T.Helper()

@@ -74,7 +74,7 @@ func (svc trackCommand) Command() *cobra.Command {
 				return log.Error("Failed to display branch selection", err)
 			}
 
-			log.Successf("successfly tracked  %s", branch)
+			log.Successf("successfully tracking %s", branch)
 			return nil
 		},
 	}
