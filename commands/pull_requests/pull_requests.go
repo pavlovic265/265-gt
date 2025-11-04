@@ -43,7 +43,7 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 	}
 
 	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe, svc.configManager).Command())
-	pullRequestCmd.AddCommand(NewListCommand(svc.exe, svc.configManager).Command())
+	pullRequestCmd.AddCommand(NewListCommand(svc.exe, svc.configManager, svc.gitHelper).Command())
 
 	return pullRequestCmd
 }
