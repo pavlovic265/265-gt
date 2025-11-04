@@ -18,7 +18,7 @@ type trackCommand struct {
 	gitHelper helpers.GitHelper
 }
 
-func NewtrackCommand(
+func NewTrackCommand(
 	exe executor.Executor,
 	gitHelper helpers.GitHelper,
 ) trackCommand {
