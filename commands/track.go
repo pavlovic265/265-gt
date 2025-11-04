@@ -69,9 +69,7 @@ func (svc trackCommand) Command() *cobra.Command {
 
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-					if err := svc.gitHelper.RebaseBranch(branch, m.Selected); err != nil {
-						return err
-					}
+					svc.gitHelper.SetParent(m.Selected, branch)
 				} else {
 					// User cancelled or no selection made
 					return log.ErrorMsg("No branch selected")
