@@ -49,7 +49,7 @@ func (svc trackCommand) Command() *cobra.Command {
 			if err != nil {
 				return log.Error("Failed to get branches", err)
 			}
-			branchesWithoutCurrent := make([]string, len(branchs)-1)
+			branchesWithoutCurrent := make([]string, len(branchs)-2)
 			for _, b := range branchs {
 				if b != branch {
 					branchesWithoutCurrent = append(branchesWithoutCurrent, b)
