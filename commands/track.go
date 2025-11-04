@@ -56,13 +56,13 @@ func (svc trackCommand) Command() *cobra.Command {
 
 			program := tea.NewProgram(initialModel)
 
+			branch, err := svc.gitHelper.GetCurrentBranch()
+			if err != nil {
+				return log.Error("Failed to get current branch name", err)
+			}
+
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-					branch, err := svc.gitHelper.GetCurrentBranch()
-					if err != nil {
-						return log.Error("Failed to get current branch name", err)
-					}
-
 					if err := svc.gitHelper.RebaseBranch(branch, m.Selected); err != nil {
 						return err
 					}
@@ -74,7 +74,7 @@ func (svc trackCommand) Command() *cobra.Command {
 				return log.Error("Failed to display branch selection", err)
 			}
 
-			log.Success("tracked to previous branch")
+			log.Successf("successfly tracked  %s", branch)
 			return nil
 		},
 	}
