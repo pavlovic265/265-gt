@@ -73,6 +73,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewUpgradeCommand(exe, configManager).Command())
 	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewTrackCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(stack.NewStackCommand(exe, gitHelper).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(exe, gitHelper).Command())

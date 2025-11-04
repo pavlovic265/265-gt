@@ -118,7 +118,7 @@ mocks:
 	@echo "📦 Generating executor mock..."
 	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
 	@echo "📦 Generating git helper mock..."
-	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=git_helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "📦 Generating config manager mock..."
 	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
 	@echo "✅ All mocks generated successfully"
@@ -133,7 +133,7 @@ mocks-executor:
 mocks-git-helper:
 	@echo "🔧 Generating git helper mock..."
 	@mkdir -p mocks
-	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=git_helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "✅ Git helper mock generated successfully"
 
 mocks-config:

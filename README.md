@@ -19,7 +19,7 @@
 - **Branch Stack Navigation**: Seamlessly move up and down your branch hierarchy
 - **Stack Management**: Restack branches to keep your branch hierarchy up to date
 - **Automated Git Workflows**: Simplify rebasing, syncing, and cleaning up merged branches
-- **Enhanced Pull Request Management**: Create, list, merge, and update PRs with CI/CD status indicators and mergeable state visualization
+- **Enhanced Pull Request Management**: Create, list, and merge PRs with CI/CD status indicators
 - **Multi-Platform Support**: Works with GitHub and GitLab
 - **Account Management**: Add, edit, list, and remove multiple accounts with full profile information
 - **Authentication Management**: Easy account switching and token management
@@ -176,21 +176,17 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 |---------|-------|-------------|---------|
 | `pull_request create` | `pr c` | Create a new pull request | `gt pr c` |
 | `pull_request create -d` | `pr c -d` | Create a draft pull request | `gt pr c -d` |
-| `pull_request list` | `pr li` | List all pull requests with CI/CD status and mergeable state | `gt pr li` |
+| `pull_request list` | `pr li` | List all pull requests with CI/CD status | `gt pr li` |
 
 **Pull Request List Features:**
 - **CI/CD Status Indicators**: View build status at a glance
   - `✓` (Green) - Success
   - `✗` (Red) - Failure/Error
   - `★` (Yellow) - Pending/In Progress
-- **Mergeable Status**: See merge conflicts status
-  - `●` (Green) - Mergeable
-  - `●` (Red) - Has conflicts
 - **Interactive Actions**:
   - Press `Enter` to open PR in browser
   - Press `y` to yank (copy) PR URL to clipboard
   - Press `m` to merge the pull request
-  - Press `u` to update PR branch with base branch changes
 
 ### Stack Management
 
@@ -251,7 +247,7 @@ gt account add
 ```
 
 The account management commands allow you to:
-- **Add accounts**: Interactively add GitHub/GitLab accounts with username, email, full name, platform, and API token
+- **Add accounts**: Interactively add GitHub/GitLab accounts with username, email, full name, platform, API token, and GPG signing key for commit signing
 - **List accounts**: View all configured accounts with their details
 - **Edit accounts**: Modify existing account information
 - **Remove accounts**: Delete accounts you no longer need
@@ -266,17 +262,20 @@ accounts:
     name: "User One"
     token: "ghp_..."
     platform: "GitHub"
+    signingkey: "ABCD1234EFGH5678"
   - user: "username2"
     email: "user2@example.com"
     name: "User Two"
     token: "glpat-..."
     platform: "GitLab"
+    signingkey: "1234ABCD5678EFGH"
 active_account:  # Automatically managed by auth commands
   user: "username1"
   email: "user1@example.com"
   name: "User One"
   token: "ghp_..."
   platform: "GitHub"
+  signingkey: "ABCD1234EFGH5678"
 theme:
   type: "dark"
 version:
@@ -410,6 +409,7 @@ gt account add
 # - Full name
 # - Platform (GitHub/GitLab)
 # - API token
+# - GPG signing key for commit signing (optional)
 
 # List all configured accounts
 gt account list
@@ -494,15 +494,14 @@ gt s rs
 gt pr li
 
 # Output shows:
-# ✓ 123: Add authentication module - ● (CI passed, mergeable)
-# ✗ 124: Fix bug in parser - ● (CI failed, has conflicts)
-# ★ 125: Update dependencies - ● (CI pending, mergeable)
+# ✓ 123: Add authentication module (CI passed)
+# ✗ 124: Fix bug in parser (CI failed)
+# ★ 125: Update dependencies (CI pending)
 
 # Interactive actions in the PR list:
 # - Enter: Open selected PR in browser
 # - y: Copy PR URL to clipboard
 # - m: Merge the selected PR
-# - u: Update PR branch with latest base branch changes
 # - /: Search/filter PRs
 # - Esc/q: Exit
 
@@ -510,18 +509,17 @@ gt pr li
 gt pr li
 # Press 'y' on a PR to copy its URL for sharing
 # Press 'm' on a PR to merge it directly from the terminal
-# Press 'u' on a PR to update it with the latest changes from base
 ```
 
 ## 🚧 Planned Features
 
+- [⚙️] **Branch Tracking** — Interactive branch selection to rebase current branch onto a selected branch with `gt track` command.
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
 - [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
 - [ ] **Multi-Platform Git Integration** — Support for additional Git platforms beyond GitHub (e.g., GitLab, Bitbucket).
 - [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.
 - [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
-- [x] **Git Config Profiles** — Dynamic `.gitconfig` management tied to directories using `includeIf` (implemented via `gt account attach`).
 - [ ] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
 
 

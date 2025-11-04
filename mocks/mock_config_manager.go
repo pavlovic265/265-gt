@@ -147,18 +147,6 @@ func (mr *MockConfigManagerMockRecorder) HasActiveAccount() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasActiveAccount", reflect.TypeOf((*MockConfigManager)(nil).HasActiveAccount))
 }
 
-// InitConfig mocks base method.
-func (m *MockConfigManager) InitConfig(loadLocal bool) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "InitConfig", loadLocal)
-}
-
-// InitConfig indicates an expected call of InitConfig.
-func (mr *MockConfigManagerMockRecorder) InitConfig(loadLocal interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitConfig", reflect.TypeOf((*MockConfigManager)(nil).InitConfig), loadLocal)
-}
-
 // InitGlobalConfig mocks base method.
 func (m *MockConfigManager) InitGlobalConfig() {
 	m.ctrl.T.Helper()

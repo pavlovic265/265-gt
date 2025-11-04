@@ -54,12 +54,6 @@ fi
 # Verify installation
 if command -v $BINARY &>/dev/null; then
   echo "$BINARY installed successfully."
-  # Try to show version, but don't fail if it doesn't work (e.g., no config yet)
-  if $BINARY version 2>/dev/null; then
-    echo "Version check completed."
-  else
-    echo "Installation successful. Run '$BINARY config global' to set up configuration."
-  fi
 else
   echo "Installation failed or $BINARY not found in PATH."
 fi

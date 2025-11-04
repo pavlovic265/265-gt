@@ -58,51 +58,83 @@ type pullRequest struct {
 	url    string
 }
 
+func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
+	ciStatus := ""
+	ciStatusColor := constants.White
+	switch pr.StatusState {
+	case "SUCCESS":
+		ciStatus = "✓ "
+		ciStatusColor = constants.Green
+	case "FAILURE":
+		ciStatus = "✗ "
+		ciStatusColor = constants.Red
+	case "PENDING":
+		ciStatus = "* "
+		ciStatusColor = constants.Yellow
+	}
+
+	// Mergeable status indicator
+	mergeableStatus := " ●"
+	mergeableColor := constants.Yellow
+	switch pr.Mergeable {
+	case "MERGEABLE":
+		mergeableStatus = " ●"
+		mergeableColor = constants.Green
+	case "CONFLICTING":
+		mergeableStatus = " ●"
+		mergeableColor = constants.Red
+	}
+
+	// Style each component
+	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
+	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
+	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
+	_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+
+	return pullRequest{
+		number: pr.Number,
+		title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
+		url:    pr.URL,
+	}
+}
+
+func (svc listCommand) refreshFunc() tea.Msg {
+	account := svc.configManager.GetActiveAccount()
+	updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+	if err != nil {
+		return components.RefreshCompleteMsg[pullRequest]{Err: err}
+	}
+
+	var refreshedPullRequests []pullRequest
+	for _, pr := range updatedPrs {
+		refreshedPullRequests = append(refreshedPullRequests, svc.formatPullRequest(pr))
+	}
+
+	return components.RefreshCompleteMsg[pullRequest]{
+		Choices: refreshedPullRequests,
+		Err:     nil,
+	}
+}
+
 func (svc listCommand) selectPullRequest(
 	prs []client.PullRequest,
+	selectedPRNumber ...int,
 ) error {
 	var pullRequests []pullRequest
 	for _, pr := range prs {
-		ciStatus := ""
-		ciStatusColor := constants.White
-		switch pr.StatusState {
-		case "SUCCESS":
-			ciStatus = "✓ "
-			ciStatusColor = constants.Green
-		case "FAILURE", "ERROR":
-			ciStatus = "✗ "
-			ciStatusColor = constants.Red
-		case "PENDING", "IN_PROGRESS":
-			ciStatus = "* "
-			ciStatusColor = constants.Yellow
-		}
-
-		// Mergeable status indicator
-		mergeableStatus := " ●"
-		mergeableColor := constants.Yellow
-		switch pr.Mergeable {
-		case "MERGEABLE":
-			mergeableStatus = " ●"
-			mergeableColor = constants.Green
-		case "CONFLICTING":
-			mergeableStatus = " ●"
-			mergeableColor = constants.Red
-		}
-
-		// Style each component
-		styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
-		styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
-		styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-		_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
-
-		pullRequests = append(pullRequests, pullRequest{
-			number: pr.Number,
-			title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
-			url:    pr.URL,
-		})
+		pullRequests = append(pullRequests, svc.formatPullRequest(pr))
 	}
 
 	initialCursor := 0
+	// If a previously selected PR number is provided, find its index in the new list
+	if len(selectedPRNumber) > 0 {
+		for i, pr := range pullRequests {
+			if pr.number == selectedPRNumber[0] {
+				initialCursor = i
+				break
+			}
+		}
+	}
 
 	initialModel := components.ListModel[pullRequest]{
 		AllChoices:    pullRequests,
@@ -111,27 +143,16 @@ func (svc listCommand) selectPullRequest(
 		Query:         "",
 		EnableYank:    true,
 		EnableMerge:   true,
-		EnableUpdate:  true,
 		EnableRefresh: true,
 		Formatter:     func(pr pullRequest) string { return pr.title },
 		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
+		RefreshFunc:   svc.refreshFunc,
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel[pullRequest]); ok {
-			if m.RefreshAction {
-				// Refresh the PR list
-				account := svc.configManager.GetActiveAccount()
-				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-				if err != nil {
-					return log.Error("Failed to refresh pull requests", err)
-				}
-				log.Info("Pull requests refreshed")
-				return svc.selectPullRequest(updatedPrs)
-			}
-
 			if m.YankAction {
 				svc.yankToClipboard(m.Selected.url)
 				log.Success("URL yanked to clipboard: " + m.Selected.url)
@@ -146,22 +167,6 @@ func (svc listCommand) selectPullRequest(
 				}
 				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
 				return nil
-			}
-
-			if m.UpdateAction {
-				account := svc.configManager.GetActiveAccount()
-				err := client.Client[account.Platform].UpdatePullRequestBranch(m.Selected.number)
-				if err != nil {
-					return log.Error("Failed to update pull request branch", err)
-				}
-				log.Success(fmt.Sprintf("Successfully updated PR #%d branch", m.Selected.number))
-
-				// Refresh the PR list
-				updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
-				if err != nil {
-					return log.Error("Failed to refresh pull requests", err)
-				}
-				return svc.selectPullRequest(updatedPrs)
 			}
 
 			for _, pr := range prs {
