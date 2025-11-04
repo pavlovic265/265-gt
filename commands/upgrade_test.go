@@ -40,6 +40,7 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Set up expectations for config manager
+	// LoadGlobalConfig is called twice: once in isLatestVersion() and once in RunE
 
 	mockConfigManager.EXPECT().
 		LoadGlobalConfig().
@@ -47,7 +48,11 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 			Version: &config.Version{
 				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
 			},
-		}, nil)
+		}, nil).Times(2)
+
+	mockConfigManager.EXPECT().
+		SaveGlobalConfig(gomock.Any()).
+		Return(nil)
 
 	// Set up expectations for checkWhichBinary() call
 	mockExecutor.EXPECT().
@@ -75,10 +80,6 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 		Run().
 		Return(nil)
 
-	mockConfigManager.EXPECT().
-		SaveVersion(gomock.Any()).
-		Return(nil)
-
 	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
@@ -92,6 +93,7 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Set up expectations for config manager
+	// LoadGlobalConfig is called once in isLatestVersion() before the executor fails
 
 	mockConfigManager.EXPECT().
 		LoadGlobalConfig().

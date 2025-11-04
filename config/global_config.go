@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
 // GetGlobalConfigPath returns the path to the global configuration file
@@ -48,27 +47,6 @@ func (d *DefaultConfigManager) SaveGlobalConfig(configToSave GlobalConfigStruct)
 		return err
 	}
 	return nil
-}
-
-// SaveLastChecked updates the last checked timestamp in the global config
-func (d *DefaultConfigManager) SaveLastChecked() error {
-	if globalConfig.Version == nil {
-		globalConfig.Version = &Version{}
-	}
-	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-
-	return d.SaveGlobalConfig(globalConfig)
-}
-
-// SaveVersion updates the version information in the global config
-func (d *DefaultConfigManager) SaveVersion(version string) error {
-	if globalConfig.Version == nil {
-		globalConfig.Version = &Version{}
-	}
-	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-	globalConfig.Version.CurrentVersion = version
-
-	return d.SaveGlobalConfig(globalConfig)
 }
 
 // loadGlobalConfig loads the global configuration (private helper)

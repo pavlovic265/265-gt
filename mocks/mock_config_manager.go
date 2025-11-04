@@ -229,20 +229,6 @@ func (mr *MockConfigManagerMockRecorder) SaveGlobalConfig(configToSave interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveGlobalConfig", reflect.TypeOf((*MockConfigManager)(nil).SaveGlobalConfig), configToSave)
 }
 
-// SaveLastChecked mocks base method.
-func (m *MockConfigManager) SaveLastChecked() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveLastChecked")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveLastChecked indicates an expected call of SaveLastChecked.
-func (mr *MockConfigManagerMockRecorder) SaveLastChecked() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLastChecked", reflect.TypeOf((*MockConfigManager)(nil).SaveLastChecked))
-}
-
 // SaveLocalConfig mocks base method.
 func (m *MockConfigManager) SaveLocalConfig(configToSave config.LocalConfigStruct) error {
 	m.ctrl.T.Helper()
@@ -269,20 +255,6 @@ func (m *MockConfigManager) SaveProtectedBranches(branches []string) error {
 func (mr *MockConfigManagerMockRecorder) SaveProtectedBranches(branches interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveProtectedBranches", reflect.TypeOf((*MockConfigManager)(nil).SaveProtectedBranches), branches)
-}
-
-// SaveVersion mocks base method.
-func (m *MockConfigManager) SaveVersion(version string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveVersion", version)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveVersion indicates an expected call of SaveVersion.
-func (mr *MockConfigManagerMockRecorder) SaveVersion(version interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveVersion", reflect.TypeOf((*MockConfigManager)(nil).SaveVersion), version)
 }
 
 // SetActiveAccount mocks base method.

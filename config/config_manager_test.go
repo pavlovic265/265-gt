@@ -26,15 +26,6 @@ func TestConfigManagerInterface(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPath, path)
 
-	// Test SaveVersion
-	version := "v1.0.0"
-	mockConfigManager.EXPECT().
-		SaveVersion(version).
-		Return(nil)
-
-	err = mockConfigManager.SaveVersion(version)
-	assert.NoError(t, err)
-
 	// Test GetActiveAccount
 	expectedAccount := config.Account{
 		User:     "testuser",

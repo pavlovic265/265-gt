@@ -10,6 +10,7 @@ import (
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/pointer"
+	"github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
@@ -61,9 +62,16 @@ func (svc upgradeCommand) Command() *cobra.Command {
 				}
 			}
 
-			if err := svc.configManager.SaveVersion(pointer.Deref(version)); err != nil {
-				log.Warningf("Failed to update version in config: %v", err)
-				return err
+			globalConfig, err := svc.configManager.LoadGlobalConfig()
+			if err != nil {
+				return log.Error("Global config not found. Run 'gt config global' to create it first", err)
+			}
+
+			globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+			globalConfig.Version.CurrentVersion = pointer.Deref(version)
+
+			if err := svc.configManager.SaveGlobalConfig(*globalConfig); err != nil {
+				return log.Error("Failed to update version in config", err)
 			}
 
 			log.Success("Tool upgraded successfully")

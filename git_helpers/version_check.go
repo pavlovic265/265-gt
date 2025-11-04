@@ -11,6 +11,8 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/utils/log"
+	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
 type GitHubRelease struct {
@@ -35,8 +37,15 @@ func (gh *GitHelperImpl) CheckGTVersion() {
 	}
 
 	storedVersion := version.CurrentVersion
-	// Only update the config if it exists (to avoid overwriting GitHub accounts)
-	if err := gh.configManager.SaveLastChecked(); err != nil {
+	globalConfig, err := gh.configManager.LoadGlobalConfig()
+	if err != nil {
+		_ = log.Error("Global config not found. Run 'gt config global' to create it first", err)
+		return
+	}
+
+	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+
+	if err := gh.configManager.SaveGlobalConfig(*globalConfig); err != nil {
 		return // Silently fail if we can't update last checked
 	}
 

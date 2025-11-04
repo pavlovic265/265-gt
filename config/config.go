@@ -59,10 +59,6 @@ type ConfigManager interface {
 	LoadGlobalConfig() (*GlobalConfigStruct, error)
 	SaveGlobalConfig(configToSave GlobalConfigStruct) error
 
-	// Version operations
-	SaveLastChecked() error
-	SaveVersion(version string) error
-
 	// Local config operations
 	LoadLocalConfig() (*LocalConfigStruct, error)
 	SaveLocalConfig(configToSave LocalConfigStruct) error
