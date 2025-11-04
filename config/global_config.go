@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
@@ -73,15 +72,15 @@ func (d *DefaultConfigManager) SaveVersion(version string) error {
 }
 
 // loadGlobalConfig loads the global configuration (private helper)
-func (d *DefaultConfigManager) loadGlobalConfig() (GlobalConfigStruct, error) {
+func (d *DefaultConfigManager) loadGlobalConfig() (*GlobalConfigStruct, error) {
 	configPath, err := d.GetGlobalConfigPath()
 	if err != nil {
-		return GlobalConfigStruct{}, err
+		return nil, err
 	}
 	gconf, err := readConfig[GlobalConfigStruct](configPath)
 	if err != nil {
-		return GlobalConfigStruct{}, err
+		return nil, err
 	}
 
-	return pointer.Deref(gconf), nil
+	return gconf, nil
 }

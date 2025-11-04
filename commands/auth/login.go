@@ -30,7 +30,7 @@ func NewLoginCommand(
 func (svc loginCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                "login",
-		Aliases:            []string{"lo"},
+		Aliases:            []string{"lg"},
 		Short:              "login user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {

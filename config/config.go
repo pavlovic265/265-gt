@@ -4,6 +4,7 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
+	"github.com/pavlovic265/265-gt/utils/pointer"
 )
 
 // ============================================================================
@@ -99,7 +100,12 @@ func (d *DefaultConfigManager) InitLocalConfig() {
 		_ = log.Error("Failed to load local config: %v\n", err)
 		return
 	}
-	localConfig = lc
+	if lc == nil {
+		log.Warning("Missing local config")
+		return
+	}
+
+	localConfig = pointer.Deref(lc)
 }
 
 func (d *DefaultConfigManager) InitGlobalConfig() {
@@ -108,5 +114,9 @@ func (d *DefaultConfigManager) InitGlobalConfig() {
 		_ = log.Error("Failed to load global config: %v\n", err)
 		return
 	}
-	globalConfig = gc
+	if gc == nil {
+		log.Warning("Missing global config")
+		return
+	}
+	globalConfig = pointer.Deref(gc)
 }

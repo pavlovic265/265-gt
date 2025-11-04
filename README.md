@@ -515,6 +515,7 @@ gt pr li
 
 ## 🚧 Planned Features
 
+- [⚙️] **Branch Tracking** — Interactive branch selection to rebase current branch onto a selected branch with `gt track` command.
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
 - [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.

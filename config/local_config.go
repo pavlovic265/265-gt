@@ -3,8 +3,6 @@ package config
 import (
 	"path/filepath"
 	"strings"
-
-	"github.com/pavlovic265/265-gt/utils/pointer"
 )
 
 // LoadLocalConfig loads the local (repository-specific) configuration from disk
@@ -30,18 +28,18 @@ func (d *DefaultConfigManager) SaveLocalConfig(configToSave LocalConfigStruct) e
 }
 
 // loadLocalConfig loads the local configuration (private helper)
-func (d *DefaultConfigManager) loadLocalConfig() (LocalConfigStruct, error) {
+func (d *DefaultConfigManager) loadLocalConfig() (*LocalConfigStruct, error) {
 	configPath, err := d.getLocalConfigPath()
 	if err != nil {
-		return LocalConfigStruct{}, err
+		return nil, err
 	}
 
 	lconf, err := readConfig[LocalConfigStruct](configPath)
 	if err != nil {
-		return LocalConfigStruct{}, err
+		return nil, err
 	}
 
-	return pointer.Deref(lconf), nil
+	return lconf, nil
 }
 
 // getLocalConfigPath returns the path to the local configuration file
