@@ -43,7 +43,6 @@ func (svc switchCommand) Command() *cobra.Command {
 				return log.Error("Failed to switch to previous branch", err)
 			}
 
-			log.Success("Switched to previous branch")
 			return nil
 		},
 	}
