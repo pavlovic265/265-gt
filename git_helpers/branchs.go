@@ -37,29 +37,6 @@ func (gh *GitHelperImpl) GetBranches() ([]string, error) {
 	return branches, nil
 }
 
-// GetBranchesWithoutCurrent gets all local branches
-func (gh *GitHelperImpl) GetBranchesWithoutCurrent() ([]string, error) {
-	cb, err := gh.GetCurrentBranch()
-	if err != nil {
-		return nil, err
-	}
-	exeArgs := []string{"branch", "--list"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	if err != nil {
-		return nil, err
-	}
-
-	lines := strings.Split(output.String(), "\n")
-	var branches []string
-	for _, line := range lines {
-		branch := strings.TrimSpace(line)
-		if branch != "" && branch != cb {
-			branches = append(branches, strings.TrimPrefix(branch, "* "))
-		}
-	}
-	return branches, nil
-}
-
 func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 	exeArgs := []string{"checkout", branch}
 	err := gh.exe.WithGit().WithArgs(exeArgs).Run()

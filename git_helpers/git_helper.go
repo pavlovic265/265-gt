@@ -19,7 +19,6 @@ type GitHelper interface {
 	// Branch operations
 	GetCurrentBranch() (string, error)
 	GetBranches() ([]string, error)
-	GetBranchesWithoutCurrent() ([]string, error)
 	RebaseBranch(branch string, parent string) error
 
 	// Pending branch

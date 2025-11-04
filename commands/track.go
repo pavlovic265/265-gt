@@ -40,14 +40,25 @@ func (svc trackCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			branch, err := svc.gitHelper.GetCurrentBranch()
+			if err != nil {
+				return log.Error("Failed to get current branch name", err)
+			}
+
 			branchs, err := svc.gitHelper.GetBranches()
 			if err != nil {
 				return log.Error("Failed to get branches", err)
 			}
+			branchesWithoutCurrent := make([]string, len(branchs)-1)
+			for _, b := range branchs {
+				if b != branch {
+					branchesWithoutCurrent = append(branchesWithoutCurrent, b)
+				}
+			}
 
 			initialModel := components.ListModel[string]{
-				AllChoices: branchs,
-				Choices:    branchs,
+				AllChoices: branchesWithoutCurrent,
+				Choices:    branchesWithoutCurrent,
 				Cursor:     0,
 				Query:      "",
 				Formatter:  func(s string) string { return s },
@@ -55,11 +66,6 @@ func (svc trackCommand) Command() *cobra.Command {
 			}
 
 			program := tea.NewProgram(initialModel)
-
-			branch, err := svc.gitHelper.GetCurrentBranch()
-			if err != nil {
-				return log.Error("Failed to get current branch name", err)
-			}
 
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
