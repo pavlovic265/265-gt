@@ -13,6 +13,7 @@ import (
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
@@ -20,15 +21,18 @@ import (
 type listCommand struct {
 	exe           executor.Executor
 	configManager config.ConfigManager
+	gitHelper     helpers.GitHelper
 }
 
 func NewListCommand(
 	exe executor.Executor,
 	configManager config.ConfigManager,
+	gitHelper helpers.GitHelper,
 ) listCommand {
 	return listCommand{
 		exe:           exe,
 		configManager: configManager,
+		gitHelper:     gitHelper,
 	}
 }
 
@@ -56,6 +60,7 @@ type pullRequest struct {
 	number int
 	title  string
 	url    string
+	branch string
 }
 
 func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
@@ -95,6 +100,7 @@ func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 		number: pr.Number,
 		title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
 		url:    pr.URL,
+		branch: pr.Branch,
 	}
 }
 
@@ -165,6 +171,7 @@ func (svc listCommand) selectPullRequest(
 				if err != nil {
 					return log.Error("Failed to merge pull request", err)
 				}
+				svc.gitHelper.DeleteParent(m.Selected.branch)
 				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
 				return nil
 			}

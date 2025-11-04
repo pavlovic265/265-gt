@@ -174,7 +174,7 @@ type PullRequest struct {
 	URL         string          `json:"url"`
 	Author      string          `json:"author"`
 	Mergeable   string          `json:"mergeable"`
-	HeadRefName string          `json:"headRefName"`
+	Branch      string          `json:"headRefName"`
 	StatusState StatusStateType `json:"statusState"`
 }
 
@@ -268,7 +268,7 @@ func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
 			URL:         pr.URL,
 			Author:      pr.Author.Login,
 			Mergeable:   pr.Mergeable,
-			HeadRefName: pr.HeadRefName,
+			Branch:      pr.HeadRefName,
 			StatusState: statusState,
 		})
 	}
