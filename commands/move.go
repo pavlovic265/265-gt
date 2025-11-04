@@ -58,6 +58,7 @@ func (svc moveCommand) Command() *cobra.Command {
 				if err != nil {
 					return log.Error("Failed to get branch list", err)
 				}
+
 				if err := svc.rebaseBranch(branch, branches); err != nil {
 					return err
 				}

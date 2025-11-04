@@ -171,7 +171,10 @@ func (svc listCommand) selectPullRequest(
 				if err != nil {
 					return log.Error("Failed to merge pull request", err)
 				}
-				svc.gitHelper.DeleteParent(m.Selected.branch)
+				err = svc.gitHelper.DeleteParent(m.Selected.branch)
+				if err != nil {
+					return log.Error("Failed to delete parent connection", err)
+				}
 				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
 				return nil
 			}
