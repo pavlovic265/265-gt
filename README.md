@@ -143,7 +143,8 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `checkout` | `co` | Checkout/search and switch to branch | `gt checkout main` |
 | `delete` | `dl` | Delete a branch | `gt delete old-branch` |
 | `clean` | `cl` | Clean merged branches (excludes protected) | `gt clean` |
-| `move` | `mv` | Rebase current branch | `gt move` |
+| `move` | `mv` | Rebase current branch onto another branch | `gt move` |
+| `track` | `tr` | Set parent branch relationship (no rebase) | `gt track` |
 
 ### Navigation
 
@@ -399,6 +400,45 @@ gt down  # Move to: feature/auth-system
 gt down  # Move to: feature/user-auth
 ```
 
+### Branch Tracking
+```bash
+# Interactively select a parent branch to track (no rebase)
+gt track
+# or use the alias
+gt tr
+
+# This will:
+# 1. Display an interactive list of all branches (excluding current)
+# 2. Allow searching/filtering branches by typing
+# 3. Select a parent branch with Enter
+# 4. Store parent relationship in git config (gt.branch.<branch>.parent)
+# Note: This does NOT rebase, only sets the parent relationship
+
+# Example workflow:
+# You're on 'feature/new-feature' and want to track 'develop' as parent
+gt track
+# Search for 'develop', press Enter to select
+# ✓ successfully tracking feature/new-feature
+
+# Manual parent configuration (alternative to gt track):
+# You can manually set the parent branch in git config
+git config --local gt.branch.<branch-name>.parent <parent-branch>
+
+# Example: Set 'main' as parent of current branch
+git config --local gt.branch.$(git rev-parse --abbrev-ref HEAD).parent main
+
+# View parent relationship
+git config --local --get gt.branch.<branch-name>.parent
+
+# Remove parent relationship
+git config --local --unset gt.branch.<branch-name>.parent
+
+# The parent relationship is used by:
+# - gt up/down: Navigate branch hierarchy
+# - gt stack restack: Rebase child branches onto their parents
+# - Branch organization and visualization
+```
+
 ### Multi-Account Management
 ```bash
 # Add a new account
@@ -513,7 +553,6 @@ gt pr li
 
 ## 🚧 Planned Features
 
-- [⚙️] **Branch Tracking** — Interactive branch selection to rebase current branch onto a selected branch with `gt track` command.
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
 - [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
