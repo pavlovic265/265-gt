@@ -1,6 +1,7 @@
 package pullrequests
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -22,32 +23,40 @@ type listCommand struct {
 	exe           executor.Executor
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
+	account       *config.Account
+	ctx           context.Context
 }
 
 func NewListCommand(
 	exe executor.Executor,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
-) listCommand {
-	return listCommand{
+) *listCommand {
+	return &listCommand{
 		exe:           exe,
 		configManager: configManager,
 		gitHelper:     gitHelper,
 	}
 }
 
-func (svc listCommand) Command() *cobra.Command {
+func (svc *listCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "list",
 		Short:   "show list of pull request",
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !svc.configManager.HasActiveAccount() {
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("No active account found")
 			}
-			account := svc.configManager.GetActiveAccount()
+			svc.account = cfg.Global.ActiveAccount
+			svc.ctx = cmd.Context()
 
-			prs, err := client.Client[account.Platform].ListPullRequests(args)
+			prs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, args)
 			if err != nil {
 				return log.Error("Failed to list pull requests", err)
 			}
@@ -63,7 +72,7 @@ type pullRequest struct {
 	branch string
 }
 
-func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
+func (svc *listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 	ciStatus := ""
 	ciStatusColor := constants.White
 	switch pr.StatusState {
@@ -104,9 +113,8 @@ func (svc listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 	}
 }
 
-func (svc listCommand) refreshFunc() tea.Msg {
-	account := svc.configManager.GetActiveAccount()
-	updatedPrs, err := client.Client[account.Platform].ListPullRequests([]string{})
+func (svc *listCommand) refreshFunc() tea.Msg {
+	updatedPrs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, []string{})
 	if err != nil {
 		return components.RefreshCompleteMsg[pullRequest]{Err: err}
 	}
@@ -122,7 +130,7 @@ func (svc listCommand) refreshFunc() tea.Msg {
 	}
 }
 
-func (svc listCommand) selectPullRequest(
+func (svc *listCommand) selectPullRequest(
 	prs []client.PullRequest,
 	selectedPRNumber ...int,
 ) error {
@@ -166,8 +174,7 @@ func (svc listCommand) selectPullRequest(
 			}
 
 			if m.MergeAction {
-				account := svc.configManager.GetActiveAccount()
-				err := client.Client[account.Platform].MergePullRequest(m.Selected.number)
+				err := client.Client[svc.account.Platform].MergePullRequest(m.Selected.number)
 				if err != nil {
 					return log.Error("Failed to merge pull request", err)
 				}
@@ -191,7 +198,7 @@ func (svc listCommand) selectPullRequest(
 	return nil
 }
 
-func (svc listCommand) yankToClipboard(url string) {
+func (svc *listCommand) yankToClipboard(url string) {
 	commands := [][]string{
 		{"pbcopy"},                           // macOS
 		{"xclip", "-selection", "clipboard"}, // Linux with xclip

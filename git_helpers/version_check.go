@@ -11,7 +11,6 @@ import (
 
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
@@ -21,33 +20,31 @@ type GitHubRelease struct {
 	HTMLURL string `json:"html_url"`
 }
 
-func (gh *GitHelperImpl) CheckGTVersion() {
-	version := gh.configManager.GetVersion()
+func (gh *GitHelperImpl) CheckGTVersion(ctx context.Context) {
+	cfg, ok := config.GetConfig(ctx)
+	if !ok || cfg.Global == nil || cfg.Global.Version == nil {
+		return // No config in context, skip version check
+	}
+
+	version := *cfg.Global.Version
 	if !shouldCheckVersion(version) {
 		return // Silently fail if check is not needed
 	}
 
 	// Create context with timeout to avoid blocking (reduced to 1s for faster commands)
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	latestVersion, latestURL, err := getLatestGTVersionWithContext(ctx)
+	latestVersion, latestURL, err := getLatestGTVersionWithContext(timeoutCtx)
 	if err != nil {
 		return // Silently fail if we can't get latest version
 	}
 
 	storedVersion := version.CurrentVersion
-	globalConfig, err := gh.configManager.LoadGlobalConfig()
-	if err != nil {
-		_ = log.Error("Global config not found. Run 'gt config global' to create it first", err)
-		return
-	}
 
-	globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-
-	if err := gh.configManager.SaveGlobalConfig(*globalConfig); err != nil {
-		return // Silently fail if we can't update last checked
-	}
+	// Update LastChecked in memory only - will be saved by PersistentPostRunE
+	cfg.Global.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+	cfg.MarkDirty()
 
 	// If no version is stored, show notification to upgrade
 	if len(storedVersion) == 0 {

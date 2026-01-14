@@ -6,7 +6,6 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 )
 
-// ButtonType defines the visual style of a button
 type ButtonType int
 
 const (
@@ -17,7 +16,6 @@ const (
 	ButtonDanger
 )
 
-// Button represents a styled button component
 type Button struct {
 	Label      string
 	Icon       string
@@ -25,7 +23,6 @@ type Button struct {
 	Focused    bool
 }
 
-// NewButton creates a new button with the given label and type
 func NewButton(label string, buttonType ButtonType) Button {
 	return Button{
 		Label:      label,
@@ -34,19 +31,16 @@ func NewButton(label string, buttonType ButtonType) Button {
 	}
 }
 
-// WithIcon adds an icon to the button
 func (b Button) WithIcon(icon string) Button {
 	b.Icon = icon
 	return b
 }
 
-// WithFocus sets the focus state of the button
 func (b Button) WithFocus(focused bool) Button {
 	b.Focused = focused
 	return b
 }
 
-// Render returns the styled button string
 func (b Button) Render() string {
 	var text string
 	if b.Icon != "" {
@@ -77,35 +71,28 @@ func (b Button) Render() string {
 	}
 }
 
-// Common button constructors for convenience
-
-// NewDoneButton creates a styled "Done" button with checkmark icon
 func NewDoneButton(focused bool) Button {
 	return NewButton("Done", ButtonSuccess).
 		WithIcon(constants.CheckIcon).
 		WithFocus(focused)
 }
 
-// NewAddButton creates a styled "Add" button with plus icon
 func NewAddButton(focused bool) Button {
 	return NewButton("Add", ButtonInfo).
 		WithIcon(constants.PlusIcon).
 		WithFocus(focused)
 }
 
-// NewCancelButton creates a styled "Cancel" button
 func NewCancelButton(focused bool) Button {
 	return NewButton("Cancel", ButtonDanger).
 		WithFocus(focused)
 }
 
-// NewSaveButton creates a styled "Save" button
 func NewSaveButton(focused bool) Button {
 	return NewButton("Save", ButtonSuccess).
 		WithFocus(focused)
 }
 
-// NewBackButton creates a styled "Back" button
 func NewBackButton(focused bool) Button {
 	return NewButton("Back", ButtonPrimary).
 		WithFocus(focused)

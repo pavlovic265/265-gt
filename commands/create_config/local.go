@@ -31,7 +31,10 @@ func (svc localCommand) Command() *cobra.Command {
 		Short:              "generate local config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// filePath := filepath.Join(".", constants.FileName)
+			cfg, ok := config.GetConfig(cmd.Context())
+			if !ok {
+				return log.ErrorMsg("Config not loaded")
+			}
 
 			branches, err := HandleAddProtectedBranch()
 			if err != nil {
@@ -39,10 +42,12 @@ func (svc localCommand) Command() *cobra.Command {
 			}
 
 			fmt.Println("branches", branches)
-			err = svc.configManager.SaveProtectedBranches(branches)
-			if err != nil {
-				return log.Error("Failed to save local configuration", err)
+
+			if cfg.Local == nil {
+				cfg.Local = &config.LocalConfigStruct{}
 			}
+			cfg.Local.Protected = append(cfg.Local.Protected, branches...)
+			cfg.MarkLocalDirty()
 
 			log.Success("Local configuration updated successfully")
 			return nil

@@ -33,12 +33,17 @@ func (svc switchCommand) Command() *cobra.Command {
 		Aliases: []string{"sw"},
 		Short:   "switch accounts",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
 			if len(args) > 0 {
-				if err := svc.switchUser(args[0]); err != nil {
+				if err := svc.switchUser(cfg, args[0]); err != nil {
 					return err
 				}
 			} else {
-				if err := svc.selectAndswitchUser(); err != nil {
+				if err := svc.selectAndswitchUser(cfg); err != nil {
 					return err
 				}
 			}
@@ -47,8 +52,8 @@ func (svc switchCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc switchCommand) switchUser(user string) error {
-	accounts := svc.configManager.GetAccounts()
+func (svc switchCommand) switchUser(cfg *config.ConfigContext, user string) error {
+	accounts := cfg.Global.Accounts
 	var account *config.Account
 	for _, acc := range accounts {
 		if user == acc.User {
@@ -67,17 +72,16 @@ func (svc switchCommand) switchUser(user string) error {
 		return log.Error("Failed to switch account", err)
 	}
 
-	err = svc.configManager.SaveActiveAccount(pointer.Deref(account))
-	if err != nil {
-		return log.Error("Failed to update active account", err)
-	}
+	// Update active account in context - will be saved by PersistentPostRunE
+	cfg.Global.ActiveAccount = account
+	cfg.MarkDirty()
 
 	log.Success("Switched to account: " + account.User)
 	return nil
 }
 
-func (svc switchCommand) selectAndswitchUser() error {
-	accounts := svc.configManager.GetAccounts()
+func (svc switchCommand) selectAndswitchUser(cfg *config.ConfigContext) error {
+	accounts := cfg.Global.Accounts
 	var users []string
 	for _, acc := range accounts {
 		users = append(users, acc.User)
@@ -96,7 +100,7 @@ func (svc switchCommand) selectAndswitchUser() error {
 
 	if finalModel, err := program.Run(); err == nil {
 		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-			err := svc.switchUser(m.Selected)
+			err := svc.switchUser(cfg, m.Selected)
 			if err != nil {
 				return err
 			}

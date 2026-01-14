@@ -12,17 +12,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Styling definitions for unstage command
 var (
-	// Success styles
 	unstageSuccessIconStyle = lipgloss.NewStyle().
 				Foreground(constants.Green)
 
-	// Error styles
 	unstageErrorIconStyle = lipgloss.NewStyle().
 				Foreground(constants.Red)
 
-	// Message styles
 	unstageMessageStyle = lipgloss.NewStyle().
 				Foreground(constants.White)
 )

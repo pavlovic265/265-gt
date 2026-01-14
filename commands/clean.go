@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -20,18 +21,14 @@ type cleanCommand struct {
 	gitHelper helpers.GitHelper
 }
 
-// Styling definitions for clean command
 var (
-	// Header styles
 	headerStyle = lipgloss.NewStyle().
 			Foreground(constants.Blue).
 			Bold(true)
 
-	// Info styles
 	infoStyle = lipgloss.NewStyle().
 			Foreground(constants.Cyan)
 
-	// Branch info styles
 	branchStyle = lipgloss.NewStyle().
 			Foreground(constants.Magenta)
 
@@ -62,12 +59,12 @@ func (svc cleanCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return svc.cleanBranches()
+			return svc.cleanBranches(cmd.Context())
 		},
 	}
 }
 
-func (svc cleanCommand) cleanBranches() error {
+func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 	currentBranch, err := svc.gitHelper.GetCurrentBranch()
 	if err != nil {
 		return log.Error("Failed to get current branch", err)
@@ -78,7 +75,6 @@ func (svc cleanCommand) cleanBranches() error {
 		return log.Error("Failed to get branches", err)
 	}
 
-	// Styled header
 	fmt.Println(headerStyle.Render("Branch Cleanup"))
 	log.Infof("Current branch: %s", branchStyle.Render(currentBranch))
 	fmt.Println()
@@ -89,7 +85,7 @@ func (svc cleanCommand) cleanBranches() error {
 		if branch == currentBranch {
 			continue
 		}
-		if svc.gitHelper.IsProtectedBranch(branch) {
+		if svc.gitHelper.IsProtectedBranch(ctx, branch) {
 			protectedCount++
 			continue
 		}
@@ -97,7 +93,7 @@ func (svc cleanCommand) cleanBranches() error {
 	}
 
 	log.Infof("Found %d branches (%d protected, %d cleanable)",
-		len(branches)-1, // -1 for current branch
+		len(branches)-1,
 		protectedCount,
 		cleanableCount)
 	fmt.Println()
@@ -110,7 +106,7 @@ func (svc cleanCommand) cleanBranches() error {
 	deletedCount := 0
 	skippedCount := 0
 	for _, branch := range branches {
-		if branch == currentBranch || svc.gitHelper.IsProtectedBranch(branch) {
+		if branch == currentBranch || svc.gitHelper.IsProtectedBranch(ctx, branch) {
 			continue
 		}
 

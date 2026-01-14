@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,15 +36,15 @@ func (m *MockGitHelper) EXPECT() *MockGitHelperMockRecorder {
 }
 
 // CheckGTVersion mocks base method.
-func (m *MockGitHelper) CheckGTVersion() {
+func (m *MockGitHelper) CheckGTVersion(ctx context.Context) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "CheckGTVersion")
+	m.ctrl.Call(m, "CheckGTVersion", ctx)
 }
 
 // CheckGTVersion indicates an expected call of CheckGTVersion.
-func (mr *MockGitHelperMockRecorder) CheckGTVersion() *gomock.Call {
+func (mr *MockGitHelperMockRecorder) CheckGTVersion(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckGTVersion", reflect.TypeOf((*MockGitHelper)(nil).CheckGTVersion))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckGTVersion", reflect.TypeOf((*MockGitHelper)(nil).CheckGTVersion), ctx)
 }
 
 // DeleteParent mocks base method.
@@ -192,17 +193,17 @@ func (mr *MockGitHelperMockRecorder) IsGitRepository() *gomock.Call {
 }
 
 // IsProtectedBranch mocks base method.
-func (m *MockGitHelper) IsProtectedBranch(branch string) bool {
+func (m *MockGitHelper) IsProtectedBranch(ctx context.Context, branch string) bool {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsProtectedBranch", branch)
+	ret := m.ctrl.Call(m, "IsProtectedBranch", ctx, branch)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
 // IsProtectedBranch indicates an expected call of IsProtectedBranch.
-func (mr *MockGitHelperMockRecorder) IsProtectedBranch(branch interface{}) *gomock.Call {
+func (mr *MockGitHelperMockRecorder) IsProtectedBranch(ctx, branch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsProtectedBranch", reflect.TypeOf((*MockGitHelper)(nil).IsProtectedBranch), branch)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsProtectedBranch", reflect.TypeOf((*MockGitHelper)(nil).IsProtectedBranch), ctx, branch)
 }
 
 // IsRebaseInProgress mocks base method.

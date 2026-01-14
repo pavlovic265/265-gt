@@ -1,7 +1,6 @@
 package account_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -27,22 +26,18 @@ func TestListCommand_Command(t *testing.T) {
 	assert.NotNil(t, cmd.RunE)
 }
 
-func TestListCommand_LoadConfigError(t *testing.T) {
+func TestListCommand_NoContext(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
-
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(nil, errors.New("config error"))
 
 	listCmd := account.NewListCommand(mockConfigManager)
 	cmd := listCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Failed to load config")
+	assert.Contains(t, err.Error(), "no config found")
 }
 
 func TestListCommand_NoAccounts(t *testing.T) {
@@ -51,16 +46,10 @@ func TestListCommand_NoAccounts(t *testing.T) {
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	globalConfig := &config.GlobalConfigStruct{
-		Accounts: []config.Account{},
-	}
-
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(globalConfig, nil)
-
 	listCmd := account.NewListCommand(mockConfigManager)
 	cmd := listCmd.Command()
+
+	setAccountCommandContext(cmd, []config.Account{}, nil)
 
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
@@ -72,36 +61,27 @@ func TestListCommand_WithAccounts(t *testing.T) {
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	globalConfig := &config.GlobalConfigStruct{
-		Accounts: []config.Account{
-			{
-				User:     "user1",
-				Email:    "user1@example.com",
-				Platform: constants.GitHubPlatform,
-				Name:     "User One",
-			},
-			{
-				User:     "user2",
-				Email:    "user2@example.com",
-				Platform: constants.GitLabPlatform,
-				Name:     "User Two",
-			},
+	activeAccount := &config.Account{
+		User:     "user1",
+		Email:    "user1@example.com",
+		Platform: constants.GitHubPlatform,
+		Name:     "User One",
+	}
+
+	accounts := []config.Account{
+		*activeAccount,
+		{
+			User:     "user2",
+			Email:    "user2@example.com",
+			Platform: constants.GitLabPlatform,
+			Name:     "User Two",
 		},
 	}
 
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(globalConfig, nil)
-
-	mockConfigManager.EXPECT().
-		GetActiveAccount().
-		Return(config.Account{
-			User:     "user1",
-			Platform: constants.GitHubPlatform,
-		})
-
 	listCmd := account.NewListCommand(mockConfigManager)
 	cmd := listCmd.Command()
+
+	setAccountCommandContext(cmd, accounts, activeAccount)
 
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)

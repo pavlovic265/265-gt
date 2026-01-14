@@ -12,7 +12,6 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 )
 
-// Styling definitions for account form interface
 var (
 	optionsStyle = lipgloss.NewStyle().
 			Foreground(constants.BrightBlack)

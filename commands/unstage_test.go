@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create an unstage command with mock executor
 func createUnstageCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor,
 	*mocks.MockGitHelper,

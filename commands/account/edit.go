@@ -33,13 +33,12 @@ func (ec editCommand) Command() *cobra.Command {
 		Short: "Edit an existing account",
 		Long:  "Select and edit an existing GitHub or GitLab account",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Load existing config
-			globalConfig, err := ec.configManager.LoadGlobalConfig()
+			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
-				return log.Error("Global config not found. Run 'gt config global' to create it first", err)
+				return err
 			}
 
-			if len(globalConfig.Accounts) == 0 {
+			if len(cfg.Global.Accounts) == 0 {
 				log.Info("No accounts configured")
 				fmt.Println("\nRun 'gt account add' to add an account")
 				return nil
@@ -47,7 +46,7 @@ func (ec editCommand) Command() *cobra.Command {
 
 			// Build choices for search and select
 			var choices []string
-			for _, account := range globalConfig.Accounts {
+			for _, account := range cfg.Global.Accounts {
 				platform := account.Platform.String()
 				choices = append(choices, fmt.Sprintf("%s (%s) - %s", account.User, platform, account.Email))
 			}
@@ -88,25 +87,22 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			// Edit the selected account
-			selectedAccount := globalConfig.Accounts[selectedIndex]
+			selectedAccount := cfg.Global.Accounts[selectedIndex]
 			editedAccount, err := HandleEditAccount(&selectedAccount)
 			if err != nil {
 				return log.Error("Failed to edit account", err)
 			}
 
-			// Update the account in config
-			globalConfig.Accounts[selectedIndex] = *editedAccount
+			// Update the account in context - will be saved by PersistentPostRunE
+			cfg.Global.Accounts[selectedIndex] = *editedAccount
 
 			// Update active account if it was the one being edited
-			activeAccount := ec.configManager.GetActiveAccount()
-			if activeAccount.User == selectedAccount.User && activeAccount.Platform == selectedAccount.Platform {
-				globalConfig.ActiveAccount = editedAccount
+			if cfg.Global.ActiveAccount != nil &&
+				cfg.Global.ActiveAccount.User == selectedAccount.User &&
+				cfg.Global.ActiveAccount.Platform == selectedAccount.Platform {
+				cfg.Global.ActiveAccount = editedAccount
 			}
-
-			// Save config
-			if err := ec.configManager.SaveGlobalConfig(*globalConfig); err != nil {
-				return log.Error("Failed to save config", err)
-			}
+			cfg.MarkDirty()
 
 			log.Success("Account updated successfully")
 			return nil

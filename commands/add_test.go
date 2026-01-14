@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create an add command with mock executor
 func createAddCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor,
 	*mocks.MockGitHelper,

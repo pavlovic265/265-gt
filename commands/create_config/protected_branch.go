@@ -12,7 +12,6 @@ import (
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
-// Styling definitions for protected branch interface
 var (
 	optionsStyle = lipgloss.NewStyle().
 			Foreground(constants.BrightBlack)

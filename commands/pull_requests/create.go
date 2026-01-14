@@ -31,15 +31,21 @@ func (svc createCommand) Command() *cobra.Command {
 		Aliases: []string{"c"},
 		Short:   "Create a pull request",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
+				return log.ErrorMsg("No active account found")
+			}
+			account := cfg.Global.ActiveAccount
+
 			if draft {
 				args = append([]string{"--draft"}, args...)
 			}
-			account := svc.configManager.GetActiveAccount()
-			if !svc.configManager.HasActiveAccount() {
-				return log.ErrorMsg("No active account found")
-			}
 
-			err := client.Client[account.Platform].CreatePullRequest(args)
+			err = client.Client[account.Platform].CreatePullRequest(cmd.Context(), args)
 			if err != nil {
 				return log.Error("Failed to create pull request", err)
 			}

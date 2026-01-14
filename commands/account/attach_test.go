@@ -31,12 +31,10 @@ func TestAttachCommand_NoActiveAccount(t *testing.T) {
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	mockConfigManager.EXPECT().
-		HasActiveAccount().
-		Return(false)
-
 	attachCmd := account.NewAttachCommand(mockConfigManager)
 	cmd := attachCmd.Command()
+
+	setAccountCommandContext(cmd, []config.Account{}, nil)
 
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
@@ -49,22 +47,16 @@ func TestAttachCommand_NonExistentDirectory(t *testing.T) {
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	mockConfigManager.EXPECT().
-		HasActiveAccount().
-		Return(true)
-
-	mockConfigManager.EXPECT().
-		GetActiveAccount().
-		Return(config.Account{
-			User:  "testuser",
-			Email: "test@example.com",
-			Name:  "Test User",
-		})
-
 	attachCmd := account.NewAttachCommand(mockConfigManager)
 	cmd := attachCmd.Command()
 
-	// Try to attach to non-existent directory
+	activeAccount := &config.Account{
+		User:  "testuser",
+		Email: "test@example.com",
+		Name:  "Test User",
+	}
+	setAccountCommandContext(cmd, []config.Account{*activeAccount}, activeAccount)
+
 	err := cmd.RunE(cmd, []string{"/path/that/does/not/exist"})
 	assert.Error(t, err)
 }

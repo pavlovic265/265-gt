@@ -21,7 +21,6 @@ func TestAuthCommand_Command(t *testing.T) {
 
 	assert.Equal(t, "auth", cmd.Use)
 	assert.Equal(t, "auth user", cmd.Short)
-	assert.NotNil(t, cmd.PersistentPreRun)
 }
 
 func TestNewAuthCommand(t *testing.T) {

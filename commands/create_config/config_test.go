@@ -22,7 +22,6 @@ func TestConfigCommand_Command(t *testing.T) {
 	assert.Equal(t, "config", cmd.Use)
 	assert.Equal(t, []string{"conf"}, cmd.Aliases)
 	assert.Equal(t, "create config", cmd.Short)
-	assert.NotNil(t, cmd.PersistentPreRun)
 }
 
 func TestNewConfigCommand(t *testing.T) {

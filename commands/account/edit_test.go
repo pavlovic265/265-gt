@@ -1,7 +1,6 @@
 package account_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -26,23 +25,19 @@ func TestEditCommand_Command(t *testing.T) {
 	assert.NotNil(t, cmd.RunE)
 }
 
-func TestEditCommand_LoadConfigError(t *testing.T) {
+func TestEditCommand_NoContext(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(nil, errors.New("config not found"))
-
 	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
 	cmd := editCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Global config not found")
+	assert.Contains(t, err.Error(), "no config found")
 }
 
 func TestEditCommand_NoAccounts(t *testing.T) {
@@ -52,16 +47,10 @@ func TestEditCommand_NoAccounts(t *testing.T) {
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	globalConfig := &config.GlobalConfigStruct{
-		Accounts: []config.Account{},
-	}
-
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(globalConfig, nil)
-
 	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
 	cmd := editCmd.Command()
+
+	setAccountCommandContext(cmd, []config.Account{}, nil)
 
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)

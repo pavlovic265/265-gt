@@ -22,7 +22,6 @@ func TestAccountCommand_Command(t *testing.T) {
 	assert.Equal(t, "account", cmd.Use)
 	assert.Equal(t, []string{"acc"}, cmd.Aliases)
 	assert.Equal(t, "Manage accounts", cmd.Short)
-	assert.NotNil(t, cmd.PersistentPreRun)
 }
 
 func TestNewAccountCommand(t *testing.T) {

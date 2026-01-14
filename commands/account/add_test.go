@@ -1,14 +1,26 @@
 package account_test
 
 import (
-	"errors"
+	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/pavlovic265/265-gt/commands/account"
+	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/mocks"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
+
+// setAccountCommandContext sets up the context with config for account command tests
+func setAccountCommandContext(cmd *cobra.Command, accounts []config.Account, activeAccount *config.Account) {
+	cfg := config.NewConfigContext(&config.GlobalConfigStruct{
+		Accounts:      accounts,
+		ActiveAccount: activeAccount,
+	}, nil)
+	ctx := config.WithConfig(context.Background(), cfg)
+	cmd.SetContext(ctx)
+}
 
 func TestAddCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -25,23 +37,19 @@ func TestAddCommand_Command(t *testing.T) {
 	assert.NotNil(t, cmd.RunE)
 }
 
-func TestAddCommand_LoadConfigError(t *testing.T) {
+func TestAddCommand_NoContext(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(nil, errors.New("config not found"))
-
 	addCmd := account.NewAddCommand(mockExecutor, mockConfigManager)
 	cmd := addCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Global config not found")
+	assert.Contains(t, err.Error(), "no config found")
 }
 
 func TestNewAddCommand(t *testing.T) {

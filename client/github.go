@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -13,24 +14,26 @@ import (
 )
 
 type gitHubCli struct {
-	exe           executor.Executor
-	gitHelper     helpers.GitHelper
-	configManager config.ConfigManager
+	exe       executor.Executor
+	gitHelper helpers.GitHelper
 }
 
 func NewGitHubCli(
 	exe executor.Executor,
-	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) CliClient {
 	return &gitHubCli{
-		exe:           exe,
-		configManager: configManager,
-		gitHelper:     gitHelper,
+		exe:       exe,
+		gitHelper: gitHelper,
 	}
 }
 
-func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
+func (svc gitHubCli) getActiveAccount(ctx context.Context) (*config.Account, error) {
+	cfg, ok := config.GetConfig(ctx)
+	if !ok {
+		return nil, fmt.Errorf("config not loaded")
+	}
+
 	exeArgs := []string{"auth", "status"}
 	output, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
@@ -54,8 +57,7 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 				}
 			}
 
-			accounts := svc.configManager.GetAccounts()
-			for _, acc := range accounts {
+			for _, acc := range cfg.Global.Accounts {
 				if acc.User == user && strings.HasPrefix(acc.Token, tokenPrefix) {
 					return &acc, nil
 				}
@@ -66,23 +68,26 @@ func (svc gitHubCli) getActiveAccount() (*config.Account, error) {
 	return nil, fmt.Errorf("could not found account")
 }
 
-func (svc gitHubCli) AuthStatus() error {
+func (svc gitHubCli) AuthStatus(ctx context.Context) error {
 	exeArgs := []string{"auth", "status"}
 	output, err := svc.exe.WithGh().WithArgs(exeArgs).RunWithOutput()
 	if err != nil {
 		return err
 	}
 
-	// Format and display the output with beautiful UI
-	svc.displayAuthStatus(output.String())
+	svc.displayAuthStatus(ctx, output.String())
 
 	return nil
 }
 
-func (svc gitHubCli) AuthLogin(user string) error {
-	accounts := svc.configManager.GetAccounts()
+func (svc gitHubCli) AuthLogin(ctx context.Context, user string) error {
+	cfg, ok := config.GetConfig(ctx)
+	if !ok {
+		return fmt.Errorf("config not loaded")
+	}
+
 	var account config.Account
-	for _, acc := range accounts {
+	for _, acc := range cfg.Global.Accounts {
 		if acc.User == user {
 			account = acc
 			break
@@ -95,16 +100,19 @@ func (svc gitHubCli) AuthLogin(user string) error {
 		return err
 	}
 
-	err = svc.configManager.SaveActiveAccount(account)
-	if err != nil {
-		return err
-	}
+	cfg.Global.ActiveAccount = pointer.From(account)
+	cfg.MarkDirty()
 
 	return nil
 }
 
-func (svc gitHubCli) AuthLogout(user string) error {
-	if !svc.configManager.HasActiveAccount() {
+func (svc gitHubCli) AuthLogout(ctx context.Context, user string) error {
+	cfg, ok := config.GetConfig(ctx)
+	if !ok {
+		return fmt.Errorf("config not loaded")
+	}
+
+	if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 		return fmt.Errorf("no active account found")
 	}
 
@@ -114,28 +122,23 @@ func (svc gitHubCli) AuthLogout(user string) error {
 		return err
 	}
 
-	acc, err := svc.getActiveAccount()
+	acc, err := svc.getActiveAccount(ctx)
 	if err != nil {
 		return err
 	}
 
 	if acc != nil {
-		err = svc.configManager.SaveActiveAccount(pointer.Deref(acc))
-		if err != nil {
-			return err
-		}
+		cfg.Global.ActiveAccount = acc
 	} else {
-		err = svc.configManager.ClearActiveAccount()
-		if err != nil {
-			return err
-		}
+		cfg.Global.ActiveAccount = nil
 	}
+	cfg.MarkDirty()
 
 	return nil
 }
 
-func (svc *gitHubCli) CreatePullRequest(args []string) error {
-	acc, err := svc.getActiveAccount()
+func (svc *gitHubCli) CreatePullRequest(ctx context.Context, args []string) error {
+	acc, err := svc.getActiveAccount(ctx)
 	if err != nil {
 		return err
 	}
@@ -157,7 +160,6 @@ func (svc *gitHubCli) CreatePullRequest(args []string) error {
 		"--base", parent,
 	}
 
-	// Add any additional args (like --draft)
 	exeArgs = append(exeArgs, args...)
 
 	err = svc.exe.WithGh().WithArgs(exeArgs).Run()
@@ -186,8 +188,8 @@ var (
 	StatusStateTypePending StatusStateType
 )
 
-func (svc *gitHubCli) ListPullRequests(args []string) ([]PullRequest, error) {
-	acc, err := svc.getActiveAccount()
+func (svc *gitHubCli) ListPullRequests(ctx context.Context, args []string) ([]PullRequest, error) {
+	acc, err := svc.getActiveAccount(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -293,8 +295,7 @@ func (svc *gitHubCli) UpdatePullRequestBranch(prNumber int) error {
 	return nil
 }
 
-func (svc gitHubCli) displayAuthStatus(output string) {
-	// Simple title with subtle color
+func (svc gitHubCli) displayAuthStatus(ctx context.Context, output string) {
 	fmt.Println("GitHub Authentication Status")
 	fmt.Println()
 
@@ -308,39 +309,27 @@ func (svc gitHubCli) displayAuthStatus(output string) {
 			continue
 		}
 
-		// Platform header (e.g., "github.com")
 		if !strings.HasPrefix(line, " ") && !strings.HasPrefix(line, "✓") && !strings.HasPrefix(line, "-") {
 			if currentPlatform != "" {
-				fmt.Println() // Add spacing between platforms
+				fmt.Println()
 			}
 			currentPlatform = line
 			fmt.Println("> " + currentPlatform)
 			continue
 		}
 
-		// Style the lines with subtle colors
 		if strings.HasPrefix(line, "✓") {
-			// Success lines (logged in accounts)
 			fmt.Println(line)
 		} else if strings.HasPrefix(line, "-") {
-			// Detail lines
-			if strings.Contains(line, "Active account: true") {
-				fmt.Println("  " + line)
-			} else if strings.Contains(line, "Active account: false") {
-				fmt.Println("  " + line)
-			} else if strings.Contains(line, "Token:") {
-				fmt.Println("  " + line)
-			} else {
-				fmt.Println("  " + line)
-			}
+			fmt.Println("  " + line)
 		}
 	}
 
 	fmt.Println()
 
-	// Show active account from our config
-	activeAccount := svc.configManager.GetActiveAccount()
-	if svc.configManager.HasActiveAccount() {
+	cfg, ok := config.GetConfig(ctx)
+	if ok && cfg.Global.ActiveAccount != nil && cfg.Global.ActiveAccount.User != "" {
+		activeAccount := cfg.Global.ActiveAccount
 		fmt.Println(constants.GetSuccessAnsiStyle().Render(
 			"* Active Account: " + activeAccount.User + " (" + activeAccount.Platform.String() + ")"))
 	} else {
