@@ -7,25 +7,19 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 )
 
-// Styling definitions for log utility
 var (
-	// Success styles
 	successIconStyle = lipgloss.NewStyle().
 				Foreground(constants.Green)
 
-	// Error styles
 	errorIconStyle = lipgloss.NewStyle().
 			Foreground(constants.Red)
 
-	// Info styles
 	infoIconStyle = lipgloss.NewStyle().
 			Foreground(constants.Blue)
 
-	// Warning styles
 	warningIconStyle = lipgloss.NewStyle().
 				Foreground(constants.Yellow)
 
-	// Message styles
 	messageStyle = lipgloss.NewStyle().
 			Foreground(constants.White)
 )
@@ -61,7 +55,6 @@ func Warning(message string) {
 		messageStyle.Render(message))
 }
 
-// Errorf creates a formatted error message and logs it
 func Errorf(format string, args ...any) error {
 	message := fmt.Sprintf(format, args...)
 	fmt.Printf("%s %s\n",
@@ -70,19 +63,16 @@ func Errorf(format string, args ...any) error {
 	return fmt.Errorf("%s", message)
 }
 
-// Infof creates a formatted info message and logs it
 func Infof(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Info(message)
 }
 
-// Successf creates a formatted success message and logs it
 func Successf(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Success(message)
 }
 
-// Warningf creates a formatted warning message and logs it
 func Warningf(format string, args ...any) {
 	message := fmt.Sprintf(format, args...)
 	Warning(message)

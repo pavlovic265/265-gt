@@ -30,19 +30,15 @@ type ListModel[T any] struct {
 	RefreshFunc func() tea.Msg
 }
 
-// RefreshCompleteMsg is sent when refresh completes
 type RefreshCompleteMsg[T any] struct {
 	Choices []T
 	Err     error
 }
 
-// Styling definitions
 var (
-	// Search input styles
 	searchLabelStyle = lipgloss.NewStyle().
 				Foreground(constants.Blue)
 
-	// List item styles
 	cursorStyle = lipgloss.NewStyle().
 			Foreground(constants.Yellow)
 
@@ -52,11 +48,9 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().
 				Foreground(constants.Green)
 
-	// Empty state style
 	emptyStateStyle = lipgloss.NewStyle().
 			Foreground(constants.BrightBlack)
 
-	// Footer styles
 	footerStyle = lipgloss.NewStyle().
 			Foreground(constants.BrightBlack)
 

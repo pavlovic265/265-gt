@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a commit command with mock executor
 func createCommitCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor,
 	*mocks.MockGitHelper,

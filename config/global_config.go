@@ -9,8 +9,7 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 )
 
-// GetGlobalConfigPath returns the path to the global configuration file
-func (d *DefaultConfigManager) GetGlobalConfigPath() (string, error) {
+func (d *DefaultConfigManager) getGlobalConfigPath() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
@@ -27,38 +26,18 @@ func (d *DefaultConfigManager) GetGlobalConfigPath() (string, error) {
 	return configPath, nil
 }
 
-// LoadGlobalConfig loads the global configuration from disk
 func (d *DefaultConfigManager) LoadGlobalConfig() (*GlobalConfigStruct, error) {
-	configPath, err := d.GetGlobalConfigPath()
+	configPath, err := d.getGlobalConfigPath()
 	if err != nil {
 		return nil, err
 	}
 	return readConfig[GlobalConfigStruct](configPath)
 }
 
-// SaveGlobalConfig saves the global configuration to disk
 func (d *DefaultConfigManager) SaveGlobalConfig(configToSave GlobalConfigStruct) error {
-	configPath, err := d.GetGlobalConfigPath()
+	configPath, err := d.getGlobalConfigPath()
 	if err != nil {
 		return err
 	}
-	err = writeConfig(configPath, &configToSave)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// loadGlobalConfig loads the global configuration (private helper)
-func (d *DefaultConfigManager) loadGlobalConfig() (*GlobalConfigStruct, error) {
-	configPath, err := d.GetGlobalConfigPath()
-	if err != nil {
-		return nil, err
-	}
-	gconf, err := readConfig[GlobalConfigStruct](configPath)
-	if err != nil {
-		return nil, err
-	}
-
-	return gconf, nil
+	return writeConfig(configPath, &configToSave)
 }

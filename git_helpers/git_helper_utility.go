@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-// RelinkParentChildren updates the parent pointers of the deleted branch's children
-// to point to the deleted branch's parent
 func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []string) error {
 	if parent == "" {
 		// branch is not tracked, nothing to relink

@@ -28,10 +28,9 @@ func (ac addCommand) Command() *cobra.Command {
 		Short: "Add a new account",
 		Long:  "Add a new GitHub or GitLab account interactively",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Load existing config
-			globalConfig, err := ac.configManager.LoadGlobalConfig()
+			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
-				return log.Error("Global config not found. Run 'gt config global' to create it first", err)
+				return err
 			}
 
 			// Run the account form
@@ -45,13 +44,9 @@ func (ac addCommand) Command() *cobra.Command {
 				return nil
 			}
 
-			// Append new accounts
-			globalConfig.Accounts = append(globalConfig.Accounts, accounts...)
-
-			// Save config
-			if err := ac.configManager.SaveGlobalConfig(*globalConfig); err != nil {
-				return log.Error("Failed to save config", err)
-			}
+			// Append new accounts to context - will be saved by PersistentPostRunE
+			cfg.Global.Accounts = append(cfg.Global.Accounts, accounts...)
+			cfg.MarkDirty()
 
 			log.Successf("Added %d account(s)", len(accounts))
 			return nil

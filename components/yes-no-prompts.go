@@ -15,17 +15,13 @@ type YesNoPrompt struct {
 	Quitting bool
 }
 
-// Styling definitions for yes/no prompt
 var (
-	// Question style
 	questionStyle = lipgloss.NewStyle().
 			Foreground(constants.Blue)
 
-	// Options style
 	optionsStyle = lipgloss.NewStyle().
 			Foreground(constants.BrightBlack)
 
-	// Key styles
 	yesKeyStyle = lipgloss.NewStyle().
 			Foreground(constants.Green).
 			Bold(true)
@@ -42,7 +38,6 @@ var (
 			Foreground(constants.Yellow).
 			Bold(true)
 
-	// Canceled message style
 	canceledIconStyle = lipgloss.NewStyle().
 				Foreground(constants.Red)
 	canceledStyle = lipgloss.NewStyle().

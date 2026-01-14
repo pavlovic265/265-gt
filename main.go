@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,18 +26,52 @@ import (
 var (
 	exe           = executor.NewExe()
 	configManager = config.NewDefaultConfigManager(exe)
-	gitHelper     = helpers.NewGitHelper(exe, configManager)
-	_             = client.InitCliClient(exe, configManager, gitHelper)
+	gitHelper     = helpers.NewGitHelper(exe)
+	_             = client.InitCliClient(exe, gitHelper)
 )
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
 
 var rootCmd = &cobra.Command{
 	Use: "gt",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		gitHelper.CheckGTVersion()
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		globalCfg, _ := configManager.LoadGlobalConfig()
+		localCfg, _ := configManager.LoadLocalConfig()
+
+		ctx := cmd.Context()
+		if ctx == nil {
+			ctx = context.Background()
+		}
+
+		cfg := config.NewConfigContext(globalCfg, localCfg)
+		ctx = config.WithConfig(ctx, cfg)
+		cmd.SetContext(ctx)
+
+		if globalCfg != nil {
+			gitHelper.CheckGTVersion(ctx)
+		}
+		return nil
 	},
-	// Override the default error handling to pass unknown commands to git
+	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+		cfg, ok := config.GetConfig(cmd.Context())
+		if !ok {
+			return nil
+		}
+
+		if cfg.IsDirty() {
+			if err := configManager.SaveGlobalConfig(*cfg.Global); err != nil {
+				return err
+			}
+		}
+
+		if cfg.IsLocalDirty() && cfg.Local != nil {
+			if err := configManager.SaveLocalConfig(*cfg.Local); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	},
 	SilenceErrors: true,
 	SilenceUsage:  true,
 }

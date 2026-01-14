@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a switch command with mock executor
 func createSwitchCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor,
 	*mocks.MockGitHelper,

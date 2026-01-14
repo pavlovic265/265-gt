@@ -33,11 +33,13 @@ func (svc upgradeCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "upgrade",
 		Short: "upgrade of current build",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			svc.configManager.InitGlobalConfig()
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			version, isLatest, err := svc.isLatestVersion()
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			version, isLatest, err := svc.isLatestVersion(cfg)
 			if err != nil {
 				return err
 			}
@@ -62,17 +64,10 @@ func (svc upgradeCommand) Command() *cobra.Command {
 				}
 			}
 
-			globalConfig, err := svc.configManager.LoadGlobalConfig()
-			if err != nil {
-				return log.Error("Global config not found. Run 'gt config global' to create it first", err)
-			}
-
-			globalConfig.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
-			globalConfig.Version.CurrentVersion = pointer.Deref(version)
-
-			if err := svc.configManager.SaveGlobalConfig(*globalConfig); err != nil {
-				return log.Error("Failed to update version in config", err)
-			}
+			// Update version in context - will be saved by PersistentPostRunE
+			cfg.Global.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
+			cfg.Global.Version.CurrentVersion = pointer.Deref(version)
+			cfg.MarkDirty()
 
 			log.Success("Tool upgraded successfully")
 			return nil
@@ -122,7 +117,7 @@ func (svc upgradeCommand) upgradeWithScript() error {
 	return nil
 }
 
-func (svc upgradeCommand) isLatestVersion() (*string, bool, error) {
+func (svc upgradeCommand) isLatestVersion(cfg *config.ConfigContext) (*string, bool, error) {
 	// Get latest version from GitHub API
 	url := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 	resp, err := http.Get(url)
@@ -139,12 +134,8 @@ func (svc upgradeCommand) isLatestVersion() (*string, bool, error) {
 		return nil, false, err
 	}
 
-	// Get current version from config manager
-	globalConfig, err := svc.configManager.LoadGlobalConfig()
-	if err != nil {
-		return nil, false, err
-	}
-	currentVersion := globalConfig.Version.CurrentVersion
+	// Get current version from context config
+	currentVersion := cfg.Global.Version.CurrentVersion
 	if currentVersion == result.TagName {
 		return pointer.From(result.TagName), true, nil
 	}

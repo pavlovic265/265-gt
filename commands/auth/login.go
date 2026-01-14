@@ -34,7 +34,12 @@ func (svc loginCommand) Command() *cobra.Command {
 		Short:              "login user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accounts := svc.configManager.GetAccounts()
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			accounts := cfg.Global.Accounts
 
 			var users []string
 			for _, acc := range accounts {
@@ -61,7 +66,7 @@ func (svc loginCommand) Command() *cobra.Command {
 							break
 						}
 					}
-					if err := client.Client[account.Platform].AuthLogin(account.User); err != nil {
+					if err := client.Client[account.Platform].AuthLogin(cmd.Context(), account.User); err != nil {
 						return log.Error("Authentication failed", err)
 					}
 

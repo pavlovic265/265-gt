@@ -27,9 +27,6 @@ func (ac accountCommand) Command() *cobra.Command {
 		Aliases: []string{"acc"},
 		Short:   "Manage accounts",
 		Long:    "Manage your GitHub and GitLab accounts for gt",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			ac.configManager.InitGlobalConfig()
-		},
 	}
 
 	accountCmd.AddCommand(NewAddCommand(ac.exe, ac.configManager).Command())

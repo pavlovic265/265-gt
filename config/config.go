@@ -3,13 +3,7 @@ package config
 import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
-	"github.com/pavlovic265/265-gt/utils/log"
-	"github.com/pavlovic265/265-gt/utils/pointer"
 )
-
-// ============================================================================
-// STRUCTS
-// ============================================================================
 
 type Account struct {
 	User       string             `yaml:"user"`
@@ -44,75 +38,13 @@ type DefaultConfigManager struct {
 	exe executor.Executor
 }
 
-// ============================================================================
-// INTERFACE
-// ============================================================================
-
-// ConfigManager interface defines the contract for config operations
 type ConfigManager interface {
-	// Initialization
-	InitLocalConfig()
-	InitGlobalConfig()
-
-	// Global config operations
-	GetGlobalConfigPath() (string, error)
 	LoadGlobalConfig() (*GlobalConfigStruct, error)
 	SaveGlobalConfig(configToSave GlobalConfigStruct) error
-
-	// Local config operations
 	LoadLocalConfig() (*LocalConfigStruct, error)
 	SaveLocalConfig(configToSave LocalConfigStruct) error
-
-	// Protected branches config operations
-	SaveProtectedBranches(branches []string) error
-	GetProtectedBranches() []string
-
-	// Account operations
-	SaveActiveAccount(account Account) error
-	SetActiveAccount(account Account) error
-	GetActiveAccount() Account
-	GetAccounts() []Account
-	ClearActiveAccount() error
-	HasActiveAccount() bool
-
-	// Version operations
-	GetVersion() Version
-	GetCurrentVersion() string
 }
 
-var (
-	localConfig  LocalConfigStruct
-	globalConfig GlobalConfigStruct
-)
-
-// NewDefaultConfigManager creates a new DefaultConfigManager instance
 func NewDefaultConfigManager(exe executor.Executor) *DefaultConfigManager {
 	return &DefaultConfigManager{exe: exe}
-}
-
-func (d *DefaultConfigManager) InitLocalConfig() {
-	lc, err := d.loadLocalConfig()
-	if err != nil {
-		_ = log.Error("Failed to load local config: %v\n", err)
-		return
-	}
-	if lc == nil {
-		log.Warning("Missing local config")
-		return
-	}
-
-	localConfig = pointer.Deref(lc)
-}
-
-func (d *DefaultConfigManager) InitGlobalConfig() {
-	gc, err := d.loadGlobalConfig()
-	if err != nil {
-		_ = log.Error("Failed to load global config: %v\n", err)
-		return
-	}
-	if gc == nil {
-		log.Warning("Missing global config")
-		return
-	}
-	globalConfig = pointer.Deref(gc)
 }

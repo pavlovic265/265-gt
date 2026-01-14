@@ -30,12 +30,17 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "see status of current auth user",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !svc.configManager.HasActiveAccount() {
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("No active account found")
 			}
-			account := svc.configManager.GetActiveAccount()
+			account := cfg.Global.ActiveAccount
 
-			err := client.Client[account.Platform].AuthStatus()
+			err = client.Client[account.Platform].AuthStatus(cmd.Context())
 			if err != nil {
 				return log.Error("Authentication failed", err)
 			}

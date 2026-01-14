@@ -40,6 +40,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
@@ -51,7 +52,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 					return log.ErrorMsg("Cannot delete the branch you are currently on")
 				}
 
-				if svc.gitHelper.IsProtectedBranch(branch) {
+				if svc.gitHelper.IsProtectedBranch(ctx, branch) {
 					return log.ErrorMsg("Cannot delete protected branch: " + branch)
 				}
 
@@ -66,7 +67,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
-					if branch != currentBranchName && !svc.gitHelper.IsProtectedBranch(branch) {
+					if branch != currentBranchName && !svc.gitHelper.IsProtectedBranch(ctx, branch) {
 						branchesWithoutCurrent = append(branchesWithoutCurrent, branch)
 					}
 				}

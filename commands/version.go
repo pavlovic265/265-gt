@@ -28,9 +28,6 @@ func (svc versionCommand) Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "version of current build",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			svc.configManager.InitGlobalConfig()
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			latest, _ := cmd.Flags().GetBool("latest")
 
@@ -38,7 +35,7 @@ func (svc versionCommand) Command() *cobra.Command {
 				return svc.getLatestVersion()
 			}
 
-			return svc.getCurrentVersion()
+			return svc.getCurrentVersion(cmd)
 		},
 	}
 
@@ -47,11 +44,13 @@ func (svc versionCommand) Command() *cobra.Command {
 	return cmd
 }
 
-func (svc versionCommand) getCurrentVersion() error {
-	// Read version from config
-	version := svc.configManager.GetCurrentVersion()
-	if version == "" {
-		version = "unknown"
+func (svc versionCommand) getCurrentVersion(cmd *cobra.Command) error {
+	// Read version from context config
+	version := "unknown"
+	if cfg, ok := config.GetConfig(cmd.Context()); ok && cfg.Global.Version != nil {
+		if cfg.Global.Version.CurrentVersion != "" {
+			version = cfg.Global.Version.CurrentVersion
+		}
 	}
 
 	fmt.Printf("%s %s\n",

@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a status command with mock executor
 func createStatusCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor,
 	*mocks.MockGitHelper,

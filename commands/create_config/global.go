@@ -1,9 +1,6 @@
 package createconfig
 
 import (
-	"errors"
-	"os"
-
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
@@ -34,20 +31,16 @@ func (svc globalCommand) Command() *cobra.Command {
 		Short:              "generate global config",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, err := svc.configManager.GetGlobalConfigPath()
-			if errors.Is(err, os.ErrNotExist) {
-				err = svc.createGlobalConfig()
-				if err != nil {
-					return log.Error("Failed to create global configuration", err)
-				}
+			_, err := svc.configManager.LoadGlobalConfig()
+			if err == nil {
+				log.Warning("Global config file already exists")
 				return nil
 			}
 
+			err = svc.createGlobalConfig()
 			if err != nil {
-				return log.Error("Error checking global config file", err)
+				return log.Error("Failed to create global configuration", err)
 			}
-			log.Warning("Global config file already exists")
-
 			return nil
 		},
 	}

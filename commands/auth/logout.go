@@ -30,12 +30,17 @@ func (svc logoutCommand) Command() *cobra.Command {
 		Short:              "logout user with token",
 		DisableFlagParsing: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			account := svc.configManager.GetActiveAccount()
-			if !svc.configManager.HasActiveAccount() {
-				return log.ErrorMsg("No active account found")
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
 			}
 
-			if err := client.Client[account.Platform].AuthLogout(account.User); err != nil {
+			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
+				return log.ErrorMsg("No active account found")
+			}
+			account := cfg.Global.ActiveAccount
+
+			if err := client.Client[account.Platform].AuthLogout(cmd.Context(), account.User); err != nil {
 				return log.Error("Logout failed", err)
 			}
 

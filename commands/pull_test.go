@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create a pull command with mock executor and git helper
 func createPullCommandWithMock(t *testing.T) (
 	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {

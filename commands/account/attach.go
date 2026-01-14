@@ -31,12 +31,17 @@ func (atc attachCommand) Command() *cobra.Command {
 		Long:    "Configure Git to use the active account's credentials for a specific directory",
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !atc.configManager.HasActiveAccount() {
+			cfg, err := config.RequireGlobal(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("No active account. Run 'gt auth' to set an active account")
 			}
 
 			// Get active account
-			activeAccount := atc.configManager.GetActiveAccount()
+			activeAccount := *cfg.Global.ActiveAccount
 
 			// Determine target directory
 			targetDir := "."

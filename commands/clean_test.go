@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test helper to create a clean command with mock executor and git helper
 func createCleanCommandWithMock(t *testing.T) (
 	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
@@ -69,9 +68,8 @@ func TestCleanCommand_RunE_WithBranchesToClean(t *testing.T) {
 		GetBranches().
 		Return([]string{"main", "feature-branch", "test-branch"}, nil)
 
-	// Set up expectations for IsProtectedBranch - use AnyTimes since it's called in a loop
 	mockGitHelper.EXPECT().
-		IsProtectedBranch(gomock.Any()).
+		IsProtectedBranch(gomock.Any(), gomock.Any()).
 		Return(false).
 		AnyTimes()
 

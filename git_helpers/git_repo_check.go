@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// IsGitRepository checks if the current directory is a git repository
 func (gh *GitHelperImpl) IsGitRepository() error {
 	exeArgs := []string{"rev-parse", "--git-dir"}
 	_, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
@@ -16,7 +15,6 @@ func (gh *GitHelperImpl) IsGitRepository() error {
 	return nil
 }
 
-// GetGitRoot gets the root directory of the git repository
 func (gh *GitHelperImpl) GetGitRoot() (string, error) {
 	exeArgs := []string{"rev-parse", "--show-toplevel"}
 	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
@@ -26,7 +24,6 @@ func (gh *GitHelperImpl) GetGitRoot() (string, error) {
 	return strings.TrimSpace(output.String()), nil
 }
 
-// EnsureGitRepository ensures the current directory is a git repository
 func (gh *GitHelperImpl) EnsureGitRepository() error {
 	err := gh.IsGitRepository()
 	if err != nil {

@@ -2,6 +2,7 @@ package commands_test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"testing"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test helper to create an upgrade command with mock executor and config manager
 func createUpgradeCommandWithMock(t *testing.T) (
 	*mocks.MockExecutor, *mocks.MockConfigManager, *gomock.Controller, *cobra.Command,
 ) {
@@ -26,35 +26,31 @@ func createUpgradeCommandWithMock(t *testing.T) (
 	return mockExecutor, mockConfigManager, ctrl, cmd
 }
 
+// setUpgradeCommandContext sets up the context with config for upgrade command tests
+func setUpgradeCommandContext(cmd *cobra.Command, version string) {
+	cfg := config.NewConfigContext(&config.GlobalConfigStruct{
+		Version: &config.Version{
+			CurrentVersion: version,
+		},
+	}, nil)
+	ctx := config.WithConfig(context.Background(), cfg)
+	cmd.SetContext(ctx)
+}
+
 func TestUpgradeCommand_Command(t *testing.T) {
 	_, _, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Test that the command is properly configured
 	assert.Equal(t, "upgrade", cmd.Use)
 	assert.Equal(t, "upgrade of current build", cmd.Short)
 }
 
 func TestUpgradeCommand_RunE_Success(t *testing.T) {
-	mockExecutor, mockConfigManager, ctrl, cmd := createUpgradeCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for config manager
-	// LoadGlobalConfig is called twice: once in isLatestVersion() and once in RunE
+	setUpgradeCommandContext(cmd, "v0.1.0")
 
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(&config.GlobalConfigStruct{
-			Version: &config.Version{
-				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
-			},
-		}, nil).Times(2)
-
-	mockConfigManager.EXPECT().
-		SaveGlobalConfig(gomock.Any()).
-		Return(nil)
-
-	// Set up expectations for checkWhichBinary() call
 	mockExecutor.EXPECT().
 		WithName("command").
 		Return(mockExecutor)
@@ -67,7 +63,6 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 		RunWithOutput().
 		Return(*bytes.NewBufferString("homebrew"), nil)
 
-	// Set up expectations for upgrade process
 	mockExecutor.EXPECT().
 		WithName("bash").
 		Return(mockExecutor)
@@ -80,30 +75,16 @@ func TestUpgradeCommand_RunE_Success(t *testing.T) {
 		Run().
 		Return(nil)
 
-	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 	assert.NoError(t, err)
 }
 
 func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
-	// This test handles the case where the upgrade command determines an upgrade is needed
-	// and calls the executor, but the executor fails.
-
-	mockExecutor, mockConfigManager, ctrl, cmd := createUpgradeCommandWithMock(t)
+	mockExecutor, _, ctrl, cmd := createUpgradeCommandWithMock(t)
 	defer ctrl.Finish()
 
-	// Set up expectations for config manager
-	// LoadGlobalConfig is called once in isLatestVersion() before the executor fails
+	setUpgradeCommandContext(cmd, "v0.1.0")
 
-	mockConfigManager.EXPECT().
-		LoadGlobalConfig().
-		Return(&config.GlobalConfigStruct{
-			Version: &config.Version{
-				CurrentVersion: "v0.1.0", // Different from latest to trigger upgrade
-			},
-		}, nil)
-
-	// Set up expectations for checkWhichBinary() call
 	mockExecutor.EXPECT().
 		WithName("command").
 		Return(mockExecutor)
@@ -116,7 +97,6 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 		RunWithOutput().
 		Return(*bytes.NewBufferString("homebrew"), nil)
 
-	// Set up expectations for upgrade process that will fail
 	mockExecutor.EXPECT().
 		WithName("bash").
 		Return(mockExecutor)
@@ -127,13 +107,11 @@ func TestUpgradeCommand_RunE_ExecutorError(t *testing.T) {
 
 	mockExecutor.EXPECT().
 		Run().
-		Return(fmt.Errorf("executor failed")) // Return error for this test
+		Return(fmt.Errorf("executor failed"))
 
-	// Execute the command
 	err := cmd.RunE(cmd, []string{})
 
-	// The command should fail due to executor error
-	assert.Error(t, err, "Upgrade command should fail when executor fails")
+	assert.Error(t, err)
 }
 
 func TestNewUpgradeCommand(t *testing.T) {
@@ -143,10 +121,8 @@ func TestNewUpgradeCommand(t *testing.T) {
 	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	// Test that NewUpgradeCommand creates a command with the correct executor and config manager
 	upgradeCmd := commands.NewUpgradeCommand(mockExecutor, mockConfigManager)
 
-	// Verify the command can be created
 	cmd := upgradeCmd.Command()
 	require.NotNil(t, cmd)
 	assert.Equal(t, "upgrade", cmd.Use)

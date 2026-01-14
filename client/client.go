@@ -1,28 +1,29 @@
 package client
 
 import (
-	"github.com/pavlovic265/265-gt/config"
+	"context"
+
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
 )
 
 type CliClient interface {
-	AuthStatus() error
-	AuthLogin(user string) error
-	AuthLogout(user string) error
-	CreatePullRequest(args []string) error
-	ListPullRequests(args []string) ([]PullRequest, error)
+	AuthStatus(ctx context.Context) error
+	AuthLogin(ctx context.Context, user string) error
+	AuthLogout(ctx context.Context, user string) error
+	CreatePullRequest(ctx context.Context, args []string) error
+	ListPullRequests(ctx context.Context, args []string) ([]PullRequest, error)
 	MergePullRequest(prNumber int) error
 	UpdatePullRequestBranch(prNumber int) error
 }
 
 var Client map[constants.Platform]CliClient
 
-func InitCliClient(exe executor.Executor, configManager config.ConfigManager, gitHelper helpers.GitHelper) error {
+func InitCliClient(exe executor.Executor, gitHelper helpers.GitHelper) error {
 	Client = map[constants.Platform]CliClient{
-		constants.GitHubPlatform: NewGitHubCli(exe, configManager, gitHelper),
-		constants.GitLabPlatform: NewGitLabCli(exe, configManager, gitHelper),
+		constants.GitHubPlatform: NewGitHubCli(exe, gitHelper),
+		constants.GitLabPlatform: NewGitLabCli(exe, gitHelper),
 	}
 	return nil
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test helper to create a delete command with mock executor and git helper
 func createDeleteCommandWithMock(t *testing.T) (
 	*mocks.MockGitHelper, *gomock.Controller, *cobra.Command,
 ) {
@@ -49,9 +48,8 @@ func TestDeleteCommand_RunE_WithBranchName(t *testing.T) {
 		GetCurrentBranch().
 		Return(branchName, nil)
 
-	// Set up expectations for IsProtectedBranch
 	mockGitHelper.EXPECT().
-		IsProtectedBranch("test-branch").
+		IsProtectedBranch(gomock.Any(), "test-branch").
 		Return(false)
 
 	// Set up expectations for GetParent
@@ -117,13 +115,12 @@ func TestDeleteCommand_RunE_WithoutBranchName(t *testing.T) {
 		GetBranches().
 		Return([]string{"main", "feature-branch", "test-branch"}, nil)
 
-	// Set up expectations for IsProtectedBranch
 	mockGitHelper.EXPECT().
-		IsProtectedBranch("feature-branch").
+		IsProtectedBranch(gomock.Any(), "feature-branch").
 		Return(false)
 
 	mockGitHelper.EXPECT().
-		IsProtectedBranch("test-branch").
+		IsProtectedBranch(gomock.Any(), "test-branch").
 		Return(false)
 
 	// Execute the command (this will trigger the interactive selection)

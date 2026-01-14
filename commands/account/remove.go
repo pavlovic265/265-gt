@@ -31,13 +31,12 @@ func (rc removeCommand) Command() *cobra.Command {
 		Short:   "Remove an account",
 		Long:    "Select and remove an existing GitHub or GitLab account",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Load existing config
-			globalConfig, err := rc.configManager.LoadGlobalConfig()
+			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
-				return log.Error("Global config not found. Run 'gt config global' to create it first", err)
+				return err
 			}
 
-			if len(globalConfig.Accounts) == 0 {
+			if len(cfg.Global.Accounts) == 0 {
 				log.Info("No accounts configured")
 				fmt.Println("\nRun 'gt account add' to add an account")
 				return nil
@@ -45,7 +44,7 @@ func (rc removeCommand) Command() *cobra.Command {
 
 			// Build choices for search and select
 			var choices []string
-			for _, account := range globalConfig.Accounts {
+			for _, account := range cfg.Global.Accounts {
 				platform := account.Platform.String()
 				choices = append(choices, fmt.Sprintf("%s (%s) - %s", account.User, platform, account.Email))
 			}
@@ -86,22 +85,19 @@ func (rc removeCommand) Command() *cobra.Command {
 			}
 
 			// Get the account to remove
-			accountToRemove := globalConfig.Accounts[selectedIndex]
+			accountToRemove := cfg.Global.Accounts[selectedIndex]
 
-			// Remove the account from the list
-			globalConfig.Accounts = slices.Delete(globalConfig.Accounts, selectedIndex, selectedIndex+1)
+			// Remove the account from the list - will be saved by PersistentPostRunE
+			cfg.Global.Accounts = slices.Delete(cfg.Global.Accounts, selectedIndex, selectedIndex+1)
 
 			// If the removed account was the active account, clear it
-			activeAccount := rc.configManager.GetActiveAccount()
-			if activeAccount.User == accountToRemove.User && activeAccount.Platform == accountToRemove.Platform {
-				globalConfig.ActiveAccount = &config.Account{}
+			if cfg.Global.ActiveAccount != nil &&
+				cfg.Global.ActiveAccount.User == accountToRemove.User &&
+				cfg.Global.ActiveAccount.Platform == accountToRemove.Platform {
+				cfg.Global.ActiveAccount = nil
 				log.Info("Removed active account. Run 'gt auth' to set a new active account")
 			}
-
-			// Save config
-			if err := rc.configManager.SaveGlobalConfig(*globalConfig); err != nil {
-				return log.Error("Failed to save config", err)
-			}
+			cfg.MarkDirty()
 
 			log.Successf("Removed account: %s (%s)", accountToRemove.User, accountToRemove.Platform.String())
 			return nil

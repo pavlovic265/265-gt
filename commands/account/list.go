@@ -48,12 +48,12 @@ func (lc listCommand) Command() *cobra.Command {
 		Short:   "List all accounts",
 		Long:    "List all configured GitHub and GitLab accounts",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			globalConfig, err := lc.configManager.LoadGlobalConfig()
+			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
-				return log.Error("Failed to load config", err)
+				return err
 			}
 
-			if len(globalConfig.Accounts) == 0 {
+			if len(cfg.Global.Accounts) == 0 {
 				log.Info("No accounts configured")
 				fmt.Println("\nRun 'gt account add' to add an account")
 				return nil
@@ -62,10 +62,12 @@ func (lc listCommand) Command() *cobra.Command {
 			fmt.Println(headerStyle.Render("Accounts"))
 			fmt.Println()
 
-			activeAccount := lc.configManager.GetActiveAccount()
+			activeAccount := cfg.Global.ActiveAccount
 
-			for i, account := range globalConfig.Accounts {
-				isActive := activeAccount.User == account.User && activeAccount.Platform == account.Platform
+			for i, account := range cfg.Global.Accounts {
+				isActive := activeAccount != nil &&
+					activeAccount.User == account.User &&
+					activeAccount.Platform == account.Platform
 
 				prefix := "  "
 				if isActive {
@@ -85,13 +87,13 @@ func (lc listCommand) Command() *cobra.Command {
 				fmt.Println()
 
 				// Add spacing between accounts
-				if i < len(globalConfig.Accounts)-1 {
+				if i < len(cfg.Global.Accounts)-1 {
 					fmt.Println()
 				}
 			}
 
 			fmt.Println()
-			log.Infof("Total: %d account(s)", len(globalConfig.Accounts))
+			log.Infof("Total: %d account(s)", len(cfg.Global.Accounts))
 
 			return nil
 		},
