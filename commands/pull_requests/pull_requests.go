@@ -33,11 +33,19 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 		Use:     "pull_request",
 		Short:   "commands for pull request",
 		Aliases: []string{"pr"},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// Call parent's PersistentPreRunE to load config
+			if parent := cmd.Parent(); parent != nil && parent.PersistentPreRunE != nil {
+				if err := parent.PersistentPreRunE(cmd, args); err != nil {
+					return err
+				}
+			}
+			// Then check for git repository
 			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
 				fmt.Printf("%v\n", err)
 				os.Exit(1)
 			}
+			return nil
 		},
 	}
 
