@@ -118,7 +118,7 @@ func main() {
 	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager, gitHelper).Command())
 
 	rootCmd.AddCommand(commands.NewVersionCommand(exe, configManager).Command())
-	rootCmd.AddCommand(auth.NewAuthCommand(exe, configManager).Command())
+	rootCmd.AddCommand(auth.NewAuthCommand(configManager).Command())
 	rootCmd.AddCommand(account.NewAccountCommand(exe, configManager).Command())
 	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
 	rootCmd.AddCommand(commands.NewCompletionCommand().Command())

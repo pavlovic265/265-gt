@@ -3,22 +3,18 @@ package auth
 import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type statusCommand struct {
-	exe           executor.Executor
 	configManager config.ConfigManager
 }
 
 func NewStatusCommand(
-	exe executor.Executor,
 	configManager config.ConfigManager,
 ) statusCommand {
 	return statusCommand{
-		exe:           exe,
 		configManager: configManager,
 	}
 }

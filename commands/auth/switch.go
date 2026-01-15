@@ -6,23 +6,19 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/spf13/cobra"
 )
 
 type switchCommand struct {
-	exe           executor.Executor
 	configManager config.ConfigManager
 }
 
 func NewSwitchCommand(
-	exe executor.Executor,
 	configManager config.ConfigManager,
 ) switchCommand {
 	return switchCommand{
-		exe:           exe,
 		configManager: configManager,
 	}
 }
@@ -64,12 +60,6 @@ func (svc switchCommand) switchUser(cfg *config.ConfigContext, user string) erro
 	if account == nil {
 		log.Warning("User '" + user + "' does not exist in config")
 		return nil
-	}
-
-	exeArgs := []string{"auth", "switch", "--user", account.User}
-	err := svc.exe.WithGh().WithArgs(exeArgs).Run()
-	if err != nil {
-		return log.Error("Failed to switch account", err)
 	}
 
 	// Update active account in context - will be saved by PersistentPostRunE

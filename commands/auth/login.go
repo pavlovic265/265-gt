@@ -7,22 +7,18 @@ import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type loginCommand struct {
-	exe           executor.Executor
 	configManager config.ConfigManager
 }
 
 func NewLoginCommand(
-	exe executor.Executor,
 	configManager config.ConfigManager,
 ) loginCommand {
 	return loginCommand{
-		exe:           exe,
 		configManager: configManager,
 	}
 }

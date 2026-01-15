@@ -2,21 +2,17 @@ package auth
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	"github.com/spf13/cobra"
 )
 
 type authCommand struct {
-	exe           executor.Executor
 	configManager config.ConfigManager
 }
 
 func NewAuthCommand(
-	exe executor.Executor,
 	configManager config.ConfigManager,
 ) authCommand {
 	return authCommand{
-		exe:           exe,
 		configManager: configManager,
 	}
 }
@@ -26,10 +22,10 @@ func (svc authCommand) Command() *cobra.Command {
 		Use:   "auth",
 		Short: "auth user",
 	}
-	authCmd.AddCommand(NewStatusCommand(svc.exe, svc.configManager).Command())
-	authCmd.AddCommand(NewLoginCommand(svc.exe, svc.configManager).Command())
-	authCmd.AddCommand(NewLogoutCommand(svc.exe, svc.configManager).Command())
-	authCmd.AddCommand(NewSwitchCommand(svc.exe, svc.configManager).Command())
+	authCmd.AddCommand(NewStatusCommand(svc.configManager).Command())
+	authCmd.AddCommand(NewLoginCommand(svc.configManager).Command())
+	authCmd.AddCommand(NewLogoutCommand(svc.configManager).Command())
+	authCmd.AddCommand(NewSwitchCommand(svc.configManager).Command())
 
 	return authCmd
 }

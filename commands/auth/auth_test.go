@@ -13,10 +13,9 @@ func TestAuthCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	authCmd := auth.NewAuthCommand(mockExecutor, mockConfigManager)
+	authCmd := auth.NewAuthCommand(mockConfigManager)
 	cmd := authCmd.Command()
 
 	assert.Equal(t, "auth", cmd.Use)
@@ -27,10 +26,9 @@ func TestNewAuthCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	authCmd := auth.NewAuthCommand(mockExecutor, mockConfigManager)
+	authCmd := auth.NewAuthCommand(mockConfigManager)
 	cmd := authCmd.Command()
 
 	assert.NotNil(t, cmd)

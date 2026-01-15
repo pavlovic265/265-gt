@@ -10,7 +10,6 @@ import (
 
 type Executor interface {
 	WithGit() Executor
-	WithGh() Executor
 	WithName(name string) Executor
 	WithArgs(args []string) Executor
 	WithStdin(stdin string) Executor
@@ -41,11 +40,6 @@ func (exe exe) WithName(name string) Executor {
 
 func (exe exe) WithGit() Executor {
 	exe.Name = "git"
-	return exe
-}
-
-func (exe exe) WithGh() Executor {
-	exe.Name = "gh"
 	return exe
 }
 
