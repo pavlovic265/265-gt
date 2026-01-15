@@ -15,16 +15,16 @@ import (
 )
 
 type upgradeCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewUpgradeCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) upgradeCommand {
 	return upgradeCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }
@@ -83,13 +83,12 @@ const (
 )
 
 func (svc upgradeCommand) checkWhichBinary() *Binary {
-	exeArgs := []string{"-v", "gt"}
-	out, err := svc.exe.WithName("command").WithArgs(exeArgs).RunWithOutput()
+	out, err := svc.runner.ExecOutput("command", "-v", "gt")
 	if err != nil {
 		log.Warningf("Failed to check if homebrew is installed: %v", err)
 		return nil
 	}
-	if strings.Contains(out.String(), "homebrew") {
+	if strings.Contains(out, "homebrew") {
 		return pointer.From(BinaryHomebrew)
 	}
 
@@ -97,24 +96,12 @@ func (svc upgradeCommand) checkWhichBinary() *Binary {
 }
 
 func (svc upgradeCommand) upgradeWithHomebrew() error {
-	exeArgs := []string{"brew", "upgrade", "gt"}
-	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return svc.runner.Exec("bash", "brew", "upgrade", "gt")
 }
 
 func (svc upgradeCommand) upgradeWithScript() error {
 	installURL := "https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh"
-	exeArgs := []string{"-c", fmt.Sprintf("curl -fsSL %s | bash", installURL)}
-	err := svc.exe.WithName("bash").WithArgs(exeArgs).Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return svc.runner.Exec("bash", "-c", fmt.Sprintf("curl -fsSL %s | bash", installURL))
 }
 
 func (svc upgradeCommand) isLatestVersion(cfg *config.ConfigContext) (*string, bool, error) {

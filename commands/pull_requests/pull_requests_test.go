@@ -13,11 +13,11 @@ func TestPullRequestCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	prCmd := pullrequests.NewPullRequestCommand(mockExecutor, mockConfigManager, mockGitHelper)
+	prCmd := pullrequests.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
 	cmd := prCmd.Command()
 
 	assert.Equal(t, "pull_request", cmd.Use)
@@ -29,11 +29,11 @@ func TestNewPullRequestCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	prCmd := pullrequests.NewPullRequestCommand(mockExecutor, mockConfigManager, mockGitHelper)
+	prCmd := pullrequests.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
 	cmd := prCmd.Command()
 
 	assert.NotNil(t, cmd)

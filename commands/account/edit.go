@@ -13,16 +13,16 @@ import (
 )
 
 type editCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewEditCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) editCommand {
 	return editCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }

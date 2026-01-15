@@ -13,10 +13,10 @@ func TestAccountCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	accountCmd := account.NewAccountCommand(mockExecutor, mockConfigManager)
+	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager)
 	cmd := accountCmd.Command()
 
 	assert.Equal(t, "account", cmd.Use)
@@ -28,10 +28,10 @@ func TestNewAccountCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	accountCmd := account.NewAccountCommand(mockExecutor, mockConfigManager)
+	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager)
 	cmd := accountCmd.Command()
 
 	assert.NotNil(t, cmd)

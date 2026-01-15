@@ -20,7 +20,7 @@ import (
 )
 
 type listCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 	account       *config.Account
@@ -28,12 +28,12 @@ type listCommand struct {
 }
 
 func NewListCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) *listCommand {
 	return &listCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 		gitHelper:     gitHelper,
 	}

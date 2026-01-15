@@ -7,16 +7,16 @@ import (
 )
 
 type configCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewConfigCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) configCommand {
 	return configCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }
@@ -27,8 +27,8 @@ func (svc configCommand) Command() *cobra.Command {
 		Aliases: []string{"conf"},
 		Short:   "create config",
 	}
-	configCmd.AddCommand(NewGlobalCommand(svc.exe, svc.configManager).Command())
-	configCmd.AddCommand(NewLocalCommand(svc.exe, svc.configManager).Command())
+	configCmd.AddCommand(NewGlobalCommand(svc.runner, svc.configManager).Command())
+	configCmd.AddCommand(NewLocalCommand(svc.runner, svc.configManager).Command())
 
 	return configCmd
 }

@@ -10,16 +10,16 @@ import (
 )
 
 type localCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewLocalCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) localCommand {
 	return localCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }

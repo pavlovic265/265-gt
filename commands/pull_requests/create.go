@@ -10,18 +10,18 @@ import (
 )
 
 type createCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 }
 
 func NewCreateCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) createCommand {
 	return createCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 		gitHelper:     gitHelper,
 	}

@@ -11,16 +11,16 @@ import (
 )
 
 type addCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewAddCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) addCommand {
 	return addCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -38,9 +38,7 @@ func (svc addCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"add"}, args...)
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git(append([]string{"add"}, args...)...); err != nil {
 				return log.Error("Failed to stage files", err)
 			}
 

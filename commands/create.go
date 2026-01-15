@@ -10,16 +10,16 @@ import (
 )
 
 type createCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewCreateCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) createCommand {
 	return createCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -45,9 +45,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return log.Error("Failed to get current branch name", err)
 			}
 
-			exeArgs := []string{"checkout", "-b", branch}
-			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("checkout", "-b", branch); err != nil {
 				return log.Error("Failed to create and checkout branch", err)
 			}
 

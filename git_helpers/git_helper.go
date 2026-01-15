@@ -29,9 +29,9 @@ type GitHelper interface {
 }
 
 type GitHelperImpl struct {
-	exe executor.Executor
+	runner executor.Runner
 }
 
-func NewGitHelper(exe executor.Executor) GitHelper {
-	return &GitHelperImpl{exe: exe}
+func NewGitHelper(runner executor.Runner) GitHelper {
+	return &GitHelperImpl{runner: runner}
 }

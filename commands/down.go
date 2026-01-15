@@ -10,16 +10,16 @@ import (
 )
 
 type downCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewDownCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) downCommand {
 	return downCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -49,9 +49,7 @@ func (svc downCommand) Command() *cobra.Command {
 				return log.ErrorMsg("Cannot move down - no parent branch available")
 			}
 
-			exeArgs := []string{"checkout", parent}
-			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("checkout", parent); err != nil {
 				return log.Error("Failed to checkout parent branch", err)
 			}
 

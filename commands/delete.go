@@ -13,16 +13,16 @@ import (
 )
 
 type deleteCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewDeleteCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) deleteCommand {
 	return deleteCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -93,9 +93,7 @@ func (svc deleteCommand) deleteBranch(
 	}
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
-	exeArgs := []string{"branch", "-D", branch}
-	err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := svc.runner.Git("branch", "-D", branch); err != nil {
 		return log.Error("Failed to delete branch", err)
 	}
 

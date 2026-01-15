@@ -11,16 +11,16 @@ import (
 )
 
 type contCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewContCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) contCommand {
 	return contCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -36,9 +36,7 @@ func (svc contCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := []string{"rebase", "--continue"}
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("rebase", "--continue"); err != nil {
 				return log.Error("Failed to continue rebase", err)
 			}
 

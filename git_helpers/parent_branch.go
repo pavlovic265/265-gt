@@ -1,30 +1,13 @@
 package helpers
 
-import (
-	"strings"
-)
-
 func (gh *GitHelperImpl) SetParent(parent string, child string) error {
-	exeArgs := []string{"config", "--local", "gt.branch." + child + ".parent", parent}
-	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
-		return err
-	}
-	return nil
+	return gh.runner.Git("config", "--local", "gt.branch."+child+".parent", parent)
 }
 
 func (gh *GitHelperImpl) GetParent(branch string) (string, error) {
-	exeArgs := []string{"config", "--local", "--get", "gt.branch." + branch + ".parent"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	parent := strings.TrimSpace(output.String())
-	return parent, err
+	return gh.runner.GitOutput("config", "--local", "--get", "gt.branch."+branch+".parent")
 }
 
 func (gh *GitHelperImpl) DeleteParent(branch string) error {
-	exeArgs := []string{"config", "--local", "--unset", "gt.branch." + branch + ".parent"}
-	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
-		return err
-	}
-	return nil
+	return gh.runner.Git("config", "--local", "--unset", "gt.branch."+branch+".parent")
 }

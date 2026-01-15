@@ -8,16 +8,16 @@ import (
 )
 
 type addCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewAddCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) addCommand {
 	return addCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }

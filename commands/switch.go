@@ -11,16 +11,16 @@ import (
 )
 
 type switchCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewSwitchCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) switchCommand {
 	return switchCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -37,12 +37,9 @@ func (svc switchCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := []string{"checkout", "-"}
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("checkout", "-"); err != nil {
 				return log.Error("Failed to switch to previous branch", err)
 			}
-
 			return nil
 		},
 	}

@@ -35,7 +35,7 @@ type LocalConfigStruct struct {
 }
 
 type DefaultConfigManager struct {
-	exe executor.Executor
+	runner executor.Runner
 }
 
 type ConfigManager interface {
@@ -45,6 +45,6 @@ type ConfigManager interface {
 	SaveLocalConfig(configToSave LocalConfigStruct) error
 }
 
-func NewDefaultConfigManager(exe executor.Executor) *DefaultConfigManager {
-	return &DefaultConfigManager{exe: exe}
+func NewDefaultConfigManager(runner executor.Runner) *DefaultConfigManager {
+	return &DefaultConfigManager{runner: runner}
 }

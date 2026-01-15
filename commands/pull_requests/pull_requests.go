@@ -8,18 +8,18 @@ import (
 )
 
 type pullRequestCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 }
 
 func NewPullRequestCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) pullRequestCommand {
 	return pullRequestCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 		gitHelper:     gitHelper,
 	}
@@ -32,8 +32,8 @@ func (svc pullRequestCommand) Command() *cobra.Command {
 		Aliases: []string{"pr"},
 	}
 
-	pullRequestCmd.AddCommand(NewCreateCommand(svc.exe, svc.configManager, svc.gitHelper).Command())
-	pullRequestCmd.AddCommand(NewListCommand(svc.exe, svc.configManager, svc.gitHelper).Command())
+	pullRequestCmd.AddCommand(NewCreateCommand(svc.runner, svc.configManager, svc.gitHelper).Command())
+	pullRequestCmd.AddCommand(NewListCommand(svc.runner, svc.configManager, svc.gitHelper).Command())
 
 	return pullRequestCmd
 }

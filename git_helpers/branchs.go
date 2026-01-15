@@ -8,23 +8,16 @@ import (
 )
 
 func (gh *GitHelperImpl) GetCurrentBranch() (string, error) {
-	exeArgs := []string{"rev-parse", "--abbrev-ref", "HEAD"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	if err != nil {
-		return "", err
-	}
-	currentBranch := strings.TrimSpace(output.String())
-	return currentBranch, nil
+	return gh.runner.GitOutput("rev-parse", "--abbrev-ref", "HEAD")
 }
 
 func (gh *GitHelperImpl) GetBranches() ([]string, error) {
-	exeArgs := []string{"branch", "--list"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, err := gh.runner.GitOutput("branch", "--list")
 	if err != nil {
 		return nil, err
 	}
 
-	lines := strings.Split(output.String(), "\n")
+	lines := strings.Split(output, "\n")
 	var branches []string
 	for _, line := range lines {
 		branch := strings.TrimSpace(line)
@@ -36,18 +29,14 @@ func (gh *GitHelperImpl) GetBranches() ([]string, error) {
 }
 
 func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
-	exeArgs := []string{"checkout", branch}
-	err := gh.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := gh.runner.Git("checkout", branch); err != nil {
 		return log.Error("Failed to checkout current branch", err)
 	}
 
 	_ = gh.SetPending(constants.ParentBranch, parent)
 	_ = gh.SetPending(constants.ChildBranch, branch)
 
-	exeArgs = []string{"rebase", parent}
-	err = gh.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := gh.runner.Git("rebase", parent); err != nil {
 		log.Warning("Rebase paused due to conflicts. Resolve them, then run `gt cont` or abort.")
 		return log.Error("Rebase paused", err)
 	}

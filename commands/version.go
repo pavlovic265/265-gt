@@ -10,16 +10,16 @@ import (
 )
 
 type versionCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewVersionCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) versionCommand {
 	return versionCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }

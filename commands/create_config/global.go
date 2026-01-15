@@ -10,16 +10,16 @@ import (
 )
 
 type globalCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewGlobalCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) globalCommand {
 	return globalCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }

@@ -11,16 +11,16 @@ import (
 )
 
 type commitCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewCommitCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) commitCommand {
 	return commitCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -59,9 +59,7 @@ func (svc commitCommand) Command() *cobra.Command {
 
 func (svc commitCommand) handleEmptyCommit() error {
 	message := timeutils.Now().Format(timeutils.LayoutUserFriendly)
-	exeArgs := []string{"commit", "--allow-empty", "-m", message}
-	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := svc.runner.Git("commit", "--allow-empty", "-m", message); err != nil {
 		return log.Error("Failed to create empty commit", err)
 	}
 
@@ -70,9 +68,7 @@ func (svc commitCommand) handleEmptyCommit() error {
 }
 
 func (svc commitCommand) handleCommit(message string) error {
-	exeArgs := []string{"commit", "-m", message}
-	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := svc.runner.Git("commit", "-m", message); err != nil {
 		return log.Error("Failed to create commit", err)
 	}
 

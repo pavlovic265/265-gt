@@ -8,107 +8,63 @@ import (
 	"strings"
 )
 
-type Executor interface {
-	WithGit() Executor
-	WithName(name string) Executor
-	WithArgs(args []string) Executor
-	WithStdin(stdin string) Executor
-	Run() error
-	RunWithOutput() (bytes.Buffer, error)
-	RunSilent() error
+//go:generate mockgen -source=executor.go -destination=../mocks/mock_executor.go -package=mocks
+
+// Runner executes shell commands
+type Runner interface {
+	// Git runs a git command with output to terminal
+	Git(args ...string) error
+
+	// GitOutput runs a git command and returns stdout
+	GitOutput(args ...string) (string, error)
+
+	// Exec runs an arbitrary command with output to terminal
+	Exec(name string, args ...string) error
+
+	// ExecOutput runs an arbitrary command and returns stdout
+	ExecOutput(name string, args ...string) (string, error)
 }
 
-type exe struct {
-	Name string
+type runner struct{}
 
-	Args  []string
-	Stdin string
+func NewRunner() Runner {
+	return &runner{}
 }
 
-func NewExe() Executor {
-	return exe{
-		Name:  "",
-		Args:  []string{},
-		Stdin: "",
-	}
+func (r *runner) Git(args ...string) error {
+	return r.Exec("git", args...)
 }
 
-func (exe exe) WithName(name string) Executor {
-	exe.Name = name
-	return exe
+func (r *runner) GitOutput(args ...string) (string, error) {
+	return r.ExecOutput("git", args...)
 }
 
-func (exe exe) WithGit() Executor {
-	exe.Name = "git"
-	return exe
-}
-
-func (exe exe) WithArgs(args []string) Executor {
-	exe.Args = args
-	return exe
-}
-
-func (exe exe) WithStdin(stdin string) Executor {
-	exe.Stdin = stdin
-	return exe
-}
-
-func (exe exe) Run() error {
-	cmd := exec.Command(exe.Name, exe.Args...)
-
-	if exe.Stdin != "" {
-		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
-	} else {
-		// Connect to terminal stdin for interactive commands
-		cmd.Stdin = os.Stdin
-	}
-
+func (r *runner) Exec(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("%s %s: %w", name, strings.Join(args, " "), err)
 	}
-
 	return nil
 }
 
-func (exe exe) RunWithOutput() (bytes.Buffer, error) {
-	var output bytes.Buffer
-	cmd := exec.Command(exe.Name, exe.Args...)
+func (r *runner) ExecOutput(name string, args ...string) (string, error) {
+	cmd := exec.Command(name, args...)
 
-	if exe.Stdin != "" {
-		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		errMsg := strings.TrimSpace(stderr.String())
+		if errMsg != "" {
+			return "", fmt.Errorf("%s %s: %s", name, strings.Join(args, " "), errMsg)
+		}
+		return "", fmt.Errorf("%s %s: %w", name, strings.Join(args, " "), err)
 	}
 
-	cmd.Stdout = &output
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return bytes.Buffer{}, fmt.Errorf("error executing `%s %s`: %v", exe.Name, strings.Join(exe.Args, " "), err)
-	}
-
-	return output, nil
-}
-
-func (exe exe) RunSilent() error {
-	cmd := exec.Command(exe.Name, exe.Args...)
-
-	if exe.Stdin != "" {
-		cmd.Stdin = strings.NewReader(exe.Stdin + "\n")
-	}
-
-	// Set GIT_EDITOR to true to prevent interactive editor from opening
-	cmd.Env = append(os.Environ(), "GIT_EDITOR=true")
-
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("error executing `%s %s`: %w", exe.Name, strings.Join(exe.Args, " "), err)
-	}
-
-	return nil
+	return strings.TrimSpace(stdout.String()), nil
 }

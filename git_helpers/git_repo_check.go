@@ -3,12 +3,10 @@ package helpers
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 func (gh *GitHelperImpl) IsGitRepository() error {
-	exeArgs := []string{"rev-parse", "--git-dir"}
-	_, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	_, err := gh.runner.GitOutput("rev-parse", "--git-dir")
 	if err != nil {
 		return fmt.Errorf("not a git repository (or any of the parent directories): .git")
 	}
@@ -16,12 +14,11 @@ func (gh *GitHelperImpl) IsGitRepository() error {
 }
 
 func (gh *GitHelperImpl) GetGitRoot() (string, error) {
-	exeArgs := []string{"rev-parse", "--show-toplevel"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, err := gh.runner.GitOutput("rev-parse", "--show-toplevel")
 	if err != nil {
 		return "", fmt.Errorf("not a git repository (or any of the parent directories): .git")
 	}
-	return strings.TrimSpace(output.String()), nil
+	return output, nil
 }
 
 func (gh *GitHelperImpl) EnsureGitRepository() error {

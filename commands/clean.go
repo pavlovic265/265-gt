@@ -17,7 +17,7 @@ import (
 )
 
 type cleanCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
@@ -37,11 +37,11 @@ var (
 )
 
 func NewCleanCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) cleanCommand {
 	return cleanCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -178,8 +178,7 @@ func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted b
 
 		if model.IsYes() {
 			// Delete the branch
-			exeArgs := []string{"branch", "-D", branch}
-			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+			output, err := svc.runner.GitOutput("branch", "-D", branch)
 			if err != nil {
 				return false, false, err
 			}
@@ -195,9 +194,8 @@ func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted b
 					branchStyle.Render(parent))
 			}
 
-			gitOutput := strings.TrimSpace(output.String())
 			fmt.Printf("   ")
-			log.Success(gitOutput)
+			log.Success(output)
 			fmt.Println()
 
 			return false, true, nil

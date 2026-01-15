@@ -10,16 +10,16 @@ import (
 )
 
 type pullCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewPullCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) pullCommand {
 	return pullCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -41,9 +41,7 @@ func (svc pullCommand) Command() *cobra.Command {
 				return log.Error("Failed to get current branch name", err)
 			}
 
-			exeArgs := []string{"pull", "origin", currentBranchName}
-			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("pull", "origin", currentBranchName); err != nil {
 				return log.Error("Failed to pull branch from remote", err)
 			}
 

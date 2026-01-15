@@ -10,16 +10,16 @@ import (
 )
 
 type stackCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewStackCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) stackCommand {
 	return stackCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -37,7 +37,7 @@ func (svc stackCommand) Command() *cobra.Command {
 		},
 	}
 
-	stackCmd.AddCommand(NewRestackCommand(svc.exe, svc.gitHelper).Command())
+	stackCmd.AddCommand(NewRestackCommand(svc.runner, svc.gitHelper).Command())
 
 	return stackCmd
 }

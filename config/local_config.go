@@ -2,7 +2,6 @@ package config
 
 import (
 	"path/filepath"
-	"strings"
 )
 
 func (d *DefaultConfigManager) LoadLocalConfig() (*LocalConfigStruct, error) {
@@ -22,14 +21,11 @@ func (d *DefaultConfigManager) SaveLocalConfig(configToSave LocalConfigStruct) e
 }
 
 func (d *DefaultConfigManager) getLocalConfigPath() (string, error) {
-	exeArgs := []string{"rev-parse", "--show-toplevel"}
-	output, err := d.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	output, err := d.runner.GitOutput("rev-parse", "--show-toplevel")
 	if err != nil {
 		return "", nil
 	}
 
-	localConfig := strings.TrimSpace(output.String())
-	configPath := filepath.Join(localConfig, ".gtconfig.yaml")
-
+	configPath := filepath.Join(output, ".gtconfig.yaml")
 	return configPath, nil
 }

@@ -14,10 +14,10 @@ func TestEditCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
 	cmd := editCmd.Command()
 
 	assert.Equal(t, "edit", cmd.Use)
@@ -29,10 +29,10 @@ func TestEditCommand_NoContext(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
 	cmd := editCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
@@ -44,10 +44,10 @@ func TestEditCommand_NoAccounts(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
 	cmd := editCmd.Command()
 
 	setAccountCommandContext(cmd, []config.Account{}, nil)
@@ -60,10 +60,10 @@ func TestNewEditCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	editCmd := account.NewEditCommand(mockExecutor, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
 	cmd := editCmd.Command()
 
 	assert.NotNil(t, cmd)

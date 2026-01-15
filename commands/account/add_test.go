@@ -26,10 +26,10 @@ func TestAddCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	addCmd := account.NewAddCommand(mockExecutor, mockConfigManager)
+	addCmd := account.NewAddCommand(mockRunner, mockConfigManager)
 	cmd := addCmd.Command()
 
 	assert.Equal(t, "add", cmd.Use)
@@ -41,10 +41,10 @@ func TestAddCommand_NoContext(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	addCmd := account.NewAddCommand(mockExecutor, mockConfigManager)
+	addCmd := account.NewAddCommand(mockRunner, mockConfigManager)
 	cmd := addCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
@@ -56,10 +56,10 @@ func TestNewAddCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	addCmd := account.NewAddCommand(mockExecutor, mockConfigManager)
+	addCmd := account.NewAddCommand(mockRunner, mockConfigManager)
 	cmd := addCmd.Command()
 
 	assert.NotNil(t, cmd)

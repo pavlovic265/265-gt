@@ -24,16 +24,16 @@ var (
 )
 
 type unstageCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewUnstageCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) unstageCommand {
 	return unstageCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -50,9 +50,8 @@ func (svc unstageCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"restore", "--staged"}, args...)
-			err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			gitArgs := append([]string{"restore", "--staged"}, args...)
+			if err := svc.runner.Git(gitArgs...); err != nil {
 				return fmt.Errorf("%s %s",
 					unstageErrorIconStyle.Render(constants.CrossIcon),
 					unstageMessageStyle.Render(fmt.Sprintf("Failed to unstage files: %v", err)))

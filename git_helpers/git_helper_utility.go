@@ -1,9 +1,6 @@
 package helpers
 
-import (
-	"os"
-	"strings"
-)
+import "os"
 
 func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []string) error {
 	if parent == "" {
@@ -23,20 +20,16 @@ func (gh *GitHelperImpl) RelinkParentChildren(parent string, branchChildren []st
 
 func (gh *GitHelperImpl) IsRebaseInProgress() bool {
 	// Check for rebase-merge directory (interactive rebase)
-	exeArgs := []string{"rev-parse", "--git-path", "rebase-merge"}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	path, err := gh.runner.GitOutput("rev-parse", "--git-path", "rebase-merge")
 	if err == nil {
-		path := strings.TrimSpace(output.String())
 		if _, err := os.Stat(path); err == nil {
 			return true
 		}
 	}
 
 	// Check for rebase-apply directory (non-interactive rebase or git am)
-	exeArgs = []string{"rev-parse", "--git-path", "rebase-apply"}
-	output, err = gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	path, err = gh.runner.GitOutput("rev-parse", "--git-path", "rebase-apply")
 	if err == nil {
-		path := strings.TrimSpace(output.String())
 		if _, err := os.Stat(path); err == nil {
 			return true
 		}
@@ -46,10 +39,5 @@ func (gh *GitHelperImpl) IsRebaseInProgress() bool {
 }
 
 func (gh *GitHelperImpl) GetRemoteURL(remoteName string) (string, error) {
-	exeArgs := []string{"remote", "get-url", remoteName}
-	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(output.String()), nil
+	return gh.runner.GitOutput("remote", "get-url", remoteName)
 }

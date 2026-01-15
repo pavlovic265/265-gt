@@ -14,14 +14,14 @@ import (
 )
 
 func createVersionCommandWithMock(t *testing.T) (
-	*mocks.MockExecutor, *mocks.MockConfigManager, *gomock.Controller, *cobra.Command,
+	*mocks.MockRunner, *mocks.MockConfigManager, *gomock.Controller, *cobra.Command,
 ) {
 	ctrl := gomock.NewController(t)
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
-	versionCmd := commands.NewVersionCommand(mockExecutor, mockConfigManager)
+	versionCmd := commands.NewVersionCommand(mockRunner, mockConfigManager)
 	cmd := versionCmd.Command()
-	return mockExecutor, mockConfigManager, ctrl, cmd
+	return mockRunner, mockConfigManager, ctrl, cmd
 }
 
 // setVersionCommandContext sets up the context with config for version command tests
@@ -79,10 +79,10 @@ func TestNewVersionCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	versionCmd := commands.NewVersionCommand(mockExecutor, mockConfigManager)
+	versionCmd := commands.NewVersionCommand(mockRunner, mockConfigManager)
 
 	cmd := versionCmd.Command()
 	require.NotNil(t, cmd)

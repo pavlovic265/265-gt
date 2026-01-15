@@ -13,10 +13,10 @@ func TestConfigCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	configCmd := createconfig.NewConfigCommand(mockExecutor, mockConfigManager)
+	configCmd := createconfig.NewConfigCommand(mockRunner, mockConfigManager)
 	cmd := configCmd.Command()
 
 	assert.Equal(t, "config", cmd.Use)
@@ -28,10 +28,10 @@ func TestNewConfigCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 
-	configCmd := createconfig.NewConfigCommand(mockExecutor, mockConfigManager)
+	configCmd := createconfig.NewConfigCommand(mockRunner, mockConfigManager)
 	cmd := configCmd.Command()
 
 	assert.NotNil(t, cmd)

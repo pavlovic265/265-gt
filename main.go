@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -24,9 +23,9 @@ import (
 )
 
 var (
-	exe           = executor.NewExe()
-	configManager = config.NewDefaultConfigManager(exe)
-	gitHelper     = helpers.NewGitHelper(exe)
+	runner        = executor.NewRunner()
+	configManager = config.NewDefaultConfigManager(runner)
+	gitHelper     = helpers.NewGitHelper(runner)
 )
 
 func init() {
@@ -82,13 +81,7 @@ var rootCmd = &cobra.Command{
 func passToGit(args []string) {
 	fmt.Printf("Unknown command, passing to git: git %s\n", strings.Join(args, " "))
 
-	err := exe.WithGit().WithArgs(args).Run()
-	if err != nil {
-		// If git command fails, exit with the same exit code
-		if exitError, ok := err.(*exec.ExitError); ok {
-			os.Exit(exitError.ExitCode())
-		}
-		// For other errors, exit with code 1
+	if err := runner.Git(args...); err != nil {
 		os.Exit(1)
 	}
 }
@@ -97,30 +90,30 @@ func main() {
 	// Load .env file if it exists
 	_ = godotenv.Load() // Ignore .env loading errors as the file is optional
 
-	rootCmd.AddCommand(commands.NewAddCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewStatusCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewSwitchCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewPushCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewPullCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewCreateCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewContCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewCheckoutCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewMoveCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewDeleteCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewCleanCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewUpgradeCommand(exe, configManager).Command())
-	rootCmd.AddCommand(commands.NewDownCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewUpCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewTrackCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commands.NewUnstageCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(stack.NewStackCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(commit.NewCommitCommand(exe, gitHelper).Command())
-	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(exe, configManager, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewAddCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewStatusCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewSwitchCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewPushCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewPullCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCreateCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewContCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCheckoutCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewMoveCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewDeleteCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCleanCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewUpgradeCommand(runner, configManager).Command())
+	rootCmd.AddCommand(commands.NewDownCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewUpCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewTrackCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewUnstageCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(stack.NewStackCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(commit.NewCommitCommand(runner, gitHelper).Command())
+	rootCmd.AddCommand(pullrequests.NewPullRequestCommand(runner, configManager, gitHelper).Command())
 
-	rootCmd.AddCommand(commands.NewVersionCommand(exe, configManager).Command())
+	rootCmd.AddCommand(commands.NewVersionCommand(runner, configManager).Command())
 	rootCmd.AddCommand(auth.NewAuthCommand(configManager).Command())
-	rootCmd.AddCommand(account.NewAccountCommand(exe, configManager).Command())
-	rootCmd.AddCommand(createconfig.NewConfigCommand(exe, configManager).Command())
+	rootCmd.AddCommand(account.NewAccountCommand(runner, configManager).Command())
+	rootCmd.AddCommand(createconfig.NewConfigCommand(runner, configManager).Command())
 	rootCmd.AddCommand(commands.NewCompletionCommand().Command())
 
 	// Execute the command and handle unknown commands

@@ -14,16 +14,16 @@ import (
 )
 
 type checkoutCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewCheckoutCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) checkoutCommand {
 	return checkoutCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -60,9 +60,7 @@ func (svc checkoutCommand) Command() *cobra.Command {
 func (svc checkoutCommand) checkoutBranch(
 	branch string,
 ) error {
-	exeArgs := []string{"checkout", branch}
-	err := svc.exe.WithGit().WithArgs(exeArgs).Run()
-	if err != nil {
+	if err := svc.runner.Git("checkout", branch); err != nil {
 		return log.Error(fmt.Sprintf("Failed to checkout branch '%s'", branch), err)
 	}
 

@@ -13,10 +13,10 @@ func TestStackCommand_Command(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	stackCmd := stack.NewStackCommand(mockExecutor, mockGitHelper)
+	stackCmd := stack.NewStackCommand(mockRunner, mockGitHelper)
 	cmd := stackCmd.Command()
 
 	assert.Equal(t, "stack", cmd.Use)
@@ -29,10 +29,10 @@ func TestNewStackCommand(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockExecutor := mocks.NewMockExecutor(ctrl)
+	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	stackCmd := stack.NewStackCommand(mockExecutor, mockGitHelper)
+	stackCmd := stack.NewStackCommand(mockRunner, mockGitHelper)
 	cmd := stackCmd.Command()
 
 	assert.NotNil(t, cmd)

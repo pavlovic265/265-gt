@@ -13,16 +13,16 @@ import (
 )
 
 type statusCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewStatusCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) statusCommand {
 	return statusCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -41,15 +41,14 @@ func (svc statusCommand) Command() *cobra.Command {
 			}
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exeArgs := append([]string{"status"}, args...)
-
-			output, err := svc.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+			gitArgs := append([]string{"status"}, args...)
+			output, err := svc.runner.GitOutput(gitArgs...)
 			if err != nil {
 				return err
 			}
 
 			// Style the git status output
-			styledOutput := svc.styleGitStatus(output.String())
+			styledOutput := svc.styleGitStatus(output)
 			fmt.Print(styledOutput)
 
 			return nil

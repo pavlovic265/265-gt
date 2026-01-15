@@ -7,16 +7,16 @@ import (
 )
 
 type accountCommand struct {
-	exe           executor.Executor
+	runner        executor.Runner
 	configManager config.ConfigManager
 }
 
 func NewAccountCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	configManager config.ConfigManager,
 ) accountCommand {
 	return accountCommand{
-		exe:           exe,
+		runner:        runner,
 		configManager: configManager,
 	}
 }
@@ -29,9 +29,9 @@ func (ac accountCommand) Command() *cobra.Command {
 		Long:    "Manage your GitHub and GitLab accounts for gt",
 	}
 
-	accountCmd.AddCommand(NewAddCommand(ac.exe, ac.configManager).Command())
+	accountCmd.AddCommand(NewAddCommand(ac.runner, ac.configManager).Command())
 	accountCmd.AddCommand(NewListCommand(ac.configManager).Command())
-	accountCmd.AddCommand(NewEditCommand(ac.exe, ac.configManager).Command())
+	accountCmd.AddCommand(NewEditCommand(ac.runner, ac.configManager).Command())
 	accountCmd.AddCommand(NewRemoveCommand(ac.configManager).Command())
 	accountCmd.AddCommand(NewAttachCommand(ac.configManager).Command())
 

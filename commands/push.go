@@ -11,16 +11,16 @@ import (
 )
 
 type pushCommand struct {
-	exe       executor.Executor
+	runner    executor.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewPushCommand(
-	exe executor.Executor,
+	runner executor.Runner,
 	gitHelper helpers.GitHelper,
 ) pushCommand {
 	return pushCommand{
-		exe:       exe,
+		runner:    runner,
 		gitHelper: gitHelper,
 	}
 }
@@ -44,9 +44,7 @@ func (svc pushCommand) Command() *cobra.Command {
 
 			log.Warning("Using force push - this will overwrite remote changes")
 
-			exeArgs := []string{"push", "--force", "origin", currentBranchName}
-			err = svc.exe.WithGit().WithArgs(exeArgs).Run()
-			if err != nil {
+			if err := svc.runner.Git("push", "--force", "origin", currentBranchName); err != nil {
 				return log.Error("Failed to push branch to remote", err)
 			}
 
