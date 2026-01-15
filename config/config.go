@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/runner"
 )
 
 type Account struct {
@@ -35,7 +35,7 @@ type LocalConfigStruct struct {
 }
 
 type DefaultConfigManager struct {
-	runner executor.Runner
+	runner runner.Runner
 }
 
 type ConfigManager interface {
@@ -45,6 +45,6 @@ type ConfigManager interface {
 	SaveLocalConfig(configToSave LocalConfigStruct) error
 }
 
-func NewDefaultConfigManager(runner executor.Runner) *DefaultConfigManager {
+func NewDefaultConfigManager(runner runner.Runner) *DefaultConfigManager {
 	return &DefaultConfigManager{runner: runner}
 }

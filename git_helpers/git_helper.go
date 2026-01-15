@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/runner"
 )
 
 type GitHelper interface {
@@ -29,9 +29,9 @@ type GitHelper interface {
 }
 
 type GitHelperImpl struct {
-	runner executor.Runner
+	runner runner.Runner
 }
 
-func NewGitHelper(runner executor.Runner) GitHelper {
+func NewGitHelper(runner runner.Runner) GitHelper {
 	return &GitHelperImpl{runner: runner}
 }

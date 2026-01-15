@@ -2,17 +2,17 @@ package account
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
 )
 
 type accountCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 }
 
 func NewAccountCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 ) accountCommand {
 	return accountCommand{

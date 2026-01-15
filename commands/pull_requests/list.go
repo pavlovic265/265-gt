@@ -13,14 +13,14 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type listCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 	account       *config.Account
@@ -28,7 +28,7 @@ type listCommand struct {
 }
 
 func NewListCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) *listCommand {

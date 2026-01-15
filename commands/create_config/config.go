@@ -2,17 +2,17 @@ package createconfig
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
 )
 
 type configCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 }
 
 func NewConfigCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 ) configCommand {
 	return configCommand{

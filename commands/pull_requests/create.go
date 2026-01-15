@@ -3,20 +3,20 @@ package pullrequests
 import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type createCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 }
 
 func NewCreateCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) createCommand {

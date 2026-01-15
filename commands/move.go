@@ -6,19 +6,19 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type moveCommand struct {
-	runner    executor.Runner
+	runner    runner.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewMoveCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	gitHelper helpers.GitHelper,
 ) moveCommand {
 	return moveCommand{

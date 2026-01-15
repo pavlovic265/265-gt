@@ -2,20 +2,20 @@ package createconfig
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
 type globalCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 }
 
 func NewGlobalCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 ) globalCommand {
 	return globalCommand{

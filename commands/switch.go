@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 type switchCommand struct {
-	runner    executor.Runner
+	runner    runner.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewSwitchCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	gitHelper helpers.GitHelper,
 ) switchCommand {
 	return switchCommand{

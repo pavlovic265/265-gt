@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
 )
 
 type stackCommand struct {
-	runner    executor.Runner
+	runner    runner.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewStackCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	gitHelper helpers.GitHelper,
 ) stackCommand {
 	return stackCommand{

@@ -2,19 +2,19 @@ package pullrequests
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
 )
 
 type pullRequestCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
 }
 
 func NewPullRequestCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
 ) pullRequestCommand {

@@ -3,20 +3,20 @@ package commit
 import (
 	"os"
 
-	"github.com/pavlovic265/265-gt/executor"
 	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
 	"github.com/spf13/cobra"
 )
 
 type commitCommand struct {
-	runner    executor.Runner
+	runner    runner.Runner
 	gitHelper helpers.GitHelper
 }
 
 func NewCommitCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	gitHelper helpers.GitHelper,
 ) commitCommand {
 	return commitCommand{

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/executor"
+	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
@@ -15,12 +15,12 @@ import (
 )
 
 type upgradeCommand struct {
-	runner        executor.Runner
+	runner        runner.Runner
 	configManager config.ConfigManager
 }
 
 func NewUpgradeCommand(
-	runner executor.Runner,
+	runner runner.Runner,
 	configManager config.ConfigManager,
 ) upgradeCommand {
 	return upgradeCommand{
