@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -183,17 +184,28 @@ func (c *gitHubClient) CreatePullRequest(ctx context.Context, args []string) err
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 {
+		body, _ := io.ReadAll(resp.Body)
 		var errResp struct {
 			Message string `json:"message"`
 			Errors  []struct {
-				Message string `json:"message"`
+				Resource string `json:"resource"`
+				Code     string `json:"code"`
+				Field    string `json:"field"`
+				Message  string `json:"message"`
 			} `json:"errors"`
 		}
-		_ = json.NewDecoder(resp.Body).Decode(&errResp)
+		_ = json.Unmarshal(body, &errResp)
 		if len(errResp.Errors) > 0 {
-			return fmt.Errorf("failed to create PR: %s", errResp.Errors[0].Message)
+			e := errResp.Errors[0]
+			if e.Message != "" {
+				return fmt.Errorf("failed to create PR: %s", e.Message)
+			}
+			return fmt.Errorf("failed to create PR: %s %s (%s)", e.Resource, e.Field, e.Code)
 		}
-		return fmt.Errorf("failed to create PR: %s", errResp.Message)
+		if errResp.Message != "" {
+			return fmt.Errorf("failed to create PR: %s", errResp.Message)
+		}
+		return fmt.Errorf("failed to create PR (status %d): %s", resp.StatusCode, string(body))
 	}
 
 	var pr struct {
