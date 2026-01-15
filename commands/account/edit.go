@@ -80,7 +80,7 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			if selectedIndex == -1 {
-				return log.Error("Failed to select account", fmt.Errorf("invalid selection"))
+				return log.ErrorMsg("Failed to select account: invalid selection")
 			}
 
 			selectedAccount := cfg.Global.Accounts[selectedIndex]

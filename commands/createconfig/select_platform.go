@@ -1,11 +1,11 @@
 package createconfig
 
 import (
-	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 type selectPlatformModel struct {
@@ -92,5 +92,5 @@ func HandleSelectPlatform() (*string, error) {
 		return &m.choice, nil
 	}
 
-	return nil, fmt.Errorf("faild to select platform")
+	return nil, log.ErrorMsg("failed to select platform")
 }

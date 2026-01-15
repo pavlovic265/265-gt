@@ -36,6 +36,10 @@ func (svc createCommand) Command() *cobra.Command {
 				return log.ErrorMsg("Branch name is required")
 			}
 			branch := args[0]
+
+			if err := svc.gitHelper.ValidateBranchName(branch); err != nil {
+				return log.Error("Invalid branch name", err)
+			}
 			parent, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)

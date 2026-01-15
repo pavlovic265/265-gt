@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pavlovic265/265-gt/constants"
@@ -30,7 +31,7 @@ func (gh *GitHelperImpl) GetBranches() ([]string, error) {
 
 func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 	if err := gh.runner.Git("checkout", branch); err != nil {
-		return log.Error("Failed to checkout current branch", err)
+		return fmt.Errorf("failed to checkout branch: %w", err)
 	}
 
 	_ = gh.SetPending(constants.ParentBranch, parent)
@@ -38,14 +39,14 @@ func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 
 	if err := gh.runner.Git("rebase", parent); err != nil {
 		log.Warning("Rebase paused due to conflicts. Resolve them, then run `gt cont` or abort.")
-		return log.Error("Rebase paused", err)
+		return fmt.Errorf("rebase paused: %w", err)
 	}
 
 	_ = gh.DeletePending(constants.ParentBranch)
 	_ = gh.DeletePending(constants.ChildBranch)
 
 	if err := gh.SetParent(parent, branch); err != nil {
-		return log.Error("Failed to set parent branch relationship", err)
+		return fmt.Errorf("failed to set parent branch relationship: %w", err)
 	}
 
 	log.Successf("Branch '%s' rebased onto '%s' successfully", branch, parent)

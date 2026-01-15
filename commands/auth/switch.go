@@ -1,9 +1,6 @@
 package auth
 
 import (
-	"strings"
-
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -76,28 +73,13 @@ func (svc switchCommand) selectAndswitchUser(cfg *config.ConfigContext) error {
 		users = append(users, acc.User)
 	}
 
-	initialModel := components.ListModel[string]{
-		AllChoices: users,
-		Choices:    users,
-		Cursor:     0,
-		Query:      "",
-		Formatter:  func(s string) string { return s },
-		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
-	}
-
-	program := tea.NewProgram(initialModel)
-
-	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-			err := svc.switchUser(cfg, m.Selected)
-			if err != nil {
-				return err
-			}
-		} else {
-			return log.ErrorMsg("No user selected for switching")
-		}
-	} else {
+	selected, err := components.SelectString(users)
+	if err != nil {
 		return log.Error("Failed to display user selection menu", err)
 	}
-	return nil
+	if selected == "" {
+		return log.ErrorMsg("No user selected for switching")
+	}
+
+	return svc.switchUser(cfg, selected)
 }

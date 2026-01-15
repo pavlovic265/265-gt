@@ -25,6 +25,7 @@ type GitHelper interface {
 	RelinkParentChildren(parent string, branchChildren []string) error
 	IsRebaseInProgress() bool
 	GetRemoteURL(remoteName string) (string, error)
+	ValidateBranchName(name string) error
 }
 
 type GitHelperImpl struct {

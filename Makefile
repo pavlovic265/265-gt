@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks mocks-runner mocks-git-helper mocks-config clean-mocks
+.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks mocks-runner mocks-git-helper mocks-config clean-mocks check
 
 # Default target, builds the application
 all: build
@@ -56,6 +56,9 @@ test-verbose:
 	@echo "Running all tests with verbose output..."
 	go test -v -timeout 60s ./...
 	@echo "Tests complete."
+
+# Run build, test, and lint
+check: build test lint
 
 release: build
 	@echo "🔍 Fetching latest version from repository..."

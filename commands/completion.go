@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -75,7 +76,7 @@ func printCompletion(root *cobra.Command, shell string, withDesc bool, w io.Writ
 	case "powershell":
 		return root.GenPowerShellCompletionWithDesc(w)
 	default:
-		return fmt.Errorf("unsupported shell: %s", shell)
+		return log.ErrorMsg(fmt.Sprintf("unsupported shell: %s", shell))
 	}
 }
 
@@ -90,17 +91,17 @@ func installCompletion(root *cobra.Command, shell, customDir string, withDesc bo
 	}
 
 	if outDir == "" || outFile == "" {
-		return fmt.Errorf("no default install path for shell %q on %s", shell, runtime.GOOS)
+		return log.ErrorMsg(fmt.Sprintf("no default install path for shell %q on %s", shell, runtime.GOOS))
 	}
 
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create directory %s: %w", outDir, err)
+		return log.Error(fmt.Sprintf("failed to create directory %s", outDir), err)
 	}
 
 	dst := filepath.Join(outDir, outFile)
 	f, err := os.Create(dst)
 	if err != nil {
-		return fmt.Errorf("failed to create %s: %w", dst, err)
+		return log.Error(fmt.Sprintf("failed to create %s", dst), err)
 	}
 	defer f.Close()
 

@@ -1,13 +1,18 @@
 package helpers
 
+import "github.com/pavlovic265/265-gt/constants"
+
 func (gh *GitHelperImpl) SetParent(parent string, child string) error {
-	return gh.runner.Git("config", "--local", "gt.branch."+child+".parent", parent)
+	key := constants.GitConfigBranchPrefix + child + constants.GitConfigParentSuffix
+	return gh.runner.Git("config", "--local", key, parent)
 }
 
 func (gh *GitHelperImpl) GetParent(branch string) (string, error) {
-	return gh.runner.GitOutput("config", "--local", "--get", "gt.branch."+branch+".parent")
+	key := constants.GitConfigBranchPrefix + branch + constants.GitConfigParentSuffix
+	return gh.runner.GitOutput("config", "--local", "--get", key)
 }
 
 func (gh *GitHelperImpl) DeleteParent(branch string) error {
-	return gh.runner.Git("config", "--local", "--unset", "gt.branch."+branch+".parent")
+	key := constants.GitConfigBranchPrefix + branch + constants.GitConfigParentSuffix
+	return gh.runner.Git("config", "--local", "--unset", key)
 }

@@ -278,3 +278,17 @@ func (mr *MockGitHelperMockRecorder) SetPending(branchType, branch interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPending", reflect.TypeOf((*MockGitHelper)(nil).SetPending), branchType, branch)
 }
+
+// ValidateBranchName mocks base method.
+func (m *MockGitHelper) ValidateBranchName(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ValidateBranchName", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ValidateBranchName indicates an expected call of ValidateBranchName.
+func (mr *MockGitHelperMockRecorder) ValidateBranchName(name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateBranchName", reflect.TypeOf((*MockGitHelper)(nil).ValidateBranchName), name)
+}

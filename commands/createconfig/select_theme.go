@@ -1,12 +1,12 @@
 package createconfig
 
 import (
-	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 type selectThemeModel struct {
@@ -89,5 +89,5 @@ func HandleSelectTheme() (*config.ThemeConfig, error) {
 		return &themeConfig, nil
 	}
 
-	return nil, fmt.Errorf("failed to select theme")
+	return nil, log.ErrorMsg("failed to select theme")
 }

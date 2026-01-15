@@ -81,7 +81,7 @@ func (rc removeCommand) Command() *cobra.Command {
 			}
 
 			if selectedIndex == -1 {
-				return log.Error("Failed to select account", fmt.Errorf("invalid selection"))
+				return log.ErrorMsg("Failed to select account: invalid selection")
 			}
 
 			// Get the account to remove

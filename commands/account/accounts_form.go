@@ -10,6 +10,8 @@ import (
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/utils/log"
+	"github.com/pavlovic265/265-gt/utils/validate"
 )
 
 var (
@@ -30,7 +32,8 @@ type accountsModel struct {
 	accounts      []config.Account
 	platform      constants.Platform
 	platformIndex int
-	editMode      bool // true = edit mode (only Done button), false = add mode (Done + Add buttons)
+	editMode      bool
+	err           string
 }
 
 func newAccountsModel() accountsModel {
@@ -191,6 +194,11 @@ func (am accountsModel) View() string {
 		fmt.Fprintf(&b, "\n%s  %s\n\n", doneButton.Render(), addButton.Render())
 	}
 
+	if am.err != "" {
+		errorStyle := lipgloss.NewStyle().Foreground(constants.Red)
+		b.WriteString(errorStyle.Render("Error: "+am.err) + "\n\n")
+	}
+
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))
 	b.WriteString(quitKeyStyle.Render("Ctrl+Q"))
@@ -199,8 +207,25 @@ func (am accountsModel) View() string {
 	return b.String()
 }
 
+func (am accountsModel) validateInputs() error {
+	if err := validate.Username(am.inputs[0].Value()); err != nil {
+		return err
+	}
+	if err := validate.Token(am.inputs[1].Value()); err != nil {
+		return err
+	}
+	if err := validate.Email(am.inputs[2].Value()); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (am accountsModel) handleDone() (tea.Model, tea.Cmd) {
 	if am.inputs[0].Value() != "" && am.inputs[1].Value() != "" {
+		if err := am.validateInputs(); err != nil {
+			am.err = err.Error()
+			return am, nil
+		}
 		platform := platformOptions[am.platformIndex]
 		am.accounts = append(am.accounts, config.Account{
 			User:       am.inputs[0].Value(),
@@ -215,6 +240,11 @@ func (am accountsModel) handleDone() (tea.Model, tea.Cmd) {
 }
 
 func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
+	if err := am.validateInputs(); err != nil {
+		am.err = err.Error()
+		return am, nil
+	}
+
 	platform := platformOptions[am.platformIndex]
 	am.accounts = append(am.accounts, config.Account{
 		User:       am.inputs[0].Value(),
@@ -231,6 +261,7 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 	am.inputs[3] = components.NewNameInput()
 	am.inputs[4] = components.NewSigningKeyInput()
 	am.focusIndex = 0
+	am.err = ""
 
 	cmds := make([]tea.Cmd, len(am.inputs))
 	return am, tea.Batch(cmds...)
@@ -310,7 +341,7 @@ func HandleAddAccounts() ([]config.Account, error) {
 		return m.accounts, nil
 	}
 
-	return nil, fmt.Errorf("failed to read accounts")
+	return nil, log.ErrorMsg("failed to read accounts")
 }
 
 func HandleEditAccount(account *config.Account) (*config.Account, error) {
@@ -327,5 +358,5 @@ func HandleEditAccount(account *config.Account) (*config.Account, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("failed to edit account")
+	return nil, log.ErrorMsg("failed to edit account")
 }

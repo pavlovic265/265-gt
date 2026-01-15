@@ -1,24 +1,10 @@
 package commands
 
 import (
-	"fmt"
-
-	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
-)
-
-var (
-	unstageSuccessIconStyle = lipgloss.NewStyle().
-				Foreground(constants.Green)
-
-	unstageErrorIconStyle = lipgloss.NewStyle().
-				Foreground(constants.Red)
-
-	unstageMessageStyle = lipgloss.NewStyle().
-				Foreground(constants.White)
 )
 
 type unstageCommand struct {
@@ -48,19 +34,13 @@ func (svc unstageCommand) Command() *cobra.Command {
 
 			gitArgs := append([]string{"restore", "--staged"}, args...)
 			if err := svc.runner.Git(gitArgs...); err != nil {
-				return fmt.Errorf("%s %s",
-					unstageErrorIconStyle.Render(constants.CrossIcon),
-					unstageMessageStyle.Render(fmt.Sprintf("Failed to unstage files: %v", err)))
+				return log.Error("Failed to unstage files", err)
 			}
 
 			if len(args) == 0 {
-				fmt.Printf("%s %s\n",
-					unstageSuccessIconStyle.Render(constants.CheckIcon),
-					unstageMessageStyle.Render("All staged changes unstaged"))
+				log.Success("All staged changes unstaged")
 			} else {
-				fmt.Printf("%s %s\n",
-					unstageSuccessIconStyle.Render(constants.CheckIcon),
-					unstageMessageStyle.Render("Files unstaged successfully"))
+				log.Success("Files unstaged successfully")
 			}
 			return nil
 		},
