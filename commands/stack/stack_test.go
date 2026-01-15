@@ -37,3 +37,18 @@ func TestNewStackCommand(t *testing.T) {
 	assert.NotNil(t, cmd)
 	assert.Equal(t, "stack", cmd.Use)
 }
+
+func TestStackCommand_HasSubcommands(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRunner := mocks.NewMockRunner(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+
+	stackCmd := stack.NewStackCommand(mockRunner, mockGitHelper)
+	cmd := stackCmd.Command()
+
+	assert.True(t, cmd.HasSubCommands())
+	assert.Len(t, cmd.Commands(), 1)
+	assert.Equal(t, "restack", cmd.Commands()[0].Use)
+}
