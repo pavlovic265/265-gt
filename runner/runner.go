@@ -1,3 +1,4 @@
+// Package runner provides command execution utilities for git and shell commands.
 package runner
 
 import (
@@ -8,15 +9,21 @@ import (
 	"strings"
 )
 
+// Runner defines the interface for executing commands.
 type Runner interface {
+	// Git executes a git command with the given arguments.
 	Git(args ...string) error
+	// GitOutput executes a git command and returns the output.
 	GitOutput(args ...string) (string, error)
+	// Exec executes an arbitrary command.
 	Exec(name string, args ...string) error
+	// ExecOutput executes a command and returns the output.
 	ExecOutput(name string, args ...string) (string, error)
 }
 
 type runnerImpl struct{}
 
+// NewRunner creates a new Runner instance.
 func NewRunner() Runner {
 	return &runnerImpl{}
 }

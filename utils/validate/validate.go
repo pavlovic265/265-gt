@@ -1,3 +1,4 @@
+// Package validate provides validation functions for user input.
 package validate
 
 import (
@@ -8,6 +9,7 @@ import (
 
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
+// Username validates that a username is non-empty and contains no whitespace.
 func Username(username string) error {
 	if username == "" {
 		return fmt.Errorf("username cannot be empty")
@@ -21,6 +23,7 @@ func Username(username string) error {
 	return nil
 }
 
+// Token validates that a token is non-empty and contains no whitespace.
 func Token(token string) error {
 	if token == "" {
 		return fmt.Errorf("token cannot be empty")
@@ -34,9 +37,10 @@ func Token(token string) error {
 	return nil
 }
 
+// Email validates email format. Empty email is allowed (optional field).
 func Email(email string) error {
 	if email == "" {
-		return nil // Email is optional
+		return nil
 	}
 	if !emailRegex.MatchString(email) {
 		return fmt.Errorf("invalid email format")

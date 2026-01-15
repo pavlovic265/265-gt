@@ -1,3 +1,4 @@
+// Package helpers provides git helper utilities for branch management and operations.
 package helpers
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/pavlovic265/265-gt/runner"
 )
 
+// GitHelper defines the interface for git helper operations.
 type GitHelper interface {
 	SetParent(parent string, child string) error
 	GetParent(branch string) (string, error)
@@ -28,10 +30,12 @@ type GitHelper interface {
 	ValidateBranchName(name string) error
 }
 
+// GitHelperImpl implements GitHelper interface.
 type GitHelperImpl struct {
 	runner runner.Runner
 }
 
+// NewGitHelper creates a new GitHelper instance.
 func NewGitHelper(runner runner.Runner) GitHelper {
 	return &GitHelperImpl{runner: runner}
 }
