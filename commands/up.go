@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,14 +29,12 @@ func NewUpCommand(
 func (svc upCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "up",
-		Short: "move to brunch up in stack",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
+		Short: "move to branch up in stack",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)

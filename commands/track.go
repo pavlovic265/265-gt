@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -33,24 +31,23 @@ func (svc trackCommand) Command() *cobra.Command {
 		Use:     "track",
 		Aliases: []string{"tr"},
 		Short:   "track existing branch",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)
 			}
 
-			branchs, err := svc.gitHelper.GetBranches()
+			branches, err := svc.gitHelper.GetBranches()
 			if err != nil {
 				return log.Error("Failed to get branches", err)
 			}
-			branchesWithoutCurrent := make([]string, len(branchs)-2)
-			for _, b := range branchs {
+
+			var branchesWithoutCurrent []string
+			for _, b := range branches {
 				if b != branch {
 					branchesWithoutCurrent = append(branchesWithoutCurrent, b)
 				}
@@ -70,17 +67,16 @@ func (svc trackCommand) Command() *cobra.Command {
 			if finalModel, err := program.Run(); err == nil {
 				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
 					if err := svc.gitHelper.SetParent(m.Selected, branch); err != nil {
-						return log.Error("Faild to set parent", err)
+						return log.Error("Failed to set parent", err)
 					}
 				} else {
-					// User cancelled or no selection made
 					return log.ErrorMsg("No branch selected")
 				}
 			} else {
 				return log.Error("Failed to display branch selection", err)
 			}
 
-			log.Successf("successfully tracking %s", branch)
+			log.Successf("Successfully tracking %s", branch)
 			return nil
 		},
 	}

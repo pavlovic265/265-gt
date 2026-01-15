@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,13 +31,11 @@ func (svc moveCommand) Command() *cobra.Command {
 		Use:     "move",
 		Aliases: []string{"mo"},
 		Short:   "rebase branch onto other branch",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			if svc.gitHelper.IsRebaseInProgress() {
 				return log.ErrorMsg("A rebase is already in progress. Resolve it, then run `gt cont` or abort.")
 			}

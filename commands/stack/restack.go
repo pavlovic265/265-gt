@@ -28,6 +28,10 @@ func (svc restackCommand) Command() *cobra.Command {
 		Aliases: []string{"rs"},
 		Short:   "Restack branches",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return err

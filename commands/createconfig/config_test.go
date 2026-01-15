@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	createconfig "github.com/pavlovic265/265-gt/commands/create_config"
+	createconfig "github.com/pavlovic265/265-gt/commands/createconfig"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/stretchr/testify/assert"
 )

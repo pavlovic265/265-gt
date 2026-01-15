@@ -1,4 +1,4 @@
-package pullrequests
+package pr
 
 import (
 	"github.com/pavlovic265/265-gt/client"

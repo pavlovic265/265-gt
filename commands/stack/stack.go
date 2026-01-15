@@ -1,9 +1,6 @@
 package stack
 
 import (
-	"fmt"
-	"os"
-
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
@@ -27,14 +24,8 @@ func NewStackCommand(
 func (svc stackCommand) Command() *cobra.Command {
 	stackCmd := &cobra.Command{
 		Use:     "stack",
-		Short:   "commands for pull request",
+		Short:   "stack management commands",
 		Aliases: []string{"s"},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				fmt.Printf("%v\n", err)
-				os.Exit(1)
-			}
-		},
 	}
 
 	stackCmd.AddCommand(NewRestackCommand(svc.runner, svc.gitHelper).Command())

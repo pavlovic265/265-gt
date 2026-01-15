@@ -1,8 +1,6 @@
 package commit
 
 import (
-	"os"
-
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -32,13 +30,11 @@ func (svc commitCommand) Command() *cobra.Command {
 		Use:     "commit",
 		Aliases: []string{"cm"},
 		Short:   "create commit",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			if empty {
 				return svc.handleEmptyCommit()
 			}

@@ -1,10 +1,10 @@
-package pullrequests_test
+package pr_test
 
 import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
+	"github.com/pavlovic265/265-gt/commands/pr"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +17,7 @@ func TestPullRequestCommand_Command(t *testing.T) {
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	prCmd := pullrequests.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
+	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
 	cmd := prCmd.Command()
 
 	assert.Equal(t, "pull_request", cmd.Use)
@@ -33,7 +33,7 @@ func TestNewPullRequestCommand(t *testing.T) {
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
 
-	prCmd := pullrequests.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
+	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
 	cmd := prCmd.Command()
 
 	assert.NotNil(t, cmd)

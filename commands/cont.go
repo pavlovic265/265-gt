@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"os"
-
 	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
@@ -29,13 +27,11 @@ func (svc contCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "cont",
 		Short: "short for rebase --continue",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			if err := svc.runner.Git("rebase", "--continue"); err != nil {
 				return log.Error("Failed to continue rebase", err)
 			}

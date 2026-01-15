@@ -1,9 +1,6 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -29,14 +26,12 @@ func (svc pushCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "push",
 		Aliases: []string{"pu"},
-		Short:   "push branch always froce",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		},
+		Short:   "push branch always force",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
 				return log.Error("Failed to get current branch name", err)

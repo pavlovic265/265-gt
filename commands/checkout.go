@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -33,13 +32,11 @@ func (svc checkoutCommand) Command() *cobra.Command {
 		Use:     "checkout",
 		Aliases: []string{"co"},
 		Short:   "checkout branch",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			if len(args) > 0 {
 				err := svc.checkoutBranch(args[0])
 				if err != nil {

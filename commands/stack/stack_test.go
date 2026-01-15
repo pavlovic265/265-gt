@@ -21,8 +21,7 @@ func TestStackCommand_Command(t *testing.T) {
 
 	assert.Equal(t, "stack", cmd.Use)
 	assert.Equal(t, []string{"s"}, cmd.Aliases)
-	assert.Equal(t, "commands for pull request", cmd.Short)
-	assert.NotNil(t, cmd.PersistentPreRun)
+	assert.Equal(t, "stack management commands", cmd.Short)
 }
 
 func TestNewStackCommand(t *testing.T) {

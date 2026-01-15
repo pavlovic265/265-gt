@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -34,13 +33,11 @@ func (svc statusCommand) Command() *cobra.Command {
 		Short:              "git status",
 		DisableFlagParsing: true,
 		SilenceUsage:       true,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			gitArgs := append([]string{"status"}, args...)
 			output, err := svc.runner.GitOutput(gitArgs...)
 			if err != nil {

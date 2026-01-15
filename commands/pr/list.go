@@ -1,4 +1,4 @@
-package pullrequests
+package pr
 
 import (
 	"context"

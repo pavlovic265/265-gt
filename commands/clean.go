@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -52,13 +51,11 @@ func (svc cleanCommand) Command() *cobra.Command {
 		Aliases: []string{"cl"},
 		Short:   "Clean up branches interactively",
 		Long:    "Clean up branches one by one with confirmation. Protected branches and current branch are skipped.",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
-				_ = log.Error("Not in a git repository", err)
-				os.Exit(1)
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			return svc.cleanBranches(cmd.Context())
 		},
 	}
