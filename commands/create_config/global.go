@@ -2,10 +2,10 @@ package createconfig
 
 import (
 	"github.com/pavlovic265/265-gt/config"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
+	"github.com/pavlovic265/265-gt/version"
 	"github.com/spf13/cobra"
 )
 
@@ -52,9 +52,8 @@ func (svc globalCommand) createGlobalConfig() error {
 		return log.Error("Failed to configure theme", err)
 	}
 
-	latestVersion, err := helpers.GetLatestVersion()
+	latestVersion, err := version.GetLatestVersion()
 	if err != nil {
-		// If we can't get version, use empty string
 		latestVersion = ""
 	}
 

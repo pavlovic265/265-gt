@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pavlovic265/265-gt/config"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/version"
 	"github.com/spf13/cobra"
 )
 
@@ -60,13 +60,13 @@ func (svc versionCommand) getCurrentVersion(cmd *cobra.Command) error {
 }
 
 func (svc versionCommand) getLatestVersion() error {
-	version, err := helpers.GetLatestVersion()
+	v, err := version.GetLatestVersion()
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("%s %s\n",
 		"Latest version:",
-		version)
+		v)
 	return nil
 }

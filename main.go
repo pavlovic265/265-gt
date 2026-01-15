@@ -16,8 +16,9 @@ import (
 	pullrequests "github.com/pavlovic265/265-gt/commands/pull_requests"
 	"github.com/pavlovic265/265-gt/commands/stack"
 	"github.com/pavlovic265/265-gt/config"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/version"
 
 	"github.com/spf13/cobra"
 )
@@ -50,7 +51,7 @@ var rootCmd = &cobra.Command{
 		cmd.SetContext(ctx)
 
 		if globalCfg != nil {
-			gitHelper.CheckGTVersion(ctx)
+			version.CheckGTVersion(ctx)
 		}
 		return nil
 	},

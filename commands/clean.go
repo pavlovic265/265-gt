@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/constants"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
@@ -127,7 +127,6 @@ func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 		}
 	}
 
-	// Summary
 	fmt.Println()
 	if deletedCount > 0 {
 		log.Successf("Deleted %d branches", deletedCount)
@@ -141,13 +140,11 @@ func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted bool, err error) {
 	parent, err := svc.gitHelper.GetParent(branch)
 	if err != nil {
-		// If we can't get parent, just set it to empty string
 		parent = ""
 	}
 
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
-	// Create styled prompt message
 	var promptMsg strings.Builder
 	promptMsg.WriteString("Delete branch ")
 	promptMsg.WriteString(branchStyle.Render("'" + branch + "'"))
@@ -177,13 +174,11 @@ func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted b
 		}
 
 		if model.IsYes() {
-			// Delete the branch
 			output, err := svc.runner.GitOutput("branch", "-D", branch)
 			if err != nil {
 				return false, false, err
 			}
 
-			// Relink children to parent
 			if len(branchChildren) > 0 {
 				err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
 				if err != nil {

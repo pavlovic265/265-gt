@@ -24,7 +24,6 @@ type GitHelper interface {
 	IsProtectedBranch(ctx context.Context, branch string) bool
 	RelinkParentChildren(parent string, branchChildren []string) error
 	IsRebaseInProgress() bool
-	CheckGTVersion(ctx context.Context)
 	GetRemoteURL(remoteName string) (string, error)
 }
 

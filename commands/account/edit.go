@@ -44,14 +44,12 @@ func (ec editCommand) Command() *cobra.Command {
 				return nil
 			}
 
-			// Build choices for search and select
 			var choices []string
 			for _, account := range cfg.Global.Accounts {
 				platform := account.Platform.String()
 				choices = append(choices, fmt.Sprintf("%s (%s) - %s", account.User, platform, account.Email))
 			}
 
-			// Show account selector
 			selectModel := components.ListModel[string]{
 				AllChoices: choices,
 				Choices:    choices,
@@ -73,7 +71,6 @@ func (ec editCommand) Command() *cobra.Command {
 					return nil
 				}
 
-				// Find the index of the selected account
 				for i, choice := range choices {
 					if choice == m.Selected {
 						selectedIndex = i
@@ -86,7 +83,6 @@ func (ec editCommand) Command() *cobra.Command {
 				return log.Error("Failed to select account", fmt.Errorf("invalid selection"))
 			}
 
-			// Edit the selected account
 			selectedAccount := cfg.Global.Accounts[selectedIndex]
 			editedAccount, err := HandleEditAccount(&selectedAccount)
 			if err != nil {

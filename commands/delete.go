@@ -6,7 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
@@ -88,7 +88,6 @@ func (svc deleteCommand) deleteBranch(
 ) error {
 	parent, err := svc.gitHelper.GetParent(branch)
 	if err != nil {
-		// If we can't get parent, just set it to empty string
 		parent = ""
 	}
 	branchChildren := svc.gitHelper.GetChildren(branch)

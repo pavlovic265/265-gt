@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/constants"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"

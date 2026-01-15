@@ -7,7 +7,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/constants"
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/spf13/cobra"
 )
@@ -47,7 +47,6 @@ func (svc statusCommand) Command() *cobra.Command {
 				return err
 			}
 
-			// Style the git status output
 			styledOutput := svc.styleGitStatus(output)
 			fmt.Print(styledOutput)
 

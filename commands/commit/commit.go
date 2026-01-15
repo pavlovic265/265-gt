@@ -3,7 +3,7 @@ package commit
 import (
 	"os"
 
-	helpers "github.com/pavlovic265/265-gt/git_helpers"
+	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
 	timeutils "github.com/pavlovic265/265-gt/utils/timeutils"
