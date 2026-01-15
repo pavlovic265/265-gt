@@ -27,8 +27,11 @@ var (
 	exe           = executor.NewExe()
 	configManager = config.NewDefaultConfigManager(exe)
 	gitHelper     = helpers.NewGitHelper(exe)
-	_             = client.InitCliClient(exe, gitHelper)
 )
+
+func init() {
+	client.InitCliClient(gitHelper)
+}
 
 const UNKNOWN_COMMAND_ERROR = "unknown command"
 
