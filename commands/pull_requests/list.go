@@ -174,7 +174,7 @@ func (svc *listCommand) selectPullRequest(
 			}
 
 			if m.MergeAction {
-				err := client.Client[svc.account.Platform].MergePullRequest(m.Selected.number)
+				err := client.Client[svc.account.Platform].MergePullRequest(svc.ctx, m.Selected.number)
 				if err != nil {
 					return log.Error("Failed to merge pull request", err)
 				}

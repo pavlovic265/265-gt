@@ -3,7 +3,6 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/pavlovic265/265-gt/blob/main/LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org/)
 [![Git Version](https://img.shields.io/badge/Git-2.39.5+-orange.svg)](https://git-scm.com/)
-[![GitHub CLI](https://img.shields.io/badge/GitHub%20CLI-2.81.0+-purple.svg)](https://cli.github.com/)
 
 [![CI](https://github.com/pavlovic265/265-gt/actions/workflows/ci.yml/badge.svg)](https://github.com/pavlovic265/265-gt/actions/workflows/ci.yml)
 [![Build](https://github.com/pavlovic265/265-gt/actions/workflows/build.yml/badge.svg)](https://github.com/pavlovic265/265-gt/actions/workflows/build.yml)
@@ -556,7 +555,7 @@ gt pr li
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
 - [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
-- [ ] **Multi-Platform Git Integration** — Support for additional Git platforms beyond GitHub (e.g., GitLab, Bitbucket).
+- [x] **Multi-Platform Git Integration** — Full support for GitHub and GitLab with direct API calls (no external CLI dependencies).
 - [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.
 - [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
 - [ ] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
