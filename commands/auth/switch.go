@@ -58,15 +58,14 @@ func (svc switchCommand) switchUser(cfg *config.ConfigContext, user string) erro
 		}
 	}
 	if account == nil {
-		log.Warning("User '" + user + "' does not exist in config")
+		log.Warningf("User '%s' does not exist in config", user)
 		return nil
 	}
 
-	// Update active account in context - will be saved by PersistentPostRunE
 	cfg.Global.ActiveAccount = account
 	cfg.MarkDirty()
 
-	log.Success("Switched to account: " + account.User)
+	log.Successf("Switched to account: %s", account.User)
 	return nil
 }
 

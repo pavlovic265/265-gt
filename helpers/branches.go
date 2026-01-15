@@ -48,7 +48,7 @@ func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 		return log.Error("Failed to set parent branch relationship", err)
 	}
 
-	log.Success("Branch '" + branch + "' rebased onto '" + parent + "' successfully")
+	log.Successf("Branch '%s' rebased onto '%s' successfully", branch, parent)
 
 	return nil
 }

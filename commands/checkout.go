@@ -2,9 +2,7 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
@@ -65,36 +63,18 @@ func (svc checkoutCommand) checkoutBranch(
 	return nil
 }
 
-func (svc checkoutCommand) selectAndCheckoutBranch(
-	choices []string,
-) error {
+func (svc checkoutCommand) selectAndCheckoutBranch(choices []string) error {
 	if len(choices) == 0 {
 		return log.ErrorMsg("No branches available to checkout")
 	}
 
-	initialModel := components.ListModel[string]{
-		AllChoices: choices,
-		Choices:    choices,
-		Cursor:     0,
-		Query:      "",
-		Formatter:  func(s string) string { return s },
-		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
-	}
-
-	program := tea.NewProgram(initialModel)
-
-	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-			err := svc.checkoutBranch(m.Selected)
-			if err != nil {
-				return err
-			}
-		} else {
-			// User cancelled or no selection made
-			return log.ErrorMsg("No branch selected")
-		}
-	} else {
+	selected, err := components.SelectString(choices)
+	if err != nil {
 		return log.Error("Failed to display branch selection", err)
 	}
-	return nil
+	if selected == "" {
+		return log.ErrorMsg("No branch selected")
+	}
+
+	return svc.checkoutBranch(selected)
 }

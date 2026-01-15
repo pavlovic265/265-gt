@@ -66,7 +66,7 @@ func (svc loginCommand) Command() *cobra.Command {
 						return log.Error("Authentication failed", err)
 					}
 
-					log.Success("Successfully authenticated with " + m.Selected)
+					log.Successf("Successfully authenticated with %s", m.Selected)
 				} else {
 					return log.ErrorMsg("No user selected for authentication")
 				}

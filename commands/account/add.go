@@ -33,7 +33,7 @@ func (ac addCommand) Command() *cobra.Command {
 				return err
 			}
 
-			accounts, err := HandleAddAccunts()
+			accounts, err := HandleAddAccounts()
 			if err != nil {
 				return log.Error("Failed to add accounts", err)
 			}

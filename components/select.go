@@ -94,8 +94,6 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
-		// fmt.Printf("DBG key: type=%v str=%q runes=%q alt=%v\n", msg.Type, msg.String(), string(msg.Runes), msg.Alt)
-
 		switch msg.String() {
 		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
 			return m, tea.Quit

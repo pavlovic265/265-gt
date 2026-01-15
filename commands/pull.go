@@ -41,7 +41,7 @@ func (svc pullCommand) Command() *cobra.Command {
 				return log.Error("Failed to pull branch from remote", err)
 			}
 
-			log.Success("Branch '" + currentBranchName + "' pulled successfully")
+			log.Successf("Branch '%s' pulled successfully", currentBranchName)
 			return nil
 		},
 	}

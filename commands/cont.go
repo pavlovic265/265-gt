@@ -55,12 +55,6 @@ func (svc contCommand) Command() *cobra.Command {
 				}
 			}
 
-			// Run stty sane to fix any terminal issues that might have occurred
-			// This is especially useful when Git opens an editor (like vim) during rebase
-			// that can mess up terminal display settings
-			// Side effects: Resets any custom terminal settings to standard defaults
-			// _ = exec.Command("stty", "sane").Run() // Ignore stty errors as they're not critical
-
 			return nil
 		},
 	}

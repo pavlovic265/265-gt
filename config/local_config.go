@@ -23,7 +23,7 @@ func (d *DefaultConfigManager) SaveLocalConfig(configToSave LocalConfigStruct) e
 func (d *DefaultConfigManager) getLocalConfigPath() (string, error) {
 	output, err := d.runner.GitOutput("rev-parse", "--show-toplevel")
 	if err != nil {
-		return "", nil
+		return "", nil // Local config is optional - not being in a git repo is fine
 	}
 
 	configPath := filepath.Join(output, ".gtconfig.yaml")

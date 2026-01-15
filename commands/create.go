@@ -49,7 +49,7 @@ func (svc createCommand) Command() *cobra.Command {
 				return log.Error("Failed to set parent branch relationship", err)
 			}
 
-			log.Success("Branch '" + branch + "' created and switched to successfully")
+			log.Successf("Branch '%s' created and switched to successfully", branch)
 			return nil
 		},
 	}

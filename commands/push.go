@@ -43,7 +43,7 @@ func (svc pushCommand) Command() *cobra.Command {
 				return log.Error("Failed to push branch to remote", err)
 			}
 
-			log.Success("Branch '" + currentBranchName + "' pushed successfully")
+			log.Successf("Branch '%s' pushed successfully", currentBranchName)
 			return nil
 		},
 	}

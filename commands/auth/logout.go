@@ -40,7 +40,7 @@ func (svc logoutCommand) Command() *cobra.Command {
 				return log.Error("Logout failed", err)
 			}
 
-			log.Success("Successfully logged out from " + account.User)
+			log.Successf("Successfully logged out from %s", account.User)
 			return nil
 		},
 	}

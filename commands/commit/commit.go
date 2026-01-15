@@ -59,7 +59,7 @@ func (svc commitCommand) handleEmptyCommit() error {
 		return log.Error("Failed to create empty commit", err)
 	}
 
-	log.Success("Empty commit created: " + message)
+	log.Successf("Empty commit created: %s", message)
 	return nil
 }
 
@@ -68,6 +68,6 @@ func (svc commitCommand) handleCommit(message string) error {
 		return log.Error("Failed to create commit", err)
 	}
 
-	log.Success("Commit created: " + message)
+	log.Successf("Commit created: %s", message)
 	return nil
 }

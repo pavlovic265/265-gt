@@ -49,7 +49,7 @@ func (svc downCommand) Command() *cobra.Command {
 				return log.Error("Failed to checkout parent branch", err)
 			}
 
-			log.Success("Moved down to branch '" + parent + "'")
+			log.Successf("Moved down to branch '%s'", parent)
 			return nil
 		},
 	}

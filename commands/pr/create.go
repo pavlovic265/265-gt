@@ -27,9 +27,9 @@ func NewCreateCommand(
 	}
 }
 
-var draft bool
-
 func (svc createCommand) Command() *cobra.Command {
+	var draft bool
+
 	cmd := &cobra.Command{
 		Use:     "create",
 		Aliases: []string{"c"},

@@ -298,7 +298,7 @@ func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
 	return am, nil
 }
 
-func HandleAddAccunts() ([]config.Account, error) {
+func HandleAddAccounts() ([]config.Account, error) {
 	selectModel := newAccountsModel()
 	selectProgram := tea.NewProgram(selectModel)
 	m, err := selectProgram.Run()
@@ -310,7 +310,7 @@ func HandleAddAccunts() ([]config.Account, error) {
 		return m.accounts, nil
 	}
 
-	return nil, fmt.Errorf("faild to read accounts")
+	return nil, fmt.Errorf("failed to read accounts")
 }
 
 func HandleEditAccount(account *config.Account) (*config.Account, error) {

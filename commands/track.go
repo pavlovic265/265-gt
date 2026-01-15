@@ -1,9 +1,6 @@
 package commands
 
 import (
-	"strings"
-
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
@@ -53,27 +50,16 @@ func (svc trackCommand) Command() *cobra.Command {
 				}
 			}
 
-			initialModel := components.ListModel[string]{
-				AllChoices: branchesWithoutCurrent,
-				Choices:    branchesWithoutCurrent,
-				Cursor:     0,
-				Query:      "",
-				Formatter:  func(s string) string { return s },
-				Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
+			selected, err := components.SelectString(branchesWithoutCurrent)
+			if err != nil {
+				return log.Error("Failed to display branch selection", err)
+			}
+			if selected == "" {
+				return log.ErrorMsg("No branch selected")
 			}
 
-			program := tea.NewProgram(initialModel)
-
-			if finalModel, err := program.Run(); err == nil {
-				if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-					if err := svc.gitHelper.SetParent(m.Selected, branch); err != nil {
-						return log.Error("Failed to set parent", err)
-					}
-				} else {
-					return log.ErrorMsg("No branch selected")
-				}
-			} else {
-				return log.Error("Failed to display branch selection", err)
+			if err := svc.gitHelper.SetParent(selected, branch); err != nil {
+				return log.Error("Failed to set parent", err)
 			}
 
 			log.Successf("Successfully tracking %s", branch)

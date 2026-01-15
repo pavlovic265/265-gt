@@ -1,9 +1,6 @@
 package commands
 
 import (
-	"strings"
-
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/components"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
@@ -66,31 +63,14 @@ func (svc moveCommand) Command() *cobra.Command {
 	}
 }
 
-func (svc moveCommand) rebaseBranch(
-	branch string,
-	choices []string,
-) error {
-	initialModel := components.ListModel[string]{
-		AllChoices: choices,
-		Choices:    choices,
-		Cursor:     0,
-		Query:      "",
-		Formatter:  func(s string) string { return s },
-		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
-	}
-
-	program := tea.NewProgram(initialModel)
-
-	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel[string]); ok && m.Selected != "" {
-			if err := svc.gitHelper.RebaseBranch(branch, m.Selected); err != nil {
-				return err
-			}
-		} else {
-			return log.ErrorMsg("No target branch selected for rebase")
-		}
-	} else {
+func (svc moveCommand) rebaseBranch(branch string, choices []string) error {
+	selected, err := components.SelectString(choices)
+	if err != nil {
 		return log.Error("Failed to display branch selection menu", err)
 	}
-	return nil
+	if selected == "" {
+		return log.ErrorMsg("No target branch selected for rebase")
+	}
+
+	return svc.gitHelper.RebaseBranch(branch, selected)
 }

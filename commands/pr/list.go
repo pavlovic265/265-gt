@@ -173,7 +173,7 @@ func (svc *listCommand) selectPullRequest(
 		if m, ok := finalModel.(components.ListModel[pullRequest]); ok {
 			if m.YankAction {
 				svc.yankToClipboard(m.Selected.url)
-				log.Success("URL yanked to clipboard: " + m.Selected.url)
+				log.Successf("URL yanked to clipboard: %s", m.Selected.url)
 				return nil
 			}
 
