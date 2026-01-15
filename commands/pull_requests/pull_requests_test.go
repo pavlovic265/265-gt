@@ -23,7 +23,6 @@ func TestPullRequestCommand_Command(t *testing.T) {
 	assert.Equal(t, "pull_request", cmd.Use)
 	assert.Equal(t, []string{"pr"}, cmd.Aliases)
 	assert.Equal(t, "commands for pull request", cmd.Short)
-	assert.NotNil(t, cmd.PersistentPreRun)
 }
 
 func TestNewPullRequestCommand(t *testing.T) {

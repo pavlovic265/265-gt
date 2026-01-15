@@ -44,3 +44,12 @@ func (gh *GitHelperImpl) IsRebaseInProgress() bool {
 
 	return false
 }
+
+func (gh *GitHelperImpl) GetRemoteURL(remoteName string) (string, error) {
+	exeArgs := []string{"remote", "get-url", remoteName}
+	output, err := gh.exe.WithGit().WithArgs(exeArgs).RunWithOutput()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(output.String()), nil
+}

@@ -178,6 +178,21 @@ func (mr *MockGitHelperMockRecorder) GetPending(branchType interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPending", reflect.TypeOf((*MockGitHelper)(nil).GetPending), branchType)
 }
 
+// GetRemoteURL mocks base method.
+func (m *MockGitHelper) GetRemoteURL(remoteName string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRemoteURL", remoteName)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRemoteURL indicates an expected call of GetRemoteURL.
+func (mr *MockGitHelperMockRecorder) GetRemoteURL(remoteName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRemoteURL", reflect.TypeOf((*MockGitHelper)(nil).GetRemoteURL), remoteName)
+}
+
 // IsGitRepository mocks base method.
 func (m *MockGitHelper) IsGitRepository() error {
 	m.ctrl.T.Helper()
