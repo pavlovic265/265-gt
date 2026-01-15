@@ -45,6 +45,10 @@ func (svc *listCommand) Command() *cobra.Command {
 		Short:   "show list of pull request",
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
 				return err

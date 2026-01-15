@@ -4,6 +4,7 @@ import (
 	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/executor"
+	helpers "github.com/pavlovic265/265-gt/git_helpers"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
@@ -11,15 +12,18 @@ import (
 type createCommand struct {
 	exe           executor.Executor
 	configManager config.ConfigManager
+	gitHelper     helpers.GitHelper
 }
 
 func NewCreateCommand(
 	exe executor.Executor,
 	configManager config.ConfigManager,
+	gitHelper helpers.GitHelper,
 ) createCommand {
 	return createCommand{
 		exe:           exe,
 		configManager: configManager,
+		gitHelper:     gitHelper,
 	}
 }
 
@@ -31,6 +35,10 @@ func (svc createCommand) Command() *cobra.Command {
 		Aliases: []string{"c"},
 		Short:   "Create a pull request",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
+				return err
+			}
+
 			cfg, err := config.RequireGlobal(cmd.Context())
 			if err != nil {
 				return err
