@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -source=runner.go -destination=../mocks/mock_runner.go -package=mocks
-
 type Runner interface {
 	Git(args ...string) error
 	GitOutput(args ...string) (string, error)

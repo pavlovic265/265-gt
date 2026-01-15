@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks
+.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks mocks-runner mocks-git-helper mocks-config clean-mocks
 
 # Default target, builds the application
 all: build
@@ -115,25 +115,25 @@ major:
 mocks:
 	@echo "🔧 Generating mocks..."
 	@mkdir -p mocks
-	@echo "📦 Generating executor mock..."
-	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
+	@echo "📦 Generating runner mock..."
+	@mockgen -source=runner/runner.go -destination=mocks/mock_runner.go -package=mocks
 	@echo "📦 Generating git helper mock..."
-	@mockgen -source=git_helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "📦 Generating config manager mock..."
 	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
 	@echo "✅ All mocks generated successfully"
 
 # Generate specific mocks
-mocks-executor:
-	@echo "🔧 Generating executor mock..."
+mocks-runner:
+	@echo "🔧 Generating runner mock..."
 	@mkdir -p mocks
-	@mockgen -source=executor/executor.go -destination=mocks/mock_executor.go -package=mocks
-	@echo "✅ Executor mock generated successfully"
+	@mockgen -source=runner/runner.go -destination=mocks/mock_runner.go -package=mocks
+	@echo "✅ Runner mock generated successfully"
 
 mocks-git-helper:
 	@echo "🔧 Generating git helper mock..."
 	@mkdir -p mocks
-	@mockgen -source=git_helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "✅ Git helper mock generated successfully"
 
 mocks-config:
