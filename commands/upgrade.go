@@ -50,7 +50,7 @@ func (svc upgradeCommand) Command() *cobra.Command {
 
 			binary := svc.checkWhichBinary()
 			if binary == nil {
-				return log.ErrorMsg("Failed to check if homebrew is installed")
+				return log.ErrorMsg("failed to check if homebrew is installed")
 			}
 
 			switch pointer.Deref(binary) {
@@ -65,6 +65,9 @@ func (svc upgradeCommand) Command() *cobra.Command {
 			}
 
 			// Update version in context - will be saved by PersistentPostRunE
+			if cfg.Global.Version == nil {
+				cfg.Global.Version = &config.Version{}
+			}
 			cfg.Global.Version.LastChecked = timeutils.Now().Format(timeutils.LayoutISOWithTime)
 			cfg.Global.Version.CurrentVersion = pointer.Deref(version)
 			cfg.MarkDirty()
@@ -122,7 +125,10 @@ func (svc upgradeCommand) isLatestVersion(cfg *config.ConfigContext) (*string, b
 	}
 
 	// Get current version from context config
-	currentVersion := cfg.Global.Version.CurrentVersion
+	currentVersion := ""
+	if cfg.Global.Version != nil {
+		currentVersion = cfg.Global.Version.CurrentVersion
+	}
 	if currentVersion == result.TagName {
 		return pointer.From(result.TagName), true, nil
 	}

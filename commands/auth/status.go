@@ -32,13 +32,13 @@ func (svc statusCommand) Command() *cobra.Command {
 			}
 
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
-				return log.ErrorMsg("No active account found")
+				return log.ErrorMsg("no active account found")
 			}
 			account := cfg.Global.ActiveAccount
 
 			err = client.Client[account.Platform].AuthStatus(cmd.Context())
 			if err != nil {
-				return log.Error("Authentication failed", err)
+				return log.Error("authentication failed", err)
 			}
 
 			return nil

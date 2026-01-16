@@ -33,20 +33,20 @@ func (svc downCommand) Command() *cobra.Command {
 
 			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			parent, err := svc.gitHelper.GetParent(currentBranch)
 			if err != nil {
-				return log.Error("Failed to get parent branch", err)
+				return log.Error("failed to get parent branch", err)
 			}
 
 			if parent == "" {
-				return log.ErrorMsg("Cannot move down - no parent branch available")
+				return log.ErrorMsg("cannot move down: no parent branch available")
 			}
 
 			if err := svc.runner.Git("checkout", parent); err != nil {
-				return log.Error("Failed to checkout parent branch", err)
+				return log.Error("failed to checkout parent branch", err)
 			}
 
 			log.Successf("Moved down to branch '%s'", parent)

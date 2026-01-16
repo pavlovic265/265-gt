@@ -45,7 +45,7 @@ func (svc createCommand) Command() *cobra.Command {
 			}
 
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
-				return log.ErrorMsg("No active account found")
+				return log.ErrorMsg("no active account found")
 			}
 			account := cfg.Global.ActiveAccount
 
@@ -55,7 +55,7 @@ func (svc createCommand) Command() *cobra.Command {
 
 			err = client.Client[account.Platform].CreatePullRequest(cmd.Context(), args)
 			if err != nil {
-				return log.Error("Failed to create pull request", err)
+				return log.Error("failed to create pull request", err)
 			}
 			log.Success("Pull request created successfully")
 			return nil

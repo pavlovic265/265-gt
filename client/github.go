@@ -29,11 +29,11 @@ func NewGitHubClient(gitHelper helpers.GitHelper) CliClient {
 func (c *gitHubClient) getRepoInfo(ctx context.Context) (*RepoInfo, *config.Account, error) {
 	cfg, ok := config.GetConfig(ctx)
 	if !ok {
-		return nil, nil, fmt.Errorf("config not loaded")
+		return nil, nil, ErrConfigNotLoaded
 	}
 
 	if cfg.Global.ActiveAccount == nil {
-		return nil, nil, fmt.Errorf("no active account")
+		return nil, nil, ErrNoActiveAccount
 	}
 
 	remoteURL, err := c.gitHelper.GetRemoteURL("origin")
@@ -81,12 +81,12 @@ func (c *gitHubClient) doRequest(
 func (c *gitHubClient) AuthStatus(ctx context.Context) error {
 	cfg, ok := config.GetConfig(ctx)
 	if !ok {
-		return fmt.Errorf("config not loaded")
+		return ErrConfigNotLoaded
 	}
 
 	account := cfg.Global.ActiveAccount
 	if account == nil {
-		return fmt.Errorf("no active account")
+		return ErrNoActiveAccount
 	}
 
 	resp, err := c.doRequest(ctx, "GET", githubAPIBase+"/user", nil, account.Token)
@@ -118,7 +118,7 @@ func (c *gitHubClient) AuthStatus(ctx context.Context) error {
 func (c *gitHubClient) AuthLogin(ctx context.Context, user string) error {
 	cfg, ok := config.GetConfig(ctx)
 	if !ok {
-		return fmt.Errorf("config not loaded")
+		return ErrConfigNotLoaded
 	}
 
 	for _, acc := range cfg.Global.Accounts {
@@ -135,7 +135,7 @@ func (c *gitHubClient) AuthLogin(ctx context.Context, user string) error {
 func (c *gitHubClient) AuthLogout(ctx context.Context, user string) error {
 	cfg, ok := config.GetConfig(ctx)
 	if !ok {
-		return fmt.Errorf("config not loaded")
+		return ErrConfigNotLoaded
 	}
 
 	cfg.Global.ActiveAccount = nil

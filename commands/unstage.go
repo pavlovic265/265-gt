@@ -34,7 +34,7 @@ func (svc unstageCommand) Command() *cobra.Command {
 
 			gitArgs := append([]string{"restore", "--staged"}, args...)
 			if err := svc.runner.Git(gitArgs...); err != nil {
-				return log.Error("Failed to unstage files", err)
+				return log.Error("failed to unstage files", err)
 			}
 
 			if len(args) == 0 {

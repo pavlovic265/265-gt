@@ -40,7 +40,7 @@ func (svc commitCommand) Command() *cobra.Command {
 			}
 
 			if len(args) == 0 {
-				return log.ErrorMsg("No commit message provided")
+				return log.ErrorMsg("no commit message provided")
 			}
 			message := string(args[0])
 			return svc.handleCommit(message)
@@ -56,7 +56,7 @@ func (svc commitCommand) Command() *cobra.Command {
 func (svc commitCommand) handleEmptyCommit() error {
 	message := timeutils.Now().Format(timeutils.LayoutUserFriendly)
 	if err := svc.runner.Git("commit", "--allow-empty", "-m", message); err != nil {
-		return log.Error("Failed to create empty commit", err)
+		return log.Error("failed to create empty commit", err)
 	}
 
 	log.Successf("Empty commit created: %s", message)
@@ -65,7 +65,7 @@ func (svc commitCommand) handleEmptyCommit() error {
 
 func (svc commitCommand) handleCommit(message string) error {
 	if err := svc.runner.Git("commit", "-m", message); err != nil {
-		return log.Error("Failed to create commit", err)
+		return log.Error("failed to create commit", err)
 	}
 
 	log.Successf("Commit created: %s", message)

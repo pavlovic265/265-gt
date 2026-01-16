@@ -33,7 +33,7 @@ func (svc switchCommand) Command() *cobra.Command {
 			}
 
 			if err := svc.runner.Git("checkout", "-"); err != nil {
-				return log.Error("Failed to switch to previous branch", err)
+				return log.Error("failed to switch to previous branch", err)
 			}
 			return nil
 		},

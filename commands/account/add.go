@@ -35,7 +35,7 @@ func (ac addCommand) Command() *cobra.Command {
 
 			accounts, err := HandleAddAccounts()
 			if err != nil {
-				return log.Error("Failed to add accounts", err)
+				return log.Error("failed to add accounts", err)
 			}
 
 			if len(accounts) == 0 {

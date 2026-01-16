@@ -34,13 +34,13 @@ func (svc upCommand) Command() *cobra.Command {
 
 			currentBranch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			children := svc.gitHelper.GetChildren(currentBranch)
 
 			if len(children) == 0 {
-				return log.ErrorMsg("Cannot move up - no child branches available")
+				return log.ErrorMsg("cannot move up: no child branches available")
 			}
 
 			if len(children) == 1 {
@@ -61,7 +61,7 @@ func (svc upCommand) checkoutBranch(
 	branch string,
 ) error {
 	if err := svc.runner.Git("checkout", branch); err != nil {
-		return log.Error("Failed to checkout branch", err)
+		return log.Error("failed to checkout branch", err)
 	}
 	log.Successf("Moved up to branch '%s'", branch)
 	return nil
@@ -70,10 +70,10 @@ func (svc upCommand) checkoutBranch(
 func (svc upCommand) selectAndCheckoutBranch(choices []string) error {
 	selected, err := components.SelectString(choices)
 	if err != nil {
-		return log.Error("Failed to display branch selection menu", err)
+		return log.Error("failed to display branch selection menu", err)
 	}
 	if selected == "" {
-		return log.ErrorMsg("No branch selected for checkout")
+		return log.ErrorMsg("no branch selected for checkout")
 	}
 
 	return svc.checkoutBranch(selected)

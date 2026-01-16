@@ -61,7 +61,7 @@ func (ec editCommand) Command() *cobra.Command {
 			selectProgram := tea.NewProgram(selectModel)
 			m, err := selectProgram.Run()
 			if err != nil {
-				return log.Error("Failed to select account", err)
+				return log.Error("failed to select account", err)
 			}
 
 			var selectedIndex = -1
@@ -80,13 +80,13 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			if selectedIndex == -1 {
-				return log.ErrorMsg("Failed to select account: invalid selection")
+				return log.ErrorMsg("failed to select account: invalid selection")
 			}
 
 			selectedAccount := cfg.Global.Accounts[selectedIndex]
 			editedAccount, err := HandleEditAccount(&selectedAccount)
 			if err != nil {
-				return log.Error("Failed to edit account", err)
+				return log.Error("failed to edit account", err)
 			}
 
 			// Update the account in context - will be saved by PersistentPostRunE

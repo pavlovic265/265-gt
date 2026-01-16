@@ -32,12 +32,12 @@ func (svc logoutCommand) Command() *cobra.Command {
 			}
 
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
-				return log.ErrorMsg("No active account found")
+				return log.ErrorMsg("no active account found")
 			}
 			account := cfg.Global.ActiveAccount
 
 			if err := client.Client[account.Platform].AuthLogout(cmd.Context(), account.User); err != nil {
-				return log.Error("Logout failed", err)
+				return log.Error("logout failed", err)
 			}
 
 			log.Successf("Successfully logged out from %s", account.User)

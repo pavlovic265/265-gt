@@ -22,7 +22,7 @@ func TestListCommand_Command(t *testing.T) {
 
 	assert.Equal(t, "list", cmd.Use)
 	assert.Equal(t, []string{"li"}, cmd.Aliases)
-	assert.Equal(t, "show list of pull request", cmd.Short)
+	assert.Equal(t, "show list of pull requests", cmd.Short)
 }
 
 func TestNewListCommand(t *testing.T) {

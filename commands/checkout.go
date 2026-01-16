@@ -56,7 +56,7 @@ func (svc checkoutCommand) checkoutBranch(
 	branch string,
 ) error {
 	if err := svc.runner.Git("checkout", branch); err != nil {
-		return log.Error(fmt.Sprintf("Failed to checkout branch '%s'", branch), err)
+		return log.Error(fmt.Sprintf("failed to checkout branch '%s'", branch), err)
 	}
 
 	log.Success(fmt.Sprintf("Switched to branch '%s'", branch))
@@ -65,15 +65,15 @@ func (svc checkoutCommand) checkoutBranch(
 
 func (svc checkoutCommand) selectAndCheckoutBranch(choices []string) error {
 	if len(choices) == 0 {
-		return log.ErrorMsg("No branches available to checkout")
+		return log.ErrorMsg("no branches available to checkout")
 	}
 
 	selected, err := components.SelectString(choices)
 	if err != nil {
-		return log.Error("Failed to display branch selection", err)
+		return log.Error("failed to display branch selection", err)
 	}
 	if selected == "" {
-		return log.ErrorMsg("No branch selected")
+		return log.ErrorMsg("no branch selected")
 	}
 
 	return svc.checkoutBranch(selected)

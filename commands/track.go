@@ -35,12 +35,12 @@ func (svc trackCommand) Command() *cobra.Command {
 
 			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			branches, err := svc.gitHelper.GetBranches()
 			if err != nil {
-				return log.Error("Failed to get branches", err)
+				return log.Error("failed to get branches", err)
 			}
 
 			var branchesWithoutCurrent []string
@@ -52,14 +52,14 @@ func (svc trackCommand) Command() *cobra.Command {
 
 			selected, err := components.SelectString(branchesWithoutCurrent)
 			if err != nil {
-				return log.Error("Failed to display branch selection", err)
+				return log.Error("failed to display branch selection", err)
 			}
 			if selected == "" {
-				return log.ErrorMsg("No branch selected")
+				return log.ErrorMsg("no branch selected")
 			}
 
 			if err := svc.gitHelper.SetParent(selected, branch); err != nil {
-				return log.Error("Failed to set parent", err)
+				return log.Error("failed to set parent", err)
 			}
 
 			log.Successf("Successfully tracking %s", branch)

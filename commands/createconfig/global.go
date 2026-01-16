@@ -39,7 +39,7 @@ func (svc globalCommand) Command() *cobra.Command {
 
 			err = svc.createGlobalConfig()
 			if err != nil {
-				return log.Error("Failed to create global configuration", err)
+				return log.Error("failed to create global configuration", err)
 			}
 			return nil
 		},
@@ -49,7 +49,7 @@ func (svc globalCommand) Command() *cobra.Command {
 func (svc globalCommand) createGlobalConfig() error {
 	theme, err := HandleSelectTheme()
 	if err != nil {
-		return log.Error("Failed to configure theme", err)
+		return log.Error("failed to configure theme", err)
 	}
 
 	latestVersion, err := version.GetLatestVersion()
@@ -69,7 +69,7 @@ func (svc globalCommand) createGlobalConfig() error {
 
 	err = svc.configManager.SaveGlobalConfig(globalConfig)
 	if err != nil {
-		return log.Error("Failed to save global configuration", err)
+		return log.Error("failed to save global configuration", err)
 	}
 
 	log.Success("Global configuration created successfully")

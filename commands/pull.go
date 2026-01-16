@@ -34,11 +34,11 @@ func (svc pullCommand) Command() *cobra.Command {
 
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			if err := svc.runner.Git("pull", "origin", currentBranchName); err != nil {
-				return log.Error("Failed to pull branch from remote", err)
+				return log.Error("failed to pull branch from remote", err)
 			}
 
 			log.Successf("Branch '%s' pulled successfully", currentBranchName)

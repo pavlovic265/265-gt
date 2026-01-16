@@ -34,12 +34,12 @@ func (svc moveCommand) Command() *cobra.Command {
 			}
 
 			if svc.gitHelper.IsRebaseInProgress() {
-				return log.ErrorMsg("A rebase is already in progress. Resolve it, then run `gt cont` or abort.")
+				return log.ErrorMsg("a rebase is already in progress; resolve it, then run `gt cont` or abort")
 			}
 
 			branch, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			if len(args) > 0 {
@@ -50,7 +50,7 @@ func (svc moveCommand) Command() *cobra.Command {
 			} else {
 				branches, err := svc.gitHelper.GetBranches()
 				if err != nil {
-					return log.Error("Failed to get branch list", err)
+					return log.Error("failed to get branch list", err)
 				}
 
 				if err := svc.rebaseBranch(branch, branches); err != nil {
@@ -66,10 +66,10 @@ func (svc moveCommand) Command() *cobra.Command {
 func (svc moveCommand) rebaseBranch(branch string, choices []string) error {
 	selected, err := components.SelectString(choices)
 	if err != nil {
-		return log.Error("Failed to display branch selection menu", err)
+		return log.Error("failed to display branch selection menu", err)
 	}
 	if selected == "" {
-		return log.ErrorMsg("No target branch selected for rebase")
+		return log.ErrorMsg("no target branch selected for rebase")
 	}
 
 	return svc.gitHelper.RebaseBranch(branch, selected)

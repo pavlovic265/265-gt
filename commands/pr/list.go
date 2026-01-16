@@ -42,7 +42,7 @@ func NewListCommand(
 func (svc *listCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:     "list",
-		Short:   "show list of pull request",
+		Short:   "show list of pull requests",
 		Aliases: []string{"li"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
@@ -55,14 +55,14 @@ func (svc *listCommand) Command() *cobra.Command {
 			}
 
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
-				return log.ErrorMsg("No active account found")
+				return log.ErrorMsg("no active account found")
 			}
 			svc.account = cfg.Global.ActiveAccount
 			svc.ctx = cmd.Context()
 
 			prs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, args)
 			if err != nil {
-				return log.Error("Failed to list pull requests", err)
+				return log.Error("failed to list pull requests", err)
 			}
 			return svc.selectPullRequest(prs)
 		},
@@ -80,13 +80,13 @@ func (svc *listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 	ciStatus := ""
 	ciStatusColor := constants.White
 	switch pr.StatusState {
-	case "SUCCESS":
+	case client.StatusStateTypeSuccess:
 		ciStatus = "✓ "
 		ciStatusColor = constants.Green
-	case "FAILURE":
+	case client.StatusStateTypeFailure:
 		ciStatus = "✗ "
 		ciStatusColor = constants.Red
-	case "PENDING":
+	case client.StatusStateTypePending:
 		ciStatus = "* "
 		ciStatusColor = constants.Yellow
 	}
@@ -107,11 +107,11 @@ func (svc *listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
 	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
 	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-	_ = lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+	styledMergeable := lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
 
 	return pullRequest{
 		number: pr.Number,
-		title:  fmt.Sprintf("%s%s: %s", styledCiStatus, styledNumber, styledTitle),
+		title:  fmt.Sprintf("%s%s: %s%s", styledCiStatus, styledNumber, styledTitle, styledMergeable),
 		url:    pr.URL,
 		branch: pr.Branch,
 	}
@@ -180,11 +180,11 @@ func (svc *listCommand) selectPullRequest(
 			if m.MergeAction {
 				err := client.Client[svc.account.Platform].MergePullRequest(svc.ctx, m.Selected.number)
 				if err != nil {
-					return log.Error("Failed to merge pull request", err)
+					return log.Error("failed to merge pull request", err)
 				}
 				err = svc.gitHelper.DeleteParent(m.Selected.branch)
 				if err != nil {
-					return log.Error("Failed to delete parent connection", err)
+					return log.Error("failed to delete parent connection", err)
 				}
 				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
 				return nil
@@ -197,7 +197,7 @@ func (svc *listCommand) selectPullRequest(
 			}
 		}
 	} else {
-		return log.Error("Failed to display pull request selection menu", err)
+		return log.Error("failed to display pull request selection menu", err)
 	}
 	return nil
 }

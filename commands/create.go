@@ -33,24 +33,24 @@ func (svc createCommand) Command() *cobra.Command {
 			}
 
 			if len(args) == 0 {
-				return log.ErrorMsg("Branch name is required")
+				return log.ErrorMsg("branch name is required")
 			}
 			branch := args[0]
 
 			if err := svc.gitHelper.ValidateBranchName(branch); err != nil {
-				return log.Error("Invalid branch name", err)
+				return log.Error("invalid branch name", err)
 			}
 			parent, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			if err := svc.runner.Git("checkout", "-b", branch); err != nil {
-				return log.Error("Failed to create and checkout branch", err)
+				return log.Error("failed to create and checkout branch", err)
 			}
 
 			if err := svc.gitHelper.SetParent(parent, branch); err != nil {
-				return log.Error("Failed to set parent branch relationship", err)
+				return log.Error("failed to set parent branch relationship", err)
 			}
 
 			log.Successf("Branch '%s' created and switched to successfully", branch)

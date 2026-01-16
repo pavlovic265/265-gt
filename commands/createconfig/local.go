@@ -33,7 +33,7 @@ func (svc localCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, ok := config.GetConfig(cmd.Context())
 			if !ok {
-				return log.ErrorMsg("Config not loaded")
+				return log.ErrorMsg("config not loaded")
 			}
 
 			branches, err := HandleAddProtectedBranch()

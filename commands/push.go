@@ -34,13 +34,13 @@ func (svc pushCommand) Command() *cobra.Command {
 
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			log.Warning("Using force push - this will overwrite remote changes")
 
 			if err := svc.runner.Git("push", "--force", "origin", currentBranchName); err != nil {
-				return log.Error("Failed to push branch to remote", err)
+				return log.Error("failed to push branch to remote", err)
 			}
 
 			log.Successf("Branch '%s' pushed successfully", currentBranchName)

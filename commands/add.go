@@ -34,7 +34,7 @@ func (svc addCommand) Command() *cobra.Command {
 			}
 
 			if err := svc.runner.Git(append([]string{"add"}, args...)...); err != nil {
-				return log.Error("Failed to stage files", err)
+				return log.Error("failed to stage files", err)
 			}
 
 			if len(args) == 0 {

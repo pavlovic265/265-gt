@@ -64,12 +64,12 @@ func (svc cleanCommand) Command() *cobra.Command {
 func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 	currentBranch, err := svc.gitHelper.GetCurrentBranch()
 	if err != nil {
-		return log.Error("Failed to get current branch", err)
+		return log.Error("failed to get current branch", err)
 	}
 
 	branches, err := svc.gitHelper.GetBranches()
 	if err != nil {
-		return log.Error("Failed to get branches", err)
+		return log.Error("failed to get branches", err)
 	}
 
 	fmt.Println(headerStyle.Render("Branch Cleanup"))
@@ -109,7 +109,7 @@ func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 
 		shouldBreak, deleted, err := svc.deleteBranch(branch)
 		if err != nil {
-			_ = log.Errorf("Failed to delete branch: %v", err)
+			_ = log.Errorf("failed to delete branch: %v", err)
 			continue
 		}
 
@@ -139,60 +139,79 @@ func (svc cleanCommand) deleteBranch(branch string) (shouldBreak bool, deleted b
 	if err != nil {
 		parent = ""
 	}
-
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
-	var promptMsg strings.Builder
-	promptMsg.WriteString("Delete branch ")
-	promptMsg.WriteString(branchStyle.Render("'" + branch + "'"))
-	promptMsg.WriteString("?")
-
-	if parent != "" {
-		promptMsg.WriteString(" ")
-		promptMsg.WriteString(parentStyle.Render("(parent: " + parent + ")"))
-	}
-
-	if len(branchChildren) > 0 {
-		promptMsg.WriteString(" ")
-		promptMsg.WriteString(infoStyle.Render(fmt.Sprintf("(children: %d)", len(branchChildren))))
-	}
-
-	initialModel := components.NewYesNoPrompt(promptMsg.String())
-	program := tea.NewProgram(initialModel)
-
-	m, err := program.Run()
+	promptMsg := svc.buildDeletePrompt(branch, parent, branchChildren)
+	model, err := svc.showDeletePrompt(promptMsg)
 	if err != nil {
 		return false, false, err
 	}
 
-	if model, ok := m.(components.YesNoPrompt); ok {
-		if model.Quitting {
-			return true, false, nil
+	if model.Quitting {
+		return true, false, nil
+	}
+
+	if model.IsYes() {
+		if err := svc.performDelete(branch, parent, branchChildren); err != nil {
+			return false, false, err
 		}
-
-		if model.IsYes() {
-			output, err := svc.runner.GitOutput("branch", "-D", branch)
-			if err != nil {
-				return false, false, err
-			}
-
-			if len(branchChildren) > 0 {
-				err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
-				if err != nil {
-					return false, false, err
-				}
-				fmt.Printf("   → Relinked %d children to %s\n",
-					len(branchChildren),
-					branchStyle.Render(parent))
-			}
-
-			fmt.Printf("   ")
-			log.Success(output)
-			fmt.Println()
-
-			return false, true, nil
-		}
+		return false, true, nil
 	}
 
 	return false, false, nil
+}
+
+func (svc cleanCommand) buildDeletePrompt(branch, parent string, children []string) string {
+	var msg strings.Builder
+	msg.WriteString("Delete branch ")
+	msg.WriteString(branchStyle.Render("'" + branch + "'"))
+	msg.WriteString("?")
+
+	if parent != "" {
+		msg.WriteString(" ")
+		msg.WriteString(parentStyle.Render("(parent: " + parent + ")"))
+	}
+
+	if len(children) > 0 {
+		msg.WriteString(" ")
+		msg.WriteString(infoStyle.Render(fmt.Sprintf("(children: %d)", len(children))))
+	}
+
+	return msg.String()
+}
+
+func (svc cleanCommand) showDeletePrompt(promptMsg string) (components.YesNoPrompt, error) {
+	initialModel := components.NewYesNoPrompt(promptMsg)
+	program := tea.NewProgram(initialModel)
+
+	m, err := program.Run()
+	if err != nil {
+		return components.YesNoPrompt{}, err
+	}
+
+	if model, ok := m.(components.YesNoPrompt); ok {
+		return model, nil
+	}
+
+	return components.YesNoPrompt{}, nil
+}
+
+func (svc cleanCommand) performDelete(branch, parent string, children []string) error {
+	output, err := svc.runner.GitOutput("branch", "-D", branch)
+	if err != nil {
+		return err
+	}
+
+	if len(children) > 0 {
+		if err := svc.gitHelper.RelinkParentChildren(parent, children); err != nil {
+			return err
+		}
+		fmt.Printf("   → Relinked %d children to %s\n", len(children), branchStyle.Render(parent))
+	}
+
+	fmt.Printf("   ")
+	log.Success(output)
+	fmt.Println()
+
+	return nil
 }

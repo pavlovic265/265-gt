@@ -39,17 +39,17 @@ func (svc deleteCommand) Command() *cobra.Command {
 			ctx := cmd.Context()
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
 			if err != nil {
-				return log.Error("Failed to get current branch name", err)
+				return log.Error("failed to get current branch name", err)
 			}
 
 			if len(args) > 0 {
 				branch := strings.TrimSpace(args[0])
 				if currentBranchName == branch {
-					return log.ErrorMsg("Cannot delete the branch you are currently on")
+					return log.ErrorMsg("cannot delete the branch you are currently on")
 				}
 
 				if svc.gitHelper.IsProtectedBranch(ctx, branch) {
-					return log.ErrorMsg("Cannot delete protected branch: " + branch)
+					return log.ErrorMsg("cannot delete protected branch: " + branch)
 				}
 
 				err := svc.deleteBranch(branch)
@@ -59,7 +59,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 			} else {
 				branches, err := svc.gitHelper.GetBranches()
 				if err != nil {
-					return log.Error("Failed to get branch list", err)
+					return log.Error("failed to get branch list", err)
 				}
 				var branchesWithoutCurrent []string
 				for _, branch := range branches {
@@ -69,7 +69,7 @@ func (svc deleteCommand) Command() *cobra.Command {
 				}
 
 				if len(branchesWithoutCurrent) == 0 {
-					return log.ErrorMsg("No branches available for deletion")
+					return log.ErrorMsg("no branches available for deletion")
 				}
 
 				return svc.selectAndDeleteBranch(branchesWithoutCurrent)
@@ -89,12 +89,12 @@ func (svc deleteCommand) deleteBranch(
 	branchChildren := svc.gitHelper.GetChildren(branch)
 
 	if err := svc.runner.Git("branch", "-D", branch); err != nil {
-		return log.Error("Failed to delete branch", err)
+		return log.Error("failed to delete branch", err)
 	}
 
 	err = svc.gitHelper.RelinkParentChildren(parent, branchChildren)
 	if err != nil {
-		return log.Error("Failed to update branch relationships", err)
+		return log.Error("failed to update branch relationships", err)
 	}
 
 	log.Successf("Branch '%s' deleted successfully", branch)
@@ -104,10 +104,10 @@ func (svc deleteCommand) deleteBranch(
 func (svc deleteCommand) selectAndDeleteBranch(choices []string) error {
 	selected, err := components.SelectString(choices)
 	if err != nil {
-		return log.Error("Failed to display branch selection menu", err)
+		return log.Error("failed to display branch selection menu", err)
 	}
 	if selected == "" {
-		return log.ErrorMsg("No branch selected for deletion")
+		return log.ErrorMsg("no branch selected for deletion")
 	}
 
 	return svc.deleteBranch(selected)

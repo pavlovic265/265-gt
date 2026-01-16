@@ -28,7 +28,7 @@ func NewPullRequestCommand(
 func (svc pullRequestCommand) Command() *cobra.Command {
 	pullRequestCmd := &cobra.Command{
 		Use:     "pull_request",
-		Short:   "commands for pull request",
+		Short:   "commands for pull requests",
 		Aliases: []string{"pr"},
 	}
 

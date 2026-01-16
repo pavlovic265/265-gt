@@ -33,7 +33,7 @@ func (svc contCommand) Command() *cobra.Command {
 			}
 
 			if err := svc.runner.Git("rebase", "--continue"); err != nil {
-				return log.Error("Failed to continue rebase", err)
+				return log.Error("failed to continue rebase", err)
 			}
 
 			if svc.gitHelper.IsRebaseInProgress() {
@@ -45,7 +45,7 @@ func (svc contCommand) Command() *cobra.Command {
 			if pErr == nil && cErr == nil {
 				if parent != "" && child != "" {
 					if err := svc.gitHelper.SetParent(parent, child); err != nil {
-						return log.Error("Failed to set parent branch relationship", err)
+						return log.Error("failed to set parent branch relationship", err)
 					}
 
 					_ = svc.gitHelper.DeletePending(constants.ParentBranch)

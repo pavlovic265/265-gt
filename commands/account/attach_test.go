@@ -38,7 +38,7 @@ func TestAttachCommand_NoActiveAccount(t *testing.T) {
 
 	err := cmd.RunE(cmd, []string{})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "No active account")
+	assert.Contains(t, err.Error(), "no active account")
 }
 
 func TestAttachCommand_NonExistentDirectory(t *testing.T) {

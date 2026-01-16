@@ -25,7 +25,7 @@ func HandleAddProtectedBranch() ([]string, error) {
 	protectedBranchProgram := tea.NewProgram(&protectedBranch)
 	m, err := protectedBranchProgram.Run()
 	if err != nil {
-		return nil, log.Error("Failed to run protected branch interface", err)
+		return nil, log.Error("failed to run protected branch interface", err)
 	}
 
 	if m, ok := m.(protectedBranchModele); ok {
@@ -36,7 +36,7 @@ func HandleAddProtectedBranch() ([]string, error) {
 		return m.branches, nil
 	}
 
-	return nil, log.ErrorMsg("Failed to read protected branch configuration")
+	return nil, log.ErrorMsg("failed to read protected branch configuration")
 }
 
 type protectedBranchModele struct {

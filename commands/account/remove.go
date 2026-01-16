@@ -61,7 +61,7 @@ func (rc removeCommand) Command() *cobra.Command {
 			selectProgram := tea.NewProgram(selectModel)
 			m, err := selectProgram.Run()
 			if err != nil {
-				return log.Error("Failed to select account", err)
+				return log.Error("failed to select account", err)
 			}
 
 			selectedIndex := -1
@@ -81,7 +81,7 @@ func (rc removeCommand) Command() *cobra.Command {
 			}
 
 			if selectedIndex == -1 {
-				return log.ErrorMsg("Failed to select account: invalid selection")
+				return log.ErrorMsg("failed to select account: invalid selection")
 			}
 
 			// Get the account to remove

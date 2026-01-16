@@ -75,10 +75,10 @@ func (svc switchCommand) selectAndswitchUser(cfg *config.ConfigContext) error {
 
 	selected, err := components.SelectString(users)
 	if err != nil {
-		return log.Error("Failed to display user selection menu", err)
+		return log.Error("failed to display user selection menu", err)
 	}
 	if selected == "" {
-		return log.ErrorMsg("No user selected for switching")
+		return log.ErrorMsg("no user selected for switching")
 	}
 
 	return svc.switchUser(cfg, selected)

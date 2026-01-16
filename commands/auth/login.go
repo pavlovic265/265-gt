@@ -41,10 +41,10 @@ func (svc loginCommand) Command() *cobra.Command {
 
 			selected, err := components.SelectString(users)
 			if err != nil {
-				return log.Error("Failed to display user selection menu", err)
+				return log.Error("failed to display user selection menu", err)
 			}
 			if selected == "" {
-				return log.ErrorMsg("No user selected for authentication")
+				return log.ErrorMsg("no user selected for authentication")
 			}
 
 			var account config.Account
@@ -56,7 +56,7 @@ func (svc loginCommand) Command() *cobra.Command {
 			}
 
 			if err := client.Client[account.Platform].AuthLogin(cmd.Context(), account.User); err != nil {
-				return log.Error("Authentication failed", err)
+				return log.Error("authentication failed", err)
 			}
 
 			log.Successf("Successfully authenticated with %s", selected)

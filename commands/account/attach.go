@@ -37,7 +37,7 @@ func (atc attachCommand) Command() *cobra.Command {
 			}
 
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
-				return log.ErrorMsg("No active account. Run 'gt auth' to set an active account")
+				return log.ErrorMsg("no active account; run 'gt auth' to set an active account")
 			}
 
 			// Get active account
@@ -58,7 +58,7 @@ func (atc attachCommand) Command() *cobra.Command {
 			// Get home directory for global config
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
-				return log.Error("Failed to get home directory", err)
+				return log.Error("failed to get home directory", err)
 			}
 
 			// 1. Update ~/.gitconfig with includeIf
@@ -84,18 +84,18 @@ func (atc attachCommand) resolvePaths(targetDir string) (absPath string, relPath
 	// Resolve to absolute path
 	absPath, err = filepath.Abs(targetDir)
 	if err != nil {
-		return "", "", log.Error("Failed to resolve directory path", err)
+		return "", "", log.Error("failed to resolve directory path", err)
 	}
 
 	// Ensure directory exists
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
-		return "", "", log.Errorf("Directory does not exist: %s", absPath)
+		return "", "", log.Errorf("directory does not exist: %s", absPath)
 	}
 
 	// Get home directory
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", "", log.Error("Failed to get home directory", err)
+		return "", "", log.Error("failed to get home directory", err)
 	}
 
 	// Convert to relative path from home if possible
@@ -120,7 +120,7 @@ func (atc attachCommand) writeToGlobalGitConfig(gitConfigPath, dirPath string) e
 	// Read existing content (empty if file doesn't exist)
 	existingContent, err := os.ReadFile(gitConfigPath)
 	if err != nil && !os.IsNotExist(err) {
-		return log.Error("Failed to read ~/.gitconfig", err)
+		return log.Error("failed to read ~/.gitconfig", err)
 	}
 
 	fileContent := string(existingContent)
@@ -147,7 +147,7 @@ func (atc attachCommand) writeToGlobalGitConfig(gitConfigPath, dirPath string) e
 
 	// Write the file
 	if err := os.WriteFile(gitConfigPath, []byte(newContent.String()), 0644); err != nil {
-		return log.Error("Failed to write ~/.gitconfig", err)
+		return log.Error("failed to write ~/.gitconfig", err)
 	}
 
 	log.Successf("Added includeIf to ~/.gitconfig")
@@ -158,7 +158,7 @@ func (atc attachCommand) writeToLocalGitConfig(gitConfigPath string, account con
 	// Read existing content (empty if file doesn't exist)
 	existingContent, err := os.ReadFile(gitConfigPath)
 	if err != nil && !os.IsNotExist(err) {
-		return log.Error("Failed to read .gitconfig", err)
+		return log.Error("failed to read .gitconfig", err)
 	}
 
 	fileContent := string(existingContent)
@@ -188,7 +188,7 @@ func (atc attachCommand) writeToLocalGitConfig(gitConfigPath string, account con
 
 	// Write the file
 	if err := os.WriteFile(gitConfigPath, []byte(newContent.String()), 0644); err != nil {
-		return log.Error("Failed to write .gitconfig", err)
+		return log.Error("failed to write .gitconfig", err)
 	}
 
 	log.Successf("Created/updated %s", gitConfigPath)
