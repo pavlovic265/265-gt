@@ -1,8 +1,6 @@
 package createconfig
 
 import (
-	"fmt"
-
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -41,14 +39,13 @@ func (svc localCommand) Command() *cobra.Command {
 				return err
 			}
 
-			fmt.Println("branches", branches)
-
 			if cfg.Local == nil {
 				cfg.Local = &config.LocalConfigStruct{}
 			}
 			cfg.Local.Protected = append(cfg.Local.Protected, branches...)
 			cfg.MarkLocalDirty()
 
+			log.Info("Note: 'main' and 'master' are protected by default")
 			log.Success("Local configuration updated successfully")
 			return nil
 		},
