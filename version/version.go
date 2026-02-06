@@ -20,19 +20,24 @@ type GitHubRelease struct {
 	HTMLURL string `json:"html_url"`
 }
 
-func GetLatestVersion() (string, error) {
+func GetLatestVersion(token string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	version, _, err := getLatestVersionWithContext(ctx)
+	version, _, err := getLatestVersionWithContext(ctx, token)
 	return version, err
 }
 
-func getLatestVersionWithContext(ctx context.Context) (string, string, error) {
+func getLatestVersionWithContext(ctx context.Context, token string) (string, string, error) {
 	apiURL := "https://api.github.com/repos/pavlovic265/265-gt/releases/latest"
 
 	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
 		return "", "", err
+	}
+
+	// Use token for authenticated requests (higher rate limit)
+	if token != "" {
+		req.Header.Set("Authorization", "token "+token)
 	}
 
 	client := &http.Client{}
@@ -66,10 +71,16 @@ func CheckGTVersion(ctx context.Context) {
 		return
 	}
 
+	// Get token from active account for authenticated API requests
+	token := ""
+	if cfg.Global.ActiveAccount != nil {
+		token = cfg.Global.ActiveAccount.Token
+	}
+
 	timeoutCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	latestVersion, latestURL, err := getLatestVersionWithContext(timeoutCtx)
+	latestVersion, latestURL, err := getLatestVersionWithContext(timeoutCtx, token)
 	if err != nil {
 		return
 	}

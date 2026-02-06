@@ -32,7 +32,7 @@ func (svc versionCommand) Command() *cobra.Command {
 			latest, _ := cmd.Flags().GetBool("latest")
 
 			if latest {
-				return svc.getLatestVersion()
+				return svc.getLatestVersion(cmd)
 			}
 
 			return svc.getCurrentVersion(cmd)
@@ -59,8 +59,14 @@ func (svc versionCommand) getCurrentVersion(cmd *cobra.Command) error {
 	return nil
 }
 
-func (svc versionCommand) getLatestVersion() error {
-	v, err := version.GetLatestVersion()
+func (svc versionCommand) getLatestVersion(cmd *cobra.Command) error {
+	// Get token from active account for authenticated API requests
+	token := ""
+	if cfg, ok := config.GetConfig(cmd.Context()); ok && cfg.Global != nil && cfg.Global.ActiveAccount != nil {
+		token = cfg.Global.ActiveAccount.Token
+	}
+
+	v, err := version.GetLatestVersion(token)
 	if err != nil {
 		return err
 	}

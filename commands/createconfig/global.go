@@ -52,7 +52,7 @@ func (svc globalCommand) createGlobalConfig() error {
 		return log.Error("failed to configure theme", err)
 	}
 
-	latestVersion, err := version.GetLatestVersion()
+	latestVersion, err := version.GetLatestVersion("")
 	if err != nil {
 		latestVersion = ""
 	}
