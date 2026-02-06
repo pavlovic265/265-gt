@@ -62,6 +62,14 @@ Examples:
 				return log.Error("failed to clone repository", err)
 			}
 
+			// Get the cloned directory name
+			clonedDir := svc.extractRepoName(cloneURL)
+
+			// Attach active account to the cloned directory
+			if err := helpers.AttachAccountToDir(account, clonedDir); err != nil {
+				log.Warningf("Could not attach account to cloned repo: %v", err)
+			}
+
 			log.Success("Repository cloned successfully")
 			return nil
 		},
@@ -120,4 +128,21 @@ func (svc cloneCommand) buildCloneURL(repo string, account *config.Account) (str
 	}
 
 	return "", log.ErrorMsg("invalid repository format - use owner/repo or full URL")
+}
+
+// extractRepoName extracts the repository name from a clone URL.
+// git@github.com:owner/repo.git -> repo
+// https://github.com/owner/repo -> repo
+func (svc cloneCommand) extractRepoName(cloneURL string) string {
+	// Remove .git suffix
+	name := strings.TrimSuffix(cloneURL, ".git")
+
+	// Get the last part after / or :
+	if idx := strings.LastIndex(name, "/"); idx != -1 {
+		name = name[idx+1:]
+	} else if idx := strings.LastIndex(name, ":"); idx != -1 {
+		name = name[idx+1:]
+	}
+
+	return name
 }
