@@ -107,6 +107,7 @@ func main() {
 	rootCmd.AddCommand(commands.NewUpCommand(run, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewTrackCommand(run, gitHelper).Command())
 	rootCmd.AddCommand(commands.NewUnstageCommand(run, gitHelper).Command())
+	rootCmd.AddCommand(commands.NewCloneCommand(run, gitHelper).Command())
 	rootCmd.AddCommand(stack.NewStackCommand(run, gitHelper).Command())
 	rootCmd.AddCommand(commit.NewCommitCommand(run, gitHelper).Command())
 	rootCmd.AddCommand(pr.NewPullRequestCommand(run, configManager, gitHelper).Command())

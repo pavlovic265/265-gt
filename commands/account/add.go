@@ -43,6 +43,13 @@ func (ac addCommand) Command() *cobra.Command {
 				return nil
 			}
 
+			// SSH setup for each account
+			for i := range accounts {
+				if err := HandleSSHSetup(&accounts[i], ac.runner); err != nil {
+					log.Warningf("SSH setup failed for %s: %v", accounts[i].User, err)
+				}
+			}
+
 			// Append new accounts to context - will be saved by PersistentPostRunE
 			cfg.Global.Accounts = append(cfg.Global.Accounts, accounts...)
 			cfg.MarkDirty()

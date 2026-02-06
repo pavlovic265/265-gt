@@ -89,6 +89,13 @@ func (ec editCommand) Command() *cobra.Command {
 				return log.Error("failed to edit account", err)
 			}
 
+			// Offer SSH setup if not configured
+			if editedAccount.SSHKeyPath == "" || editedAccount.SSHHost == "" {
+				if err := HandleSSHSetup(editedAccount, ec.runner); err != nil {
+					log.Warningf("SSH setup failed: %v", err)
+				}
+			}
+
 			// Update the account in context - will be saved by PersistentPostRunE
 			cfg.Global.Accounts[selectedIndex] = *editedAccount
 

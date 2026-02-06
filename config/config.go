@@ -14,6 +14,8 @@ type Account struct {
 	Email      string             `yaml:"email,omitempty"`
 	Name       string             `yaml:"name,omitempty"`
 	SigningKey string             `yaml:"signingkey,omitempty"`
+	SSHKeyPath string             `yaml:"ssh_key_path,omitempty"`
+	SSHHost    string             `yaml:"ssh_host,omitempty"`
 }
 
 // Version tracks version information for update checking.
