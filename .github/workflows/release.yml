@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -18,6 +17,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: ${{ github.event.release.tag_name }}
         
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -83,7 +83,10 @@ jobs:
 
     - name: Extract version
       id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      run: |
+        TAG="${{ github.event.release.tag_name }}"
+        VERSION="${TAG#v}"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Create npm package structure
       run: |
@@ -192,7 +195,7 @@ jobs:
     - name: Cleanup tag & release on failure
       if: failure()
       run: |
-        TAG=${GITHUB_REF#refs/tags/}
+        TAG="${{ github.event.release.tag_name }}"
         echo "Cleaning up $TAG due to failure"
         gh release delete "$TAG" -y || true
         git push origin --delete "$TAG" || true
