@@ -217,6 +217,8 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | `account add` | `acc add` | Add a new account interactively | `gt account add` |
 | `account list` | `acc ls` | List all configured accounts | `gt account list` |
 | `account edit` | `acc edit` | Edit an existing account | `gt account edit` |
+| `account edit -t` | `acc edit -t` | Update token only | `gt account edit -t` |
+| `account edit --gpg` | `acc edit --gpg` | Update GPG signing key only | `gt account edit --gpg` |
 | `account remove` | `acc rm` | Remove an account | `gt account remove` |
 | `account attach` | `acc at` | Attach active account to a directory | `gt account attach ~/work` |
 
@@ -247,9 +249,9 @@ gt account add
 ```
 
 The account management commands allow you to:
-- **Add accounts**: Interactively add GitHub/GitLab accounts with username, email, full name, platform, API token, and GPG signing key for commit signing
+- **Add accounts**: Interactively add GitHub/GitLab accounts with SSH key setup and optional token
 - **List accounts**: View all configured accounts with their details
-- **Edit accounts**: Modify existing account information
+- **Edit accounts**: Modify existing account information or quickly update token (`-t`) or GPG key (`--gpg`)
 - **Remove accounts**: Delete accounts you no longer need
 - **Switch accounts**: Change between accounts using `gt auth switch`
 
@@ -442,13 +444,11 @@ git config --local --unset gt.branch.<branch-name>.parent
 ```bash
 # Add a new account
 gt account add
-# Follow the interactive prompts to enter:
-# - Username
-# - Email
-# - Full name
-# - Platform (GitHub/GitLab)
-# - API token
-# - GPG signing key for commit signing (optional)
+# Follow the interactive prompts:
+# 1. Enter username, email, full name
+# 2. Select platform (GitHub/GitLab)
+# 3. SSH key setup (create new or use existing)
+# 4. Token setup (optional - with platform-specific guidance)
 
 # List all configured accounts
 gt account list
@@ -459,6 +459,14 @@ gt account list
 # Edit an existing account
 gt account edit
 # Select account to edit, then update any field
+
+# Quick update token only
+gt account edit -t
+# Select account, then enter new token
+
+# Quick update GPG signing key only
+gt account edit --gpg
+# Select account, then enter GPG key ID
 
 # Remove an account
 gt account remove
