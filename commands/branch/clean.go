@@ -109,7 +109,7 @@ func (svc cleanCommand) cleanBranches(ctx context.Context) error {
 
 		shouldBreak, deleted, err := svc.deleteBranch(branch)
 		if err != nil {
-			_ = log.Errorf("failed to delete branch: %v", err)
+			log.Warningf("failed to delete branch %s: %v", branch, err)
 			continue
 		}
 

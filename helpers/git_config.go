@@ -46,7 +46,7 @@ func resolvePaths(targetDir string) (absPath string, relPath string, err error) 
 	}
 
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
-		return "", "", log.Errorf("directory does not exist: %s", absPath)
+		return "", "", log.ErrorMsg(fmt.Sprintf("directory does not exist: %s", absPath))
 	}
 
 	homeDir, err := os.UserHomeDir()
