@@ -7,17 +7,28 @@ This project uses [release-please](https://github.com/googleapis/release-please)
 1. Merge PRs to `main` using [conventional commits](https://www.conventionalcommits.org/)
 2. release-please automatically creates/updates a Release PR
 3. When ready to release, merge the Release PR
-4. GoReleaser builds binaries and publishes to GitHub + npm
+4. release-please creates a GitHub Release (with tag)
+5. The `release: [published]` event triggers GoReleaser
+6. GoReleaser builds binaries and publishes to npm
 
 ## Flow
 
 ```
 merge PR to main → Release PR created/updated
                         ↓
-              merge Release PR → tag created
+              merge Release PR → GitHub Release created (with tag)
                         ↓
-              GoReleaser → GitHub Release + npm publish
+              release event triggers release.yml
+                        ↓
+              GoReleaser → binaries built + npm publish
 ```
+
+## Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `release-please.yml` | Push to main | Creates/updates Release PR |
+| `release.yml` | GitHub Release published | Builds binaries, publishes to npm |
 
 ## Conventional Commits
 
