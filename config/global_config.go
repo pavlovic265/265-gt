@@ -64,5 +64,9 @@ func (d *DefaultConfigManager) SaveGlobalConfig(configToSave GlobalConfigStruct)
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
-	return writeConfig(configPath, &configToSave)
+	if err := writeConfig(configPath, &configToSave); err != nil {
+		return err
+	}
+
+	return d.SavePublicConfig(configToSave)
 }

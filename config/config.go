@@ -37,6 +37,11 @@ type GlobalConfigStruct struct {
 	Theme         *ThemeConfig `yaml:"theme,omitempty"`
 }
 
+// PublicConfigStruct represents the public configuration file (~/.config/gt/public.yml).
+type PublicConfigStruct struct {
+	User string `yaml:"user,omitempty"`
+}
+
 // LocalConfigStruct represents repository-local configuration (.gtconfig.yaml).
 type LocalConfigStruct struct {
 	Protected []string `yaml:"protected,omitempty"`
@@ -51,6 +56,7 @@ type DefaultConfigManager struct {
 type ConfigManager interface {
 	LoadGlobalConfig() (*GlobalConfigStruct, error)
 	SaveGlobalConfig(configToSave GlobalConfigStruct) error
+	SavePublicConfig(globalConfig GlobalConfigStruct) error
 	LoadLocalConfig() (*LocalConfigStruct, error)
 	SaveLocalConfig(configToSave LocalConfigStruct) error
 }

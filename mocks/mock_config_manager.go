@@ -78,6 +78,20 @@ func (mr *MockConfigManagerMockRecorder) SaveGlobalConfig(configToSave interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveGlobalConfig", reflect.TypeOf((*MockConfigManager)(nil).SaveGlobalConfig), configToSave)
 }
 
+// SavePublicConfig mocks base method.
+func (m *MockConfigManager) SavePublicConfig(globalConfig config.GlobalConfigStruct) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SavePublicConfig", globalConfig)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SavePublicConfig indicates an expected call of SavePublicConfig.
+func (mr *MockConfigManagerMockRecorder) SavePublicConfig(globalConfig interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SavePublicConfig", reflect.TypeOf((*MockConfigManager)(nil).SavePublicConfig), globalConfig)
+}
+
 // SaveLocalConfig mocks base method.
 func (m *MockConfigManager) SaveLocalConfig(configToSave config.LocalConfigStruct) error {
 	m.ctrl.T.Helper()

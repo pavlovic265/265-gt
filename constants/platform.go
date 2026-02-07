@@ -5,6 +5,7 @@ var LocalConfigFileName = ".gtconfig.yaml"
 var (
 	GlobalConfigDir      = "gt"
 	GlobalConfigFileName = "config.yml"
+	PublicConfigFileName = "public.yml"
 )
 
 type Platform string

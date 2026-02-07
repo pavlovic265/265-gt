@@ -21,12 +21,15 @@ func readConfig[T any](filename string) (*T, error) {
 	return &cfg, nil
 }
 
-func writeConfig[T any](filename string, cfg *T) error {
+func writeConfigWithPerm[T any](filename string, cfg *T, perm os.FileMode) error {
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to marshal YAML: %w", err)
 	}
 
-	// Secure file writing — ensure permissions are restrictive (rw for owner only)
-	return os.WriteFile(filename, data, 0600)
+	return os.WriteFile(filename, data, perm)
+}
+
+func writeConfig[T any](filename string, cfg *T) error {
+	return writeConfigWithPerm(filename, cfg, 0600)
 }
