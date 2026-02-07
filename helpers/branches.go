@@ -43,9 +43,7 @@ func (gh *GitHelperImpl) GetRemoteBranches() ([]string, error) {
 			continue
 		}
 		// Strip "origin/" prefix
-		if strings.HasPrefix(branch, "origin/") {
-			branch = strings.TrimPrefix(branch, "origin/")
-		}
+		branch = strings.TrimPrefix(branch, "origin/")
 		branches = append(branches, branch)
 	}
 	return branches, nil
