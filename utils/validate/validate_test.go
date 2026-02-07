@@ -40,8 +40,8 @@ func TestToken_Valid(t *testing.T) {
 
 func TestToken_Empty(t *testing.T) {
 	err := Token("")
-	if err == nil {
-		t.Error("Token(\"\") should return error")
+	if err != nil {
+		t.Error("Token(\"\") should be valid (optional field)")
 	}
 }
 

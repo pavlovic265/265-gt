@@ -28,7 +28,7 @@ func NewEditCommand(
 }
 
 func (ec editCommand) Command() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "edit",
 		Short: "Edit an existing account",
 		Long:  "Select and edit an existing GitHub or GitLab account",
@@ -44,47 +44,43 @@ func (ec editCommand) Command() *cobra.Command {
 				return nil
 			}
 
-			var choices []string
-			for _, account := range cfg.Global.Accounts {
-				platform := account.Platform.String()
-				choices = append(choices, fmt.Sprintf("%s (%s) - %s", account.User, platform, account.Email))
-			}
+			// Check flags
+			tokenFlag, _ := cmd.Flags().GetBool("token")
+			gpgFlag, _ := cmd.Flags().GetBool("gpg")
 
-			selectModel := components.ListModel[string]{
-				AllChoices: choices,
-				Choices:    choices,
-				Cursor:     0,
-				Formatter:  func(s string) string { return s },
-				Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
-			}
-
-			selectProgram := tea.NewProgram(selectModel)
-			m, err := selectProgram.Run()
+			// Select account
+			selectedIndex, err := selectAccount(cfg.Global.Accounts)
 			if err != nil {
-				return log.Error("failed to select account", err)
+				return err
 			}
-
-			var selectedIndex = -1
-			if m, ok := m.(components.ListModel[string]); ok {
-				if m.Selected == "" {
-					log.Info("No account selected")
-					return nil
-				}
-
-				for i, choice := range choices {
-					if choice == m.Selected {
-						selectedIndex = i
-						break
-					}
-				}
-			}
-
 			if selectedIndex == -1 {
-				return log.ErrorMsg("failed to select account: invalid selection")
+				log.Info("No account selected")
+				return nil
 			}
 
-			selectedAccount := cfg.Global.Accounts[selectedIndex]
-			editedAccount, err := HandleEditAccount(&selectedAccount)
+			selectedAccount := &cfg.Global.Accounts[selectedIndex]
+
+			// Handle quick update flags
+			if tokenFlag {
+				if err := HandleTokenSetup(selectedAccount); err != nil {
+					return log.Error("failed to update token", err)
+				}
+				cfg.MarkDirty()
+				log.Success("Account updated successfully")
+				return nil
+			}
+
+			if gpgFlag {
+				if err := HandleGPGSetup(selectedAccount); err != nil {
+					return log.Error("failed to update GPG key", err)
+				}
+				cfg.MarkDirty()
+				log.Success("Account updated successfully")
+				return nil
+			}
+
+			// Full edit flow
+			editedAccount, err := HandleEditAccount(selectedAccount)
 			if err != nil {
 				return log.Error("failed to edit account", err)
 			}
@@ -93,6 +89,13 @@ func (ec editCommand) Command() *cobra.Command {
 			if editedAccount.SSHKeyPath == "" || editedAccount.SSHHost == "" {
 				if err := HandleSSHSetup(editedAccount, ec.runner); err != nil {
 					log.Warningf("SSH setup failed: %v", err)
+				}
+			}
+
+			// Offer token setup if not configured
+			if editedAccount.Token == "" {
+				if err := HandleTokenSetup(editedAccount); err != nil {
+					log.Warningf("Token setup failed: %v", err)
 				}
 			}
 
@@ -111,4 +114,45 @@ func (ec editCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("token", "t", false, "Update token only")
+	cmd.Flags().Bool("gpg", false, "Update GPG signing key only")
+
+	return cmd
+}
+
+func selectAccount(accounts []config.Account) (int, error) {
+	var choices []string
+	for _, account := range accounts {
+		platform := account.Platform.String()
+		choices = append(choices, fmt.Sprintf("%s (%s) - %s", account.User, platform, account.Email))
+	}
+
+	selectModel := components.ListModel[string]{
+		AllChoices: choices,
+		Choices:    choices,
+		Cursor:     0,
+		Formatter:  func(s string) string { return s },
+		Matcher:    func(s, query string) bool { return strings.Contains(s, query) },
+	}
+
+	selectProgram := tea.NewProgram(selectModel)
+	m, err := selectProgram.Run()
+	if err != nil {
+		return -1, log.Error("failed to select account", err)
+	}
+
+	if m, ok := m.(components.ListModel[string]); ok {
+		if m.Selected == "" {
+			return -1, nil
+		}
+
+		for i, choice := range choices {
+			if choice == m.Selected {
+				return i, nil
+			}
+		}
+	}
+
+	return -1, log.ErrorMsg("failed to select account: invalid selection")
 }

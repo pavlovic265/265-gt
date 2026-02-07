@@ -23,10 +23,10 @@ func Username(username string) error {
 	return nil
 }
 
-// Token validates that a token is non-empty and contains no whitespace.
+// Token validates token format. Empty token is allowed (optional field).
 func Token(token string) error {
 	if token == "" {
-		return fmt.Errorf("token cannot be empty")
+		return nil // Token is optional
 	}
 	if strings.TrimSpace(token) != token {
 		return fmt.Errorf("token cannot have leading or trailing whitespace")

@@ -43,10 +43,15 @@ func (ac addCommand) Command() *cobra.Command {
 				return nil
 			}
 
-			// SSH setup for each account
+			// SSH setup and token setup for each account
 			for i := range accounts {
 				if err := HandleSSHSetup(&accounts[i], ac.runner); err != nil {
 					log.Warningf("SSH setup failed for %s: %v", accounts[i].User, err)
+				}
+
+				// Token setup with guidance
+				if err := HandleTokenSetup(&accounts[i]); err != nil {
+					log.Warningf("Token setup failed for %s: %v", accounts[i].User, err)
 				}
 			}
 

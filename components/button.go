@@ -97,3 +97,8 @@ func NewBackButton(focused bool) Button {
 	return NewButton("Back", ButtonPrimary).
 		WithFocus(focused)
 }
+
+func NewSkipButton(focused bool) Button {
+	return NewButton("Skip", ButtonWarning).
+		WithFocus(focused)
+}

@@ -42,15 +42,13 @@ func newAccountsModel() accountsModel {
 
 func newAccountsModelWithData(account *config.Account) accountsModel {
 	accountsModel := accountsModel{
-		inputs:   make([]textinput.Model, 5),
+		inputs:   make([]textinput.Model, 3),
 		editMode: account != nil, // Set edit mode if account is provided
 	}
 
 	accountsModel.inputs[0] = components.NewUserInput()
-	accountsModel.inputs[1] = components.NewTokenInput()
-	accountsModel.inputs[2] = components.NewEmailInput()
-	accountsModel.inputs[3] = components.NewNameInput()
-	accountsModel.inputs[4] = components.NewSigningKeyInput()
+	accountsModel.inputs[1] = components.NewEmailInput()
+	accountsModel.inputs[2] = components.NewNameInput()
 	accountsModel.focusIndex = 0
 	accountsModel.platform = constants.GitHubPlatform // Default to GitHub
 	accountsModel.platformIndex = 0                   // Default to first platform (GitHub)
@@ -58,10 +56,8 @@ func newAccountsModelWithData(account *config.Account) accountsModel {
 	// Prefill if account data is provided
 	if account != nil {
 		accountsModel.inputs[0].SetValue(account.User)
-		accountsModel.inputs[1].SetValue(account.Token)
-		accountsModel.inputs[2].SetValue(account.Email)
-		accountsModel.inputs[3].SetValue(account.Name)
-		accountsModel.inputs[4].SetValue(account.SigningKey)
+		accountsModel.inputs[1].SetValue(account.Email)
+		accountsModel.inputs[2].SetValue(account.Name)
 
 		// Set platform
 		accountsModel.platform = account.Platform
@@ -211,29 +207,24 @@ func (am accountsModel) validateInputs() error {
 	if err := validate.Username(am.inputs[0].Value()); err != nil {
 		return err
 	}
-	if err := validate.Token(am.inputs[1].Value()); err != nil {
-		return err
-	}
-	if err := validate.Email(am.inputs[2].Value()); err != nil {
+	if err := validate.Email(am.inputs[1].Value()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (am accountsModel) handleDone() (tea.Model, tea.Cmd) {
-	if am.inputs[0].Value() != "" && am.inputs[1].Value() != "" {
+	if am.inputs[0].Value() != "" {
 		if err := am.validateInputs(); err != nil {
 			am.err = err.Error()
 			return am, nil
 		}
 		platform := platformOptions[am.platformIndex]
 		am.accounts = append(am.accounts, config.Account{
-			User:       am.inputs[0].Value(),
-			Token:      am.inputs[1].Value(),
-			Platform:   platform,
-			Email:      am.inputs[2].Value(),
-			Name:       am.inputs[3].Value(),
-			SigningKey: am.inputs[4].Value(),
+			User:     am.inputs[0].Value(),
+			Platform: platform,
+			Email:    am.inputs[1].Value(),
+			Name:     am.inputs[2].Value(),
 		})
 	}
 	return am, tea.Quit
@@ -247,19 +238,15 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 
 	platform := platformOptions[am.platformIndex]
 	am.accounts = append(am.accounts, config.Account{
-		User:       am.inputs[0].Value(),
-		Token:      am.inputs[1].Value(),
-		Platform:   platform,
-		Email:      am.inputs[2].Value(),
-		Name:       am.inputs[3].Value(),
-		SigningKey: am.inputs[4].Value(),
+		User:     am.inputs[0].Value(),
+		Platform: platform,
+		Email:    am.inputs[1].Value(),
+		Name:     am.inputs[2].Value(),
 	})
 
 	am.inputs[0] = components.NewUserInput()
-	am.inputs[1] = components.NewTokenInput()
-	am.inputs[2] = components.NewEmailInput()
-	am.inputs[3] = components.NewNameInput()
-	am.inputs[4] = components.NewSigningKeyInput()
+	am.inputs[1] = components.NewEmailInput()
+	am.inputs[2] = components.NewNameInput()
 	am.focusIndex = 0
 	am.err = ""
 
