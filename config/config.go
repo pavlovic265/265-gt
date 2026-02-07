@@ -39,7 +39,8 @@ type GlobalConfigStruct struct {
 
 // PublicConfigStruct represents the public configuration file (~/.config/gt/public.yml).
 type PublicConfigStruct struct {
-	User string `yaml:"user,omitempty"`
+	User     string             `yaml:"user,omitempty"`
+	Platform constants.Platform `yaml:"platform,omitempty"`
 }
 
 // LocalConfigStruct represents repository-local configuration (.gtconfig.yaml).

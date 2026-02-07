@@ -36,6 +36,7 @@ func (d *DefaultConfigManager) SavePublicConfig(globalConfig GlobalConfigStruct)
 	publicCfg := PublicConfigStruct{}
 	if globalConfig.ActiveAccount != nil {
 		publicCfg.User = globalConfig.ActiveAccount.User
+		publicCfg.Platform = globalConfig.ActiveAccount.Platform
 	}
 
 	return writeConfigWithPerm(configPath, &publicCfg, 0644)
