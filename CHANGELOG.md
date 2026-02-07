@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.66.0](https://github.com/pavlovic265/265-gt/compare/v0.65.0...v0.66.0) (2026-02-07)
+
+
+### Features
+
+* add ([0350283](https://github.com/pavlovic265/265-gt/commit/0350283fe2a2854e6ae4116d043b58e42059f162))
+
+
+### Bug Fixes
+
+* simplify TrimPrefix usage in GetRemoteBranches ([750fae5](https://github.com/pavlovic265/265-gt/commit/750fae595878153e508a4b4ea8baf44eed7e9dac))
+* standardize error handling patterns ([986fd04](https://github.com/pavlovic265/265-gt/commit/986fd0436634646bd2b93c1f619fb466c0267d1e))
+
 ## [0.65.0](https://github.com/pavlovic265/265-gt/compare/v0.64.0...v0.65.0) (2026-02-06)
 
 
