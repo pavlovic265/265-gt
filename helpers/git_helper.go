@@ -16,6 +16,7 @@ type GitHelper interface {
 	GetChildren(branch string) []string
 	GetCurrentBranch() (string, error)
 	GetBranches() ([]string, error)
+	GetRemoteBranches() ([]string, error)
 	RebaseBranch(branch string, parent string) error
 	SetPending(branchType constants.Branch, branch string) error
 	GetPending(branchType constants.Branch) (string, error)

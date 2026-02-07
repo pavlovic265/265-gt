@@ -29,6 +29,28 @@ func (gh *GitHelperImpl) GetBranches() ([]string, error) {
 	return branches, nil
 }
 
+func (gh *GitHelperImpl) GetRemoteBranches() ([]string, error) {
+	output, err := gh.runner.GitOutput("branch", "-r", "--list")
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(output, "\n")
+	var branches []string
+	for _, line := range lines {
+		branch := strings.TrimSpace(line)
+		if branch == "" || strings.Contains(branch, "HEAD") {
+			continue
+		}
+		// Strip "origin/" prefix
+		if strings.HasPrefix(branch, "origin/") {
+			branch = strings.TrimPrefix(branch, "origin/")
+		}
+		branches = append(branches, branch)
+	}
+	return branches, nil
+}
+
 func (gh *GitHelperImpl) RebaseBranch(branch string, parent string) error {
 	if err := gh.runner.Git("checkout", branch); err != nil {
 		return fmt.Errorf("failed to checkout branch: %w", err)

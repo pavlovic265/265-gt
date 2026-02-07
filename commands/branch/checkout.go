@@ -26,13 +26,19 @@ func NewCheckoutCommand(
 }
 
 func (svc checkoutCommand) Command() *cobra.Command {
-	return &cobra.Command{
+	var remote bool
+
+	cmd := &cobra.Command{
 		Use:     "checkout",
 		Aliases: []string{"co"},
 		Short:   "checkout branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
 				return err
+			}
+
+			if remote {
+				return svc.checkoutRemoteBranch(args)
 			}
 
 			if len(args) > 0 {
@@ -50,6 +56,10 @@ func (svc checkoutCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVarP(&remote, "remote", "r", false, "Checkout remote branch and track it")
+
+	return cmd
 }
 
 func (svc checkoutCommand) checkoutBranch(
@@ -77,4 +87,38 @@ func (svc checkoutCommand) selectAndCheckoutBranch(choices []string) error {
 	}
 
 	return svc.checkoutBranch(selected)
+}
+
+func (svc checkoutCommand) checkoutRemoteBranch(args []string) error {
+	var branchName string
+
+	if len(args) > 0 {
+		branchName = args[0]
+	} else {
+		branches, err := svc.gitHelper.GetRemoteBranches()
+		if err != nil {
+			return log.Error("failed to get remote branches", err)
+		}
+
+		if len(branches) == 0 {
+			return log.ErrorMsg("no remote branches available")
+		}
+
+		selected, err := components.SelectString(branches)
+		if err != nil {
+			return log.Error("failed to display branch selection", err)
+		}
+		if selected == "" {
+			return log.ErrorMsg("no branch selected")
+		}
+		branchName = selected
+	}
+
+	// Checkout and track: git checkout -b <branch> origin/<branch>
+	if err := svc.runner.Git("checkout", "-b", branchName, "origin/"+branchName); err != nil {
+		return log.Error(fmt.Sprintf("failed to checkout remote branch '%s'", branchName), err)
+	}
+
+	log.Successf("Checked out and tracking remote branch '%s'", branchName)
+	return nil
 }

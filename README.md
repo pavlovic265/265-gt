@@ -140,6 +140,7 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 |---------|-------|-------------|---------|
 | `create` | `c` | Create a new branch from current branch | `gt create feature-branch` |
 | `checkout` | `co` | Checkout/search and switch to branch | `gt checkout main` |
+| `checkout -r` | `co -r` | Checkout remote branch and track it | `gt co -r feature-branch` |
 | `delete` | `dl` | Delete a branch | `gt delete old-branch` |
 | `clean` | `cl` | Clean merged branches (excludes protected) | `gt clean` |
 | `move` | `mv` | Rebase current branch onto another branch | `gt move` |
@@ -169,6 +170,7 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 |---------|-------|-------------|---------|
 | `push` | `pu` | Force-push to remote | `gt push` |
 | `pull` | `pl` | Pull latest changes | `gt pull` |
+| `pull --all` | `pl -a` | Pull from all remotes | `gt pl -a` |
 
 ### Pull Request Management
 

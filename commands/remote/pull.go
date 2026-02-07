@@ -23,13 +23,23 @@ func NewPullCommand(
 }
 
 func (svc pullCommand) Command() *cobra.Command {
-	return &cobra.Command{
+	var all bool
+
+	cmd := &cobra.Command{
 		Use:     "pull",
 		Aliases: []string{"pl"},
 		Short:   "pull branch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := svc.gitHelper.EnsureGitRepository(); err != nil {
 				return err
+			}
+
+			if all {
+				if err := svc.runner.Git("pull", "--all"); err != nil {
+					return log.Error("failed to pull from remotes", err)
+				}
+				log.Success("Pulled from all remotes")
+				return nil
 			}
 
 			currentBranchName, err := svc.gitHelper.GetCurrentBranch()
@@ -45,4 +55,8 @@ func (svc pullCommand) Command() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVarP(&all, "all", "a", false, "Pull from all remotes")
+
+	return cmd
 }

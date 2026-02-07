@@ -92,6 +92,21 @@ func (mr *MockGitHelperMockRecorder) GetBranches() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranches", reflect.TypeOf((*MockGitHelper)(nil).GetBranches))
 }
 
+// GetRemoteBranches mocks base method.
+func (m *MockGitHelper) GetRemoteBranches() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRemoteBranches")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRemoteBranches indicates an expected call of GetRemoteBranches.
+func (mr *MockGitHelperMockRecorder) GetRemoteBranches() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRemoteBranches", reflect.TypeOf((*MockGitHelper)(nil).GetRemoteBranches))
+}
+
 // GetChildren mocks base method.
 func (m *MockGitHelper) GetChildren(branch string) []string {
 	m.ctrl.T.Helper()
