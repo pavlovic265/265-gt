@@ -2,6 +2,8 @@ package config
 
 import (
 	"path/filepath"
+
+	"github.com/pavlovic265/265-gt/constants"
 )
 
 func (d *DefaultConfigManager) LoadLocalConfig() (*LocalConfigStruct, error) {
@@ -26,6 +28,6 @@ func (d *DefaultConfigManager) getLocalConfigPath() (string, error) {
 		return "", nil // Local config is optional - not being in a git repo is fine
 	}
 
-	configPath := filepath.Join(output, ".gtconfig.yaml")
+	configPath := filepath.Join(output, constants.LocalConfigFileName)
 	return configPath, nil
 }

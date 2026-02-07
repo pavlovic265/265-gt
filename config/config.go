@@ -29,7 +29,7 @@ type ThemeConfig struct {
 	Type constants.Theme `yaml:"type"`
 }
 
-// GlobalConfigStruct represents the global configuration file (~/.gtconfig.yaml).
+// GlobalConfigStruct represents the global configuration file (~/.config/gt/config.yml).
 type GlobalConfigStruct struct {
 	Accounts      []Account    `yaml:"accounts,omitempty"`
 	ActiveAccount *Account     `yaml:"active_account,omitempty"`

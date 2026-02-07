@@ -115,7 +115,7 @@ The color palette automatically adapts to the current theme. To switch themes:
 The color palette is designed to work with the config system:
 
 ```yaml
-# ~/.gtconfig.yaml
+# ~/.config/gt/config.yml
 theme:
   type: "dark"   # or "light"
 ```

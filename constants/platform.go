@@ -1,6 +1,11 @@
 package constants
 
-var FileName = ".gtconfig.yaml"
+var LocalConfigFileName = ".gtconfig.yaml"
+
+var (
+	GlobalConfigDir      = "gt"
+	GlobalConfigFileName = "config.yml"
+)
 
 type Platform string
 

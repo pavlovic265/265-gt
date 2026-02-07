@@ -259,7 +259,7 @@ The account management commands allow you to:
 
 The configuration supports multiple accounts with automatic active account management:
 ```yaml
-# ~/.gtconfig.yaml
+# ~/.config/gt/config.yml
 accounts:
   - user: "username1"
     email: "user1@example.com"
@@ -300,7 +300,7 @@ Configure repository-specific settings like:
 The tool supports beautiful Panda Syntax theme with dark and light variants:
 
 ```yaml
-# ~/.gtconfig.yaml
+# ~/.config/gt/config.yml
 theme:
   type: "dark"  # or "light"
 ```
