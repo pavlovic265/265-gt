@@ -619,8 +619,8 @@ gt pr li
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
 - [x] **Multi-Platform Git Integration** — Full support for GitHub and GitLab with direct API calls (no external CLI dependencies).
 - [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.
-- [ ] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
-- [ ] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
+- [x] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
+- [x] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
 
 
 ## 🤝 Contributing
