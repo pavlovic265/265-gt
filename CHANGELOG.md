@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.68.0](https://github.com/pavlovic265/265-gt/compare/v0.67.0...v0.68.0) (2026-02-08)
+
+
+### Features
+
+* add platform field to public.yml ([3a9dcb0](https://github.com/pavlovic265/265-gt/commit/3a9dcb0dd49130f7ffdcb7456cf8bf9c48e94dbc))
+
 ## [0.67.0](https://github.com/pavlovic265/265-gt/compare/v0.66.0...v0.67.0) (2026-02-07)
 
 
