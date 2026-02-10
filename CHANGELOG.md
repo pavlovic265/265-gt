@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.70.0](https://github.com/pavlovic265/265-gt/compare/v0.69.0...v0.70.0) (2026-02-10)
+
+
+### Features
+
+* show PR approval status instead of merge conflict status in pr list ([21b3103](https://github.com/pavlovic265/265-gt/commit/21b310377e8b386b11be72349559abcd1d7e45e9))
+
+
+### Bug Fixes
+
+* wrap long function signature to satisfy lll linter' ([3bb4100](https://github.com/pavlovic265/265-gt/commit/3bb41000cbc19ccbccd3dd4ff75357b913895c2e))
+
 ## [0.69.0](https://github.com/pavlovic265/265-gt/compare/v0.68.0...v0.69.0) (2026-02-08)
 
 
