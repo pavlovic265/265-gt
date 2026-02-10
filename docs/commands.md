@@ -51,6 +51,11 @@
   - `✓` (Green) - Success
   - `✗` (Red) - Failure/Error
   - `★` (Yellow) - Pending/In Progress
+- **Review Approval Status**: See review state per PR
+  - `●` (Green) - Approved
+  - `●` (Orange) - No reviews yet
+  - `●` (Red) - Changes requested
+- **Merge Conflict Indicator**: `⚠` shown when the PR has merge conflicts
 - **Interactive Actions**:
   - Press `Enter` to open PR in browser
   - Press `y` to yank (copy) PR URL to clipboard

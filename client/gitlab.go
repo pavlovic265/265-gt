@@ -237,17 +237,52 @@ func (c *gitLabClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			mergeable = "CONFLICTING"
 		}
 
+		reviewState := c.getReviewState(ctx, projectPath, account.Token, mr.IID)
+
 		prs = append(prs, PullRequest{
-			Number:    mr.IID,
-			Title:     mr.Title,
-			URL:       mr.WebURL,
-			Author:    mr.Author.Username,
-			Branch:    mr.SourceBranch,
-			Mergeable: mergeable,
+			Number:      mr.IID,
+			Title:       mr.Title,
+			URL:         mr.WebURL,
+			Author:      mr.Author.Username,
+			Branch:      mr.SourceBranch,
+			Mergeable:   mergeable,
+			ReviewState: reviewState,
 		})
 	}
 
 	return prs, nil
+}
+
+func (c *gitLabClient) getReviewState(ctx context.Context, projectPath, token string, mrIID int) ReviewStateType {
+	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests/%d/approvals", gitlabAPIBase, projectPath, mrIID)
+
+	resp, err := c.doRequest(ctx, "GET", apiURL, nil, token)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return ""
+	}
+
+	var approvals struct {
+		Approved   bool `json:"approved"`
+		ApprovedBy []struct {
+			User struct {
+				Username string `json:"username"`
+			} `json:"user"`
+		} `json:"approved_by"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&approvals); err != nil {
+		return ""
+	}
+
+	if approvals.Approved || len(approvals.ApprovedBy) > 0 {
+		return ReviewStateApproved
+	}
+	return ""
 }
 
 func (c *gitLabClient) MergePullRequest(ctx context.Context, prNumber int) error {

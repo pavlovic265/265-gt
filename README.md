@@ -18,7 +18,7 @@
 - **Branch Stack Navigation**: Seamlessly move up and down your branch hierarchy
 - **Stack Management**: Restack branches to keep your branch hierarchy up to date
 - **Automated Git Workflows**: Simplify rebasing, syncing, and cleaning up merged branches
-- **Enhanced Pull Request Management**: Create, list, and merge PRs with CI/CD status indicators
+- **Enhanced Pull Request Management**: Create, list, and merge PRs with CI/CD status, review approval, and merge conflict indicators
 - **Multi-Platform Support**: Works with GitHub and GitLab
 - **Account Management**: Add, edit, list, and remove multiple accounts with full profile information
 - **Authentication Management**: Easy account switching and token management

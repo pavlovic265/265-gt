@@ -69,14 +69,14 @@ func (svc *listCommand) Command() *cobra.Command {
 	}
 }
 
-type pullRequest struct {
-	number int
-	title  string
-	url    string
-	branch string
+type PullRequestItem struct {
+	Number int
+	Title  string
+	URL    string
+	Branch string
 }
 
-func (svc *listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
+func (svc *listCommand) FormatPullRequest(pr client.PullRequest) PullRequestItem {
 	ciStatus := ""
 	ciStatusColor := constants.White
 	switch pr.StatusState {
@@ -91,44 +91,49 @@ func (svc *listCommand) formatPullRequest(pr client.PullRequest) pullRequest {
 		ciStatusColor = constants.Yellow
 	}
 
-	// Mergeable status indicator
-	mergeableStatus := " ●"
-	mergeableColor := constants.Yellow
-	switch pr.Mergeable {
-	case "MERGEABLE":
-		mergeableStatus = " ●"
-		mergeableColor = constants.Green
-	case "CONFLICTING":
-		mergeableStatus = " ●"
-		mergeableColor = constants.Red
+	// Review status indicator
+	reviewStatus := " ●"
+	reviewColor := constants.Yellow
+	switch pr.ReviewState {
+	case client.ReviewStateApproved:
+		reviewColor = constants.Green
+	case client.ReviewStateChangesRequested:
+		reviewColor = constants.Red
+	}
+
+	// Conflict indicator (only shown when conflicting)
+	conflictStatus := ""
+	if pr.Mergeable == "CONFLICTING" {
+		conflictStatus = " ⚠"
 	}
 
 	// Style each component
 	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
 	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
 	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
-	styledMergeable := lipgloss.NewStyle().Foreground(mergeableColor).Render(mergeableStatus)
+	styledReview := lipgloss.NewStyle().Foreground(reviewColor).Render(reviewStatus)
+	styledConflict := lipgloss.NewStyle().Foreground(constants.Red).Render(conflictStatus)
 
-	return pullRequest{
-		number: pr.Number,
-		title:  fmt.Sprintf("%s%s: %s%s", styledCiStatus, styledNumber, styledTitle, styledMergeable),
-		url:    pr.URL,
-		branch: pr.Branch,
+	return PullRequestItem{
+		Number: pr.Number,
+		Title:  fmt.Sprintf("%s%s: %s%s%s", styledCiStatus, styledNumber, styledTitle, styledReview, styledConflict),
+		URL:    pr.URL,
+		Branch: pr.Branch,
 	}
 }
 
 func (svc *listCommand) refreshFunc() tea.Msg {
 	updatedPrs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, []string{})
 	if err != nil {
-		return components.RefreshCompleteMsg[pullRequest]{Err: err}
+		return components.RefreshCompleteMsg[PullRequestItem]{Err: err}
 	}
 
-	var refreshedPullRequests []pullRequest
+	var refreshedPullRequests []PullRequestItem
 	for _, pr := range updatedPrs {
-		refreshedPullRequests = append(refreshedPullRequests, svc.formatPullRequest(pr))
+		refreshedPullRequests = append(refreshedPullRequests, svc.FormatPullRequest(pr))
 	}
 
-	return components.RefreshCompleteMsg[pullRequest]{
+	return components.RefreshCompleteMsg[PullRequestItem]{
 		Choices: refreshedPullRequests,
 		Err:     nil,
 	}
@@ -138,60 +143,60 @@ func (svc *listCommand) selectPullRequest(
 	prs []client.PullRequest,
 	selectedPRNumber ...int,
 ) error {
-	var pullRequests []pullRequest
+	var pullRequestItems []PullRequestItem
 	for _, pr := range prs {
-		pullRequests = append(pullRequests, svc.formatPullRequest(pr))
+		pullRequestItems = append(pullRequestItems, svc.FormatPullRequest(pr))
 	}
 
 	initialCursor := 0
 	// If a previously selected PR number is provided, find its index in the new list
 	if len(selectedPRNumber) > 0 {
-		for i, pr := range pullRequests {
-			if pr.number == selectedPRNumber[0] {
+		for i, pr := range pullRequestItems {
+			if pr.Number == selectedPRNumber[0] {
 				initialCursor = i
 				break
 			}
 		}
 	}
 
-	initialModel := components.ListModel[pullRequest]{
-		AllChoices:    pullRequests,
-		Choices:       pullRequests,
+	initialModel := components.ListModel[PullRequestItem]{
+		AllChoices:    pullRequestItems,
+		Choices:       pullRequestItems,
 		Cursor:        initialCursor,
 		Query:         "",
 		EnableYank:    true,
 		EnableMerge:   true,
 		EnableRefresh: true,
-		Formatter:     func(pr pullRequest) string { return pr.title },
-		Matcher:       func(pr pullRequest, query string) bool { return strings.Contains(pr.title, query) },
+		Formatter:     func(pr PullRequestItem) string { return pr.Title },
+		Matcher:       func(pr PullRequestItem, query string) bool { return strings.Contains(pr.Title, query) },
 		RefreshFunc:   svc.refreshFunc,
 	}
 
 	program := tea.NewProgram(initialModel)
 
 	if finalModel, err := program.Run(); err == nil {
-		if m, ok := finalModel.(components.ListModel[pullRequest]); ok {
+		if m, ok := finalModel.(components.ListModel[PullRequestItem]); ok {
 			if m.YankAction {
-				svc.yankToClipboard(m.Selected.url)
-				log.Successf("URL yanked to clipboard: %s", m.Selected.url)
+				svc.yankToClipboard(m.Selected.URL)
+				log.Successf("URL yanked to clipboard: %s", m.Selected.URL)
 				return nil
 			}
 
 			if m.MergeAction {
-				err := client.Client[svc.account.Platform].MergePullRequest(svc.ctx, m.Selected.number)
+				err := client.Client[svc.account.Platform].MergePullRequest(svc.ctx, m.Selected.Number)
 				if err != nil {
 					return log.Error("failed to merge pull request", err)
 				}
-				err = svc.gitHelper.DeleteParent(m.Selected.branch)
+				err = svc.gitHelper.DeleteParent(m.Selected.Branch)
 				if err != nil {
 					return log.Error("failed to delete parent connection", err)
 				}
-				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.number))
+				log.Success(fmt.Sprintf("Successfully merged PR #%d", m.Selected.Number))
 				return nil
 			}
 
 			for _, pr := range prs {
-				if m.Selected.number == pr.Number {
+				if m.Selected.Number == pr.Number {
 					_ = exec.Command("open", pr.URL).Start() // Ignore errors when opening URL
 				}
 			}

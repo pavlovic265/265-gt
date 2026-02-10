@@ -283,6 +283,7 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 		}
 
 		statusState := c.getCheckRunStatus(ctx, repoInfo, account.Token, pr.Head.SHA)
+		reviewState := c.getReviewState(ctx, repoInfo, account.Token, pr.Number)
 
 		prs = append(prs, PullRequest{
 			Number:      pr.Number,
@@ -292,6 +293,7 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Branch:      pr.Head.Ref,
 			Mergeable:   mergeable,
 			StatusState: statusState,
+			ReviewState: reviewState,
 		})
 	}
 
@@ -399,6 +401,58 @@ func (c *gitHubClient) getCheckRunStatus(ctx context.Context, repoInfo *RepoInfo
 	return ""
 }
 
+func (c *gitHubClient) getReviewState(ctx context.Context, repoInfo *RepoInfo, token string, prNumber int) ReviewStateType {
+	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%d/reviews", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
+
+	resp, err := c.doRequest(ctx, "GET", url, nil, token)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return ""
+	}
+
+	var reviews []struct {
+		User struct {
+			Login string `json:"login"`
+		} `json:"user"`
+		State string `json:"state"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&reviews); err != nil {
+		return ""
+	}
+
+	// Track the latest review per user
+	latestByUser := make(map[string]string)
+	for _, r := range reviews {
+		if r.State == "APPROVED" || r.State == "CHANGES_REQUESTED" {
+			latestByUser[r.User.Login] = r.State
+		}
+	}
+
+	hasChangesRequested := false
+	hasApproved := false
+	for _, state := range latestByUser {
+		switch state {
+		case "CHANGES_REQUESTED":
+			hasChangesRequested = true
+		case "APPROVED":
+			hasApproved = true
+		}
+	}
+
+	if hasChangesRequested {
+		return ReviewStateChangesRequested
+	}
+	if hasApproved {
+		return ReviewStateApproved
+	}
+	return ""
+}
+
 type PullRequest struct {
 	Number      int             `json:"number"`
 	Title       string          `json:"title"`
@@ -407,6 +461,7 @@ type PullRequest struct {
 	Mergeable   string          `json:"mergeable"`
 	Branch      string          `json:"headRefName"`
 	StatusState StatusStateType `json:"statusState"`
+	ReviewState ReviewStateType `json:"reviewState"`
 }
 
 type StatusStateType string
@@ -415,4 +470,11 @@ const (
 	StatusStateTypeSuccess StatusStateType = "SUCCESS"
 	StatusStateTypeFailure StatusStateType = "FAILURE"
 	StatusStateTypePending StatusStateType = "PENDING"
+)
+
+type ReviewStateType string
+
+const (
+	ReviewStateApproved         ReviewStateType = "APPROVED"
+	ReviewStateChangesRequested ReviewStateType = "CHANGES_REQUESTED"
 )
