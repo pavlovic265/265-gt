@@ -147,13 +147,19 @@ gt account list
 gt account edit
 # Select account to edit, then update any field
 
-# Quick update token only
+# Quick update token only (interactive prompt)
 gt account edit -t
 # Select account, then enter new token
 
-# Quick update GPG signing key only
+# Set token directly without interactive prompt
+gt account edit -t ghp_xxxxxxxxxxxx
+
+# Quick update GPG signing key only (interactive prompt)
 gt account edit --gpg
 # Select account, then enter GPG key ID
+
+# Set GPG signing key directly without interactive prompt
+gt account edit --gpg ABC123DEF456
 
 # Remove an account
 gt account remove

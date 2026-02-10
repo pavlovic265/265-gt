@@ -90,8 +90,8 @@
 | `account add` | `acc add` | Add a new account interactively | `gt account add` |
 | `account list` | `acc ls` | List all configured accounts | `gt account list` |
 | `account edit` | `acc edit` | Edit an existing account | `gt account edit` |
-| `account edit -t` | `acc edit -t` | Update token only | `gt account edit -t` |
-| `account edit --gpg` | `acc edit --gpg` | Update GPG signing key only | `gt account edit --gpg` |
+| `account edit -t [token]` | `acc edit -t [token]` | Update token only (interactive if no value given) | `gt account edit -t ghp_xxx` |
+| `account edit --gpg [key]` | `acc edit --gpg [key]` | Update GPG signing key only (interactive if no value given) | `gt account edit --gpg ABC123` |
 | `account remove` | `acc rm` | Remove an account | `gt account remove` |
 | `account attach` | `acc at` | Attach active account to a directory | `gt account attach ~/work` |
 

@@ -69,3 +69,34 @@ func TestNewEditCommand(t *testing.T) {
 	assert.NotNil(t, cmd)
 	assert.Equal(t, "edit", cmd.Use)
 }
+
+func TestEditCommand_TokenFlagIsString(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRunner := mocks.NewMockRunner(ctrl)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	cmd := editCmd.Command()
+
+	f := cmd.Flags().Lookup("token")
+	assert.NotNil(t, f)
+	assert.Equal(t, "string", f.Value.Type())
+	assert.Equal(t, "t", f.Shorthand)
+}
+
+func TestEditCommand_GPGFlagIsString(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRunner := mocks.NewMockRunner(ctrl)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	cmd := editCmd.Command()
+
+	f := cmd.Flags().Lookup("gpg")
+	assert.NotNil(t, f)
+	assert.Equal(t, "string", f.Value.Type())
+}

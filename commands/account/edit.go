@@ -45,8 +45,10 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			// Check flags
-			tokenFlag, _ := cmd.Flags().GetBool("token")
-			gpgFlag, _ := cmd.Flags().GetBool("gpg")
+			tokenFlag, _ := cmd.Flags().GetString("token")
+			tokenFlag = strings.TrimSpace(tokenFlag)
+			gpgFlag, _ := cmd.Flags().GetString("gpg")
+			gpgFlag = strings.TrimSpace(gpgFlag)
 
 			// Select account
 			selectedIndex, err := selectAccount(cfg.Global.Accounts)
@@ -61,18 +63,26 @@ func (ec editCommand) Command() *cobra.Command {
 			selectedAccount := &cfg.Global.Accounts[selectedIndex]
 
 			// Handle quick update flags
-			if tokenFlag {
-				if err := HandleTokenSetup(selectedAccount); err != nil {
-					return log.Error("failed to update token", err)
+			if cmd.Flags().Changed("token") {
+				if tokenFlag != "" {
+					selectedAccount.Token = tokenFlag
+				} else {
+					if err := HandleTokenSetup(selectedAccount); err != nil {
+						return log.Error("failed to update token", err)
+					}
 				}
 				cfg.MarkDirty()
 				log.Success("Account updated successfully")
 				return nil
 			}
 
-			if gpgFlag {
-				if err := HandleGPGSetup(selectedAccount); err != nil {
-					return log.Error("failed to update GPG key", err)
+			if cmd.Flags().Changed("gpg") {
+				if gpgFlag != "" {
+					selectedAccount.SigningKey = gpgFlag
+				} else {
+					if err := HandleGPGSetup(selectedAccount); err != nil {
+						return log.Error("failed to update GPG key", err)
+					}
 				}
 				cfg.MarkDirty()
 				log.Success("Account updated successfully")
@@ -115,8 +125,8 @@ func (ec editCommand) Command() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolP("token", "t", false, "Update token only")
-	cmd.Flags().Bool("gpg", false, "Update GPG signing key only")
+	cmd.Flags().StringP("token", "t", "", "Update token only (pass value directly or omit for interactive)")
+	cmd.Flags().String("gpg", "", "Update GPG signing key only (pass value directly or omit for interactive)")
 
 	return cmd
 }

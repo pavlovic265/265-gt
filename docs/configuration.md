@@ -16,7 +16,7 @@ gt account add
 The account management commands allow you to:
 - **Add accounts**: Interactively add GitHub/GitLab accounts with SSH key setup and optional token
 - **List accounts**: View all configured accounts with their details
-- **Edit accounts**: Modify existing account information or quickly update token (`-t`) or GPG key (`--gpg`)
+- **Edit accounts**: Modify existing account information or quickly update token (`-t [value]`) or GPG key (`--gpg [value]`). Pass a value directly to skip the interactive prompt
 - **Remove accounts**: Delete accounts you no longer need
 - **Switch accounts**: Change between accounts using `gt auth switch`
 
