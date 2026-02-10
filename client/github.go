@@ -401,7 +401,9 @@ func (c *gitHubClient) getCheckRunStatus(ctx context.Context, repoInfo *RepoInfo
 	return ""
 }
 
-func (c *gitHubClient) getReviewState(ctx context.Context, repoInfo *RepoInfo, token string, prNumber int) ReviewStateType {
+func (c *gitHubClient) getReviewState(
+	ctx context.Context, repoInfo *RepoInfo, token string, prNumber int,
+) ReviewStateType {
 	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%d/reviews", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
 
 	resp, err := c.doRequest(ctx, "GET", url, nil, token)
