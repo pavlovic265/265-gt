@@ -45,7 +45,7 @@ func (svc statusCommand) Command() *cobra.Command {
 			}
 
 			styledOutput := svc.styleGitStatus(output)
-			fmt.Print(styledOutput)
+			fmt.Println(styledOutput)
 
 			return nil
 		},
