@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.71.0](https://github.com/pavlovic265/265-gt/compare/v0.70.0...v0.71.0) (2026-02-11)
+
+
+### Features
+
+* accept token and GPG key as direct CLI arguments in account edit ([27d681c](https://github.com/pavlovic265/265-gt/commit/27d681c333e672bb387bb66d35ff6d6d03df2c9c))
+* add submit-stack (ss) command to push and create PRs for entire stack ([beac83b](https://github.com/pavlovic265/265-gt/commit/beac83b67a604d8f74c89543ec64cc3d25e1388f))
+* add viewport scrolling to list component to prevent terminal overflow ([e168eb6](https://github.com/pavlovic265/265-gt/commit/e168eb6164525463eca6067c8cd222bda6a37f98))
+
+
+### Bug Fixes
+
+* add trailing newline to status output to prevent zsh % indicator ([716f541](https://github.com/pavlovic265/265-gt/commit/716f541016298214f9db112f3469c5a8a27f3ea2))
+
 ## [0.70.0](https://github.com/pavlovic265/265-gt/compare/v0.69.0...v0.70.0) (2026-02-10)
 
 
