@@ -28,6 +28,9 @@ type ListModel[T any] struct {
 	Matcher func(T, string) bool
 	// RefreshFunc is called when refresh is triggered
 	RefreshFunc func() tea.Msg
+
+	windowHeight int // terminal height from tea.WindowSizeMsg
+	offset       int // index of first visible item in the viewport
 }
 
 type RefreshCompleteMsg[T any] struct {
@@ -64,6 +67,11 @@ func (m ListModel[T]) Init() tea.Cmd {
 
 func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.windowHeight = msg.Height
+		m.adjustViewport()
+		return m, nil
+
 	case RefreshCompleteMsg[T]:
 		m.Refreshing = false
 		if msg.Err == nil {
@@ -90,6 +98,7 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else if m.Cursor >= len(m.Choices) && len(m.Choices) > 0 {
 				m.Cursor = len(m.Choices) - 1
 			}
+			m.adjustViewport()
 		}
 		return m, nil
 
@@ -145,6 +154,7 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		m.filterChoices()
+		m.adjustViewport()
 	}
 
 	return m, nil
@@ -162,7 +172,16 @@ func (m ListModel[T]) View() string {
 		content.WriteString(emptyStateStyle.Render("No items found"))
 		content.WriteString("\n")
 	} else {
-		for i, choice := range m.Choices {
+		visibleCount := len(m.Choices) // default: show all
+		if m.windowHeight > 5 {
+			visibleCount = m.windowHeight - 5
+		}
+		end := m.offset + visibleCount
+		if end > len(m.Choices) {
+			end = len(m.Choices)
+		}
+		for i := m.offset; i < end; i++ {
+			choice := m.Choices[i]
 			var cursor, styledChoice string
 
 			// Convert choice to string using formatter
@@ -246,6 +265,29 @@ func highlightMatch(text, query string) string {
 		Background(constants.BrightBlack)
 
 	return before + highlightStyle.Render(match) + after
+}
+
+func (m *ListModel[T]) adjustViewport() {
+	visibleCount := m.windowHeight - 5
+	if visibleCount <= 0 || m.windowHeight == 0 {
+		return
+	}
+	if m.Cursor < m.offset {
+		m.offset = m.Cursor
+	}
+	if m.Cursor >= m.offset+visibleCount {
+		m.offset = m.Cursor - visibleCount + 1
+	}
+	maxOffset := len(m.Choices) - visibleCount
+	if maxOffset < 0 {
+		maxOffset = 0
+	}
+	if m.offset > maxOffset {
+		m.offset = maxOffset
+	}
+	if m.offset < 0 {
+		m.offset = 0
+	}
 }
 
 func (m *ListModel[T]) filterChoices() {
