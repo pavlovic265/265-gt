@@ -8,4 +8,5 @@ import (
 
 func RegisterCommands(root *cobra.Command, r runner.Runner, gh helpers.GitHelper) {
 	root.AddCommand(NewStackCommand(r, gh).Command())
+	root.AddCommand(NewSubmitCommand(r, gh).Command())
 }

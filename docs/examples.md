@@ -228,6 +228,26 @@ gt s rs
 # 3. Process children recursively to maintain branch hierarchy
 ```
 
+## Stack Submit
+```bash
+# Push all branches in the stack and create PRs for each
+gt submit-stack
+# or use the alias
+gt ss
+
+# Create all new PRs as drafts
+gt ss -d
+
+# Interactively choose per-branch: Create PR, Create Draft PR, or Skip
+gt ss -i
+
+# This will:
+# 1. Get the current branch and all its descendants (BFS)
+# 2. Force-push each branch to origin
+# 3. Create a PR if one doesn't already exist
+# 4. In interactive mode, skipping a branch also skips all its descendants
+```
+
 ## Enhanced Pull Request Management
 ```bash
 # List all pull requests with visual indicators

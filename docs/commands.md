@@ -66,6 +66,9 @@
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `stack restack` | `s rs` | Restack branches from current branch downward | `gt stack restack` |
+| `submit-stack` | `ss` | Push and create PRs for the entire stack | `gt ss` |
+| `submit-stack -d` | `ss -d` | Push and create draft PRs for the entire stack | `gt ss -d` |
+| `submit-stack -i` | `ss -i` | Interactively choose per-branch action | `gt ss -i` |
 
 ## Configuration
 
