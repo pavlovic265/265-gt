@@ -260,7 +260,8 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Ref string `json:"ref"`
 			SHA string `json:"sha"`
 		} `json:"head"`
-		Mergeable *bool `json:"mergeable"`
+		Mergeable *bool            `json:"mergeable"`
+		AutoMerge *json.RawMessage `json:"auto_merge"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&ghPRs); err != nil {
@@ -294,6 +295,7 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Mergeable:   mergeable,
 			StatusState: statusState,
 			ReviewState: reviewState,
+			MergeQueued: pr.AutoMerge != nil && string(*pr.AutoMerge) != "null",
 		})
 	}
 
@@ -464,6 +466,7 @@ type PullRequest struct {
 	Branch      string          `json:"headRefName"`
 	StatusState StatusStateType `json:"statusState"`
 	ReviewState ReviewStateType `json:"reviewState"`
+	MergeQueued bool            `json:"mergeQueued"`
 }
 
 type StatusStateType string

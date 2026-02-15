@@ -219,8 +219,9 @@ func (c *gitLabClient) ListPullRequests(ctx context.Context, args []string) ([]P
 		Author struct {
 			Username string `json:"username"`
 		} `json:"author"`
-		SourceBranch string `json:"source_branch"`
-		MergeStatus  string `json:"merge_status"`
+		SourceBranch              string `json:"source_branch"`
+		MergeStatus               string `json:"merge_status"`
+		MergeWhenPipelineSucceeds bool   `json:"merge_when_pipeline_succeeds"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&glMRs); err != nil {
@@ -247,6 +248,7 @@ func (c *gitLabClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Branch:      mr.SourceBranch,
 			Mergeable:   mergeable,
 			ReviewState: reviewState,
+			MergeQueued: mr.MergeWhenPipelineSucceeds,
 		})
 	}
 

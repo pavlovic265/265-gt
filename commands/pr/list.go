@@ -107,16 +107,24 @@ func (svc *listCommand) FormatPullRequest(pr client.PullRequest) PullRequestItem
 		conflictStatus = " ⚠"
 	}
 
+	// Merge queue indicator
+	mergeQueueStatus := ""
+	if pr.MergeQueued {
+		mergeQueueStatus = " ⧗"
+	}
+
 	// Style each component
 	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
 	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
 	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
 	styledReview := lipgloss.NewStyle().Foreground(reviewColor).Render(reviewStatus)
 	styledConflict := lipgloss.NewStyle().Foreground(constants.Red).Render(conflictStatus)
+	styledMergeQueue := lipgloss.NewStyle().Foreground(constants.BrightYellow).Render(mergeQueueStatus)
 
 	return PullRequestItem{
 		Number: pr.Number,
-		Title:  fmt.Sprintf("%s%s: %s%s%s", styledCiStatus, styledNumber, styledTitle, styledReview, styledConflict),
+		Title: fmt.Sprintf("%s%s: %s%s%s%s",
+			styledCiStatus, styledNumber, styledTitle, styledReview, styledConflict, styledMergeQueue),
 		URL:    pr.URL,
 		Branch: pr.Branch,
 	}
