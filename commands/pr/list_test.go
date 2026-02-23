@@ -170,3 +170,27 @@ func TestFormatPullRequest_NoConflictWhenMergeable(t *testing.T) {
 
 	assert.NotContains(t, result.Title, "⚠")
 }
+
+func TestFormatPullRequest_MergeQueuedIndicator(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	listCmd := pr.NewListCommand(
+		mocks.NewMockRunner(ctrl),
+		mocks.NewMockConfigManager(ctrl),
+		mocks.NewMockGitHelper(ctrl),
+	)
+
+	result := listCmd.FormatPullRequest(client.PullRequest{
+		Number:      12,
+		Title:       "Queued PR",
+		URL:         "https://github.com/test/repo/pull/12",
+		Branch:      "queued",
+		Mergeable:   "MERGEABLE",
+		StatusState: client.StatusStateTypeSuccess,
+		ReviewState: client.ReviewStateApproved,
+		MergeQueued: true,
+	})
+
+	assert.Contains(t, result.Title, "⧗")
+}

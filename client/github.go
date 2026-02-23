@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
@@ -260,8 +261,9 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Ref string `json:"ref"`
 			SHA string `json:"sha"`
 		} `json:"head"`
-		Mergeable *bool            `json:"mergeable"`
-		AutoMerge *json.RawMessage `json:"auto_merge"`
+		Mergeable      *bool            `json:"mergeable"`
+		MergeableState string           `json:"mergeable_state"`
+		AutoMerge      *json.RawMessage `json:"auto_merge"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&ghPRs); err != nil {
@@ -286,6 +288,9 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 		statusState := c.getCheckRunStatus(ctx, repoInfo, account.Token, pr.Head.SHA)
 		reviewState := c.getReviewState(ctx, repoInfo, account.Token, pr.Number)
 
+		mergeQueued := strings.EqualFold(pr.MergeableState, "queued") ||
+			(pr.AutoMerge != nil && string(*pr.AutoMerge) != "null")
+
 		prs = append(prs, PullRequest{
 			Number:      pr.Number,
 			Title:       pr.Title,
@@ -295,7 +300,7 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 			Mergeable:   mergeable,
 			StatusState: statusState,
 			ReviewState: reviewState,
-			MergeQueued: pr.AutoMerge != nil && string(*pr.AutoMerge) != "null",
+			MergeQueued: mergeQueued,
 		})
 	}
 
