@@ -50,7 +50,7 @@
 - **CI/CD Status Indicators**: View build status at a glance
   - `✓` (Green) - Success
   - `✗` (Red) - Failure/Error
-  - `★` (Yellow) - Pending/In Progress
+  - `*` (Yellow) - Pending/In Progress
 - **Review Approval Status**: See review state per PR
   - `●` (Green) - Approved
   - `●` (Orange) - No reviews yet
@@ -58,8 +58,9 @@
 - **Merge Conflict Indicator**: `⚠` shown when the PR has merge conflicts
 - **Interactive Actions**:
   - Press `Enter` to open PR in browser
-  - Press `y` to yank (copy) PR URL to clipboard
-  - Press `m` to merge the pull request
+  - Press `Ctrl+Y` to yank (copy) PR URL to clipboard
+  - Press `Ctrl+O` to merge the pull request
+  - Press `Ctrl+R` to refresh the list
 
 ## Stack Management
 

@@ -256,17 +256,18 @@ gt pr li
 # Output shows:
 # ✓ 123: Add authentication module (CI passed)
 # ✗ 124: Fix bug in parser (CI failed)
-# ★ 125: Update dependencies (CI pending)
+# * 125: Update dependencies (CI pending)
 
 # Interactive actions in the PR list:
 # - Enter: Open selected PR in browser
-# - y: Copy PR URL to clipboard
-# - m: Merge the selected PR
+# - Ctrl+Y: Copy PR URL to clipboard
+# - Ctrl+O: Merge the selected PR
+# - Ctrl+R: Refresh PR list
 # - /: Search/filter PRs
 # - Esc/q: Exit
 
 # Quick workflow examples:
 gt pr li
-# Press 'y' on a PR to copy its URL for sharing
-# Press 'm' on a PR to merge it directly from the terminal
+# Press 'Ctrl+Y' on a PR to copy its URL for sharing
+# Press 'Ctrl+O' on a PR to merge it directly from the terminal
 ```

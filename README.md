@@ -140,6 +140,26 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | [Usage Examples](docs/examples.md) | Workflows, branch stacking, multi-account, shell completion |
 | [Integrations](docs/integrations.md) | Powerlevel10k prompt setup |
 
+## 🧱 Code Structure
+
+```text
+.
+├── commands/              # Cobra command implementations by domain
+├── client/                # GitHub/GitLab API clients
+├── config/                # Global/local/public config management
+├── constants/             # Domain constants (platforms, config keys, enums)
+├── helpers/               # Facade exports for helper subpackages
+│   ├── githelper/         # Git workflow and branch relationship operations
+│   ├── sshhelper/         # SSH key and ssh-config utilities
+│   └── accounthelper/     # Per-directory git account attachment helpers
+├── ui/
+│   ├── components/        # Reusable TUI components (lists, prompts, inputs)
+│   └── theme/             # UI colors, icons, and style helpers
+├── runner/                # Shell/git command execution abstraction
+├── utils/                 # Small utility packages (log, validate, pointer, time)
+└── version/               # Version check and release notification logic
+```
+
 ## 🚧 Planned Features
 
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
