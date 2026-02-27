@@ -1,4 +1,4 @@
-package helpers
+package accounthelper
 
 import (
 	"fmt"
@@ -10,8 +10,6 @@ import (
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
-// AttachAccountToDir attaches an account's git config to a directory.
-// It updates ~/.gitconfig with includeIf and creates a local .gitconfig.
 func AttachAccountToDir(account *config.Account, targetDir string) error {
 	absPath, relPath, err := resolvePaths(targetDir)
 	if err != nil {
@@ -23,13 +21,11 @@ func AttachAccountToDir(account *config.Account, targetDir string) error {
 		return log.Error("failed to get home directory", err)
 	}
 
-	// 1. Update ~/.gitconfig with includeIf
 	globalGitConfig := filepath.Join(homeDir, ".gitconfig")
 	if err := writeToGlobalGitConfig(globalGitConfig, relPath); err != nil {
 		return err
 	}
 
-	// 2. Create/update .gitconfig in target directory
 	localGitConfig := filepath.Join(absPath, ".gitconfig")
 	if err := writeToLocalGitConfig(localGitConfig, account); err != nil {
 		return err
