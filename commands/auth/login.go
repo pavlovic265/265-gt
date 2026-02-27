@@ -10,13 +10,16 @@ import (
 
 type loginCommand struct {
 	configManager config.ConfigManager
+	cliClient     client.CliClient
 }
 
 func NewLoginCommand(
 	configManager config.ConfigManager,
+	cliClient client.CliClient,
 ) loginCommand {
 	return loginCommand{
 		configManager: configManager,
+		cliClient:     cliClient,
 	}
 }
 
@@ -55,7 +58,7 @@ func (svc loginCommand) Command() *cobra.Command {
 				}
 			}
 
-			if err := client.Client[account.Platform].AuthLogin(cmd.Context(), account.User); err != nil {
+			if err := svc.cliClient.AuthLogin(cmd.Context(), account.User); err != nil {
 				return log.Error("authentication failed", err)
 			}
 

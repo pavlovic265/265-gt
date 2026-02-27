@@ -9,13 +9,16 @@ import (
 
 type statusCommand struct {
 	configManager config.ConfigManager
+	cliClient     client.CliClient
 }
 
 func NewStatusCommand(
 	configManager config.ConfigManager,
+	cliClient client.CliClient,
 ) statusCommand {
 	return statusCommand{
 		configManager: configManager,
+		cliClient:     cliClient,
 	}
 }
 
@@ -34,9 +37,8 @@ func (svc statusCommand) Command() *cobra.Command {
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("no active account found")
 			}
-			account := cfg.Global.ActiveAccount
 
-			err = client.Client[account.Platform].AuthStatus(cmd.Context())
+			err = svc.cliClient.AuthStatus(cmd.Context())
 			if err != nil {
 				return log.Error("authentication failed", err)
 			}

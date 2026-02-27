@@ -13,17 +13,20 @@ type createCommand struct {
 	runner        runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
+	cliClient     client.CliClient
 }
 
 func NewCreateCommand(
 	runner runner.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
+	cliClient client.CliClient,
 ) createCommand {
 	return createCommand{
 		runner:        runner,
 		configManager: configManager,
 		gitHelper:     gitHelper,
+		cliClient:     cliClient,
 	}
 }
 
@@ -47,13 +50,12 @@ func (svc createCommand) Command() *cobra.Command {
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("no active account found")
 			}
-			account := cfg.Global.ActiveAccount
 
 			if draft {
 				args = append([]string{"--draft"}, args...)
 			}
 
-			err = client.Client[account.Platform].CreatePullRequest(cmd.Context(), args)
+			err = svc.cliClient.CreatePullRequest(cmd.Context(), args)
 			if err != nil {
 				return log.Error("failed to create pull request", err)
 			}

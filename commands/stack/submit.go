@@ -15,15 +15,18 @@ import (
 type submitCommand struct {
 	runner    runner.Runner
 	gitHelper helpers.GitHelper
+	cliClient client.CliClient
 }
 
 func NewSubmitCommand(
 	runner runner.Runner,
 	gitHelper helpers.GitHelper,
+	cliClient client.CliClient,
 ) submitCommand {
 	return submitCommand{
 		runner:    runner,
 		gitHelper: gitHelper,
+		cliClient: cliClient,
 	}
 }
 
@@ -48,9 +51,8 @@ func (svc submitCommand) Command() *cobra.Command {
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("no active account found")
 			}
-			account := cfg.Global.ActiveAccount
 
-			prs, err := client.Client[account.Platform].ListPullRequests(cmd.Context(), []string{})
+			prs, err := svc.cliClient.ListPullRequests(cmd.Context(), []string{})
 			if err != nil {
 				return log.Error("failed to list pull requests", err)
 			}
@@ -107,7 +109,7 @@ func (svc submitCommand) Command() *cobra.Command {
 					if draft {
 						prArgs = append(prArgs, "--draft")
 					}
-					if err := client.Client[account.Platform].CreatePullRequest(
+					if err := svc.cliClient.CreatePullRequest(
 						cmd.Context(), prArgs,
 					); err != nil {
 						return log.Error(

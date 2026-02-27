@@ -19,6 +19,7 @@ import (
 	"github.com/pavlovic265/265-gt/commands/stack"
 	"github.com/pavlovic265/265-gt/commands/utility"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/version"
@@ -32,6 +33,7 @@ type App struct {
 	run           runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
+	cliClient     client.CliClient
 	rootCmd       *cobra.Command
 }
 
@@ -43,12 +45,22 @@ func (app *App) passToGit(args []string) {
 	}
 }
 
-func NewApp() *App {
+func NewApp() (*App, error) {
 	run := runner.NewRunner()
 	configManager := config.NewDefaultConfigManager(run)
 	gitHelper := helpers.NewGitHelper(run)
+	platform := constants.GitHubPlatform
+	if globalCfg, err := configManager.LoadGlobalConfig(); err == nil &&
+		globalCfg != nil &&
+		globalCfg.ActiveAccount != nil &&
+		globalCfg.ActiveAccount.Platform != "" {
+		platform = globalCfg.ActiveAccount.Platform
+	}
 
-	client.InitCliClient(gitHelper)
+	cliClient, err := client.NewRestCliClient(platform, gitHelper)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cli client: %w", err)
+	}
 
 	rootCmd := &cobra.Command{
 		Use: "gt",
@@ -98,6 +110,7 @@ func NewApp() *App {
 		run:           run,
 		configManager: configManager,
 		gitHelper:     gitHelper,
+		cliClient:     cliClient,
 		rootCmd:       rootCmd,
 	}
 
@@ -105,31 +118,27 @@ func NewApp() *App {
 	branch.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
 	remote.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
 	utility.RegisterCommands(app.rootCmd, app.run, app.configManager)
-	stack.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
+	stack.RegisterCommands(app.rootCmd, app.run, app.gitHelper, app.cliClient)
 	commit.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
-	pr.RegisterCommands(app.rootCmd, app.run, app.configManager, app.gitHelper)
-	auth.RegisterCommands(app.rootCmd, app.configManager)
+	pr.RegisterCommands(app.rootCmd, app.run, app.configManager, app.gitHelper, app.cliClient)
+	auth.RegisterCommands(app.rootCmd, app.configManager, app.cliClient)
 	account.RegisterCommands(app.rootCmd, app.run, app.configManager)
 	createconfig.RegisterCommands(app.rootCmd, app.run, app.configManager)
 
-	return app
+	return app, nil
 }
 
 func (app *App) Run() {
 	if err := app.rootCmd.Execute(); err != nil {
-		// Check if this is an unknown command error
 		if strings.Contains(err.Error(), UNKNOWN_COMMAND_ERROR) {
-			// If no arguments provided, show help instead of passing to git
 			if len(os.Args) <= 1 {
 				if err := app.rootCmd.Help(); err != nil {
 					fmt.Fprintf(os.Stderr, "Error showing help: %v\n", err)
 				}
 				return
 			}
-			// Pass the command to git
 			app.passToGit(os.Args[1:])
 		} else {
-			// For other errors, print and exit
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
@@ -137,8 +146,12 @@ func (app *App) Run() {
 }
 
 func main() {
-	// Load .env file if it exists
-	_ = godotenv.Load() // Ignore .env loading errors as the file is optional
+	_ = godotenv.Load()
 
-	NewApp().Run()
+	app, err := NewApp()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+	app.Run()
 }

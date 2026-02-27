@@ -9,13 +9,16 @@ import (
 
 type logoutCommand struct {
 	configManager config.ConfigManager
+	cliClient     client.CliClient
 }
 
 func NewLogoutCommand(
 	configManager config.ConfigManager,
+	cliClient client.CliClient,
 ) logoutCommand {
 	return logoutCommand{
 		configManager: configManager,
+		cliClient:     cliClient,
 	}
 }
 
@@ -36,7 +39,7 @@ func (svc logoutCommand) Command() *cobra.Command {
 			}
 			account := cfg.Global.ActiveAccount
 
-			if err := client.Client[account.Platform].AuthLogout(cmd.Context(), account.User); err != nil {
+			if err := svc.cliClient.AuthLogout(cmd.Context(), account.User); err != nil {
 				return log.Error("logout failed", err)
 			}
 

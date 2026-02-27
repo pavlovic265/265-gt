@@ -17,8 +17,9 @@ func TestListCommand_Command(t *testing.T) {
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	listCmd := pr.NewListCommand(mockRunner, mockConfigManager, mockGitHelper)
+	listCmd := pr.NewListCommand(mockRunner, mockConfigManager, mockGitHelper, cliClient)
 	cmd := listCmd.Command()
 
 	assert.Equal(t, "list", cmd.Use)
@@ -33,8 +34,9 @@ func TestNewListCommand(t *testing.T) {
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	listCmd := pr.NewListCommand(mockRunner, mockConfigManager, mockGitHelper)
+	listCmd := pr.NewListCommand(mockRunner, mockConfigManager, mockGitHelper, cliClient)
 	cmd := listCmd.Command()
 
 	assert.NotNil(t, cmd)
@@ -49,6 +51,7 @@ func TestFormatPullRequest_ReviewApproved(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{
@@ -76,6 +79,7 @@ func TestFormatPullRequest_ReviewChangesRequested(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{
@@ -103,6 +107,7 @@ func TestFormatPullRequest_NoReviews(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{
@@ -130,6 +135,7 @@ func TestFormatPullRequest_ConflictIndicator(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{
@@ -156,6 +162,7 @@ func TestFormatPullRequest_NoConflictWhenMergeable(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{
@@ -179,6 +186,7 @@ func TestFormatPullRequest_MergeQueuedIndicator(t *testing.T) {
 		mocks.NewMockRunner(ctrl),
 		mocks.NewMockConfigManager(ctrl),
 		mocks.NewMockGitHelper(ctrl),
+		client.NewGitHubClient(mocks.NewMockGitHelper(ctrl)),
 	)
 
 	result := listCmd.FormatPullRequest(client.PullRequest{

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
@@ -17,11 +18,13 @@ type CliClient interface {
 	UpdatePullRequestBranch(ctx context.Context, prNumber int) error
 }
 
-var Client map[constants.Platform]CliClient
-
-func InitCliClient(gitHelper helpers.GitHelper) {
-	Client = map[constants.Platform]CliClient{
-		constants.GitHubPlatform: NewGitHubClient(gitHelper),
-		constants.GitLabPlatform: NewGitLabClient(gitHelper),
+func NewRestCliClient(platform constants.Platform, gitHelper helpers.GitHelper) (CliClient, error) {
+	switch platform {
+	case constants.GitHubPlatform:
+		return NewGitHubClient(gitHelper), nil
+	case constants.GitLabPlatform:
+		return NewGitLabClient(gitHelper), nil
+	default:
+		return nil, fmt.Errorf("unsupported platform: %q", platform)
 	}
 }

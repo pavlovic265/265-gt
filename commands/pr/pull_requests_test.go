@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands/pr"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/stretchr/testify/assert"
@@ -16,8 +17,9 @@ func TestPullRequestCommand_Command(t *testing.T) {
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
+	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper, cliClient)
 	cmd := prCmd.Command()
 
 	assert.Equal(t, "pull_request", cmd.Use)
@@ -32,8 +34,9 @@ func TestNewPullRequestCommand(t *testing.T) {
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper)
+	prCmd := pr.NewPullRequestCommand(mockRunner, mockConfigManager, mockGitHelper, cliClient)
 	cmd := prCmd.Command()
 
 	assert.NotNil(t, cmd)

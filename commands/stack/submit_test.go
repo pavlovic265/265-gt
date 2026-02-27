@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands/stack"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/stretchr/testify/assert"
@@ -15,8 +16,9 @@ func TestSubmitCommand_Command(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper)
+	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper, cliClient)
 	cmd := submitCmd.Command()
 
 	assert.Equal(t, "submit-stack", cmd.Use)
@@ -30,8 +32,9 @@ func TestNewSubmitCommand(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper)
+	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper, cliClient)
 	cmd := submitCmd.Command()
 
 	assert.NotNil(t, cmd)
@@ -44,8 +47,9 @@ func TestSubmitCommand_HasDraftFlag(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper)
+	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper, cliClient)
 	cmd := submitCmd.Command()
 
 	draftFlag := cmd.Flags().Lookup("draft")
@@ -60,8 +64,9 @@ func TestSubmitCommand_HasInteractiveFlag(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper)
+	submitCmd := stack.NewSubmitCommand(mockRunner, mockGitHelper, cliClient)
 	cmd := submitCmd.Command()
 
 	interactiveFlag := cmd.Flags().Lookup("interactive")

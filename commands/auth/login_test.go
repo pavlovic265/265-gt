@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/commands/auth"
 	"github.com/pavlovic265/265-gt/mocks"
 	"github.com/stretchr/testify/assert"
@@ -14,8 +15,10 @@ func TestLoginCommand_Command(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	loginCmd := auth.NewLoginCommand(mockConfigManager)
+	loginCmd := auth.NewLoginCommand(mockConfigManager, cliClient)
 	cmd := loginCmd.Command()
 
 	assert.Equal(t, "login", cmd.Use)
@@ -29,8 +32,10 @@ func TestNewLoginCommand(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockGitHelper := mocks.NewMockGitHelper(ctrl)
+	cliClient := client.NewGitHubClient(mockGitHelper)
 
-	loginCmd := auth.NewLoginCommand(mockConfigManager)
+	loginCmd := auth.NewLoginCommand(mockConfigManager, cliClient)
 	cmd := loginCmd.Command()
 
 	assert.NotNil(t, cmd)

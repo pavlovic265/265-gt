@@ -23,7 +23,7 @@ type listCommand struct {
 	runner        runner.Runner
 	configManager config.ConfigManager
 	gitHelper     helpers.GitHelper
-	account       *config.Account
+	cliClient     client.CliClient
 	ctx           context.Context
 }
 
@@ -31,11 +31,13 @@ func NewListCommand(
 	runner runner.Runner,
 	configManager config.ConfigManager,
 	gitHelper helpers.GitHelper,
+	cliClient client.CliClient,
 ) *listCommand {
 	return &listCommand{
 		runner:        runner,
 		configManager: configManager,
 		gitHelper:     gitHelper,
+		cliClient:     cliClient,
 	}
 }
 
@@ -57,10 +59,9 @@ func (svc *listCommand) Command() *cobra.Command {
 			if cfg.Global.ActiveAccount == nil || cfg.Global.ActiveAccount.User == "" {
 				return log.ErrorMsg("no active account found")
 			}
-			svc.account = cfg.Global.ActiveAccount
 			svc.ctx = cmd.Context()
 
-			prs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, args)
+			prs, err := svc.cliClient.ListPullRequests(svc.ctx, args)
 			if err != nil {
 				return log.Error("failed to list pull requests", err)
 			}
@@ -131,7 +132,7 @@ func (svc *listCommand) FormatPullRequest(pr client.PullRequest) PullRequestItem
 }
 
 func (svc *listCommand) refreshFunc() tea.Msg {
-	updatedPrs, err := client.Client[svc.account.Platform].ListPullRequests(svc.ctx, []string{})
+	updatedPrs, err := svc.cliClient.ListPullRequests(svc.ctx, []string{})
 	if err != nil {
 		return components.RefreshCompleteMsg[PullRequestItem]{Err: err}
 	}
@@ -191,7 +192,7 @@ func (svc *listCommand) selectPullRequest(
 			}
 
 			if m.MergeAction {
-				err := client.Client[svc.account.Platform].MergePullRequest(svc.ctx, m.Selected.Number)
+				err := svc.cliClient.MergePullRequest(svc.ctx, m.Selected.Number)
 				if err != nil {
 					return log.Error("failed to merge pull request", err)
 				}
