@@ -6,7 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/theme"
 )
 
 type ListModel[T any] struct {
@@ -40,25 +40,25 @@ type RefreshCompleteMsg[T any] struct {
 
 var (
 	searchLabelStyle = lipgloss.NewStyle().
-				Foreground(constants.Blue)
+				Foreground(theme.Blue)
 
 	cursorStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow)
+			Foreground(theme.Yellow)
 
 	itemStyle = lipgloss.NewStyle().
-			Foreground(constants.Foreground)
+			Foreground(theme.Foreground)
 
 	selectedItemStyle = lipgloss.NewStyle().
-				Foreground(constants.Green)
+				Foreground(theme.Green)
 
 	emptyStateStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 
 	footerStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 
 	keyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow)
+			Foreground(theme.Yellow)
 )
 
 func (m ListModel[T]) Init() tea.Cmd {
@@ -207,7 +207,7 @@ func (m ListModel[T]) View() string {
 
 	// Show refreshing indicator
 	if m.Refreshing {
-		refreshingStyle := lipgloss.NewStyle().Foreground(constants.Yellow)
+		refreshingStyle := lipgloss.NewStyle().Foreground(theme.Yellow)
 		content.WriteString(refreshingStyle.Render("⟳ Refreshing..."))
 		content.WriteString("\n\n")
 	}
@@ -261,8 +261,8 @@ func highlightMatch(text, query string) string {
 	after := text[index+len(query):]
 
 	highlightStyle := lipgloss.NewStyle().
-		Foreground(constants.Yellow).
-		Background(constants.BrightBlack)
+		Foreground(theme.Yellow).
+		Background(theme.BrightBlack)
 
 	return before + highlightStyle.Render(match) + after
 }

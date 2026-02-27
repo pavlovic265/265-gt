@@ -10,11 +10,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/pavlovic265/265-gt/client"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
@@ -79,27 +79,27 @@ type PullRequestItem struct {
 
 func (svc *listCommand) FormatPullRequest(pr client.PullRequest) PullRequestItem {
 	ciStatus := ""
-	ciStatusColor := constants.White
+	ciStatusColor := theme.White
 	switch pr.StatusState {
 	case client.StatusStateTypeSuccess:
 		ciStatus = "✓ "
-		ciStatusColor = constants.Green
+		ciStatusColor = theme.Green
 	case client.StatusStateTypeFailure:
 		ciStatus = "✗ "
-		ciStatusColor = constants.Red
+		ciStatusColor = theme.Red
 	case client.StatusStateTypePending:
 		ciStatus = "* "
-		ciStatusColor = constants.Yellow
+		ciStatusColor = theme.Yellow
 	}
 
 	// Review status indicator
 	reviewStatus := " ●"
-	reviewColor := constants.Yellow
+	reviewColor := theme.Yellow
 	switch pr.ReviewState {
 	case client.ReviewStateApproved:
-		reviewColor = constants.Green
+		reviewColor = theme.Green
 	case client.ReviewStateChangesRequested:
-		reviewColor = constants.Red
+		reviewColor = theme.Red
 	}
 
 	// Conflict indicator (only shown when conflicting)
@@ -116,11 +116,11 @@ func (svc *listCommand) FormatPullRequest(pr client.PullRequest) PullRequestItem
 
 	// Style each component
 	styledCiStatus := lipgloss.NewStyle().Foreground(ciStatusColor).Render(ciStatus)
-	styledNumber := lipgloss.NewStyle().Foreground(constants.White).Render(fmt.Sprintf("%d", pr.Number))
-	styledTitle := lipgloss.NewStyle().Foreground(constants.White).Render(pr.Title)
+	styledNumber := lipgloss.NewStyle().Foreground(theme.White).Render(fmt.Sprintf("%d", pr.Number))
+	styledTitle := lipgloss.NewStyle().Foreground(theme.White).Render(pr.Title)
 	styledReview := lipgloss.NewStyle().Foreground(reviewColor).Render(reviewStatus)
-	styledConflict := lipgloss.NewStyle().Foreground(constants.Red).Render(conflictStatus)
-	styledMergeQueue := lipgloss.NewStyle().Foreground(constants.BrightYellow).Render(mergeQueueStatus)
+	styledConflict := lipgloss.NewStyle().Foreground(theme.Red).Render(conflictStatus)
+	styledMergeQueue := lipgloss.NewStyle().Foreground(theme.BrightYellow).Render(mergeQueueStatus)
 
 	return PullRequestItem{
 		Number: pr.Number,

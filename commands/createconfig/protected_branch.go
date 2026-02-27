@@ -7,16 +7,16 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
 var (
 	optionsStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 	quitKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
+			Foreground(theme.Yellow).
 			Bold(true)
 )
 

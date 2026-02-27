@@ -6,9 +6,10 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
@@ -93,22 +94,22 @@ func (m tokenSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *tokenSetupModel) updateFocus() {
 	if m.focusIndex == 0 {
 		m.tokenInput.Focus()
-		m.tokenInput.PromptStyle = constants.GetSuccessAnsiStyle()
-		m.tokenInput.TextStyle = constants.GetAnsiStyle(constants.White)
+		m.tokenInput.PromptStyle = theme.GetSuccessAnsiStyle()
+		m.tokenInput.TextStyle = theme.GetAnsiStyle(theme.White)
 	} else {
 		m.tokenInput.Blur()
-		m.tokenInput.PromptStyle = constants.GetAnsiStyle(constants.BrightBlack)
-		m.tokenInput.TextStyle = constants.GetAnsiStyle(constants.BrightBlack)
+		m.tokenInput.PromptStyle = theme.GetAnsiStyle(theme.BrightBlack)
+		m.tokenInput.TextStyle = theme.GetAnsiStyle(theme.BrightBlack)
 	}
 }
 
 func (m tokenSetupModel) View() string {
 	var b strings.Builder
 
-	titleStyle := constants.GetWarningAnsiStyle().Bold(true)
-	dimStyle := constants.GetAnsiStyle(constants.BrightBlack)
-	highlightStyle := constants.GetWarningAnsiStyle()
-	infoStyle := constants.GetAnsiStyle(constants.Cyan)
+	titleStyle := theme.GetWarningAnsiStyle().Bold(true)
+	dimStyle := theme.GetAnsiStyle(theme.BrightBlack)
+	highlightStyle := theme.GetWarningAnsiStyle()
+	infoStyle := theme.GetAnsiStyle(theme.Cyan)
 
 	b.WriteString(titleStyle.Render(fmt.Sprintf("Token Setup for %s (%s)", m.account.User, m.account.Platform)))
 	b.WriteString("\n\n")

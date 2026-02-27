@@ -6,7 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/theme"
 )
 
 type YesNoPrompt struct {
@@ -17,31 +17,31 @@ type YesNoPrompt struct {
 
 var (
 	questionStyle = lipgloss.NewStyle().
-			Foreground(constants.Blue)
+			Foreground(theme.Blue)
 
 	optionsStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 
 	yesKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Green).
+			Foreground(theme.Green).
 			Bold(true)
 
 	noKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Red).
+			Foreground(theme.Red).
 			Bold(true)
 
 	enterKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
+			Foreground(theme.Yellow).
 			Bold(true)
 
 	quitKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
+			Foreground(theme.Yellow).
 			Bold(true)
 
 	canceledIconStyle = lipgloss.NewStyle().
-				Foreground(constants.Red)
+				Foreground(theme.Red)
 	canceledStyle = lipgloss.NewStyle().
-			Foreground(constants.White)
+			Foreground(theme.White)
 )
 
 func (m YesNoPrompt) IsYes() bool {
@@ -85,7 +85,7 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m YesNoPrompt) View() string {
 	if m.Quitting {
 		return fmt.Sprintf("%s %s\n",
-			canceledIconStyle.Render(constants.CrossIcon),
+			canceledIconStyle.Render(theme.CrossIcon),
 			canceledStyle.Render("Operation canceled by user"))
 	}
 

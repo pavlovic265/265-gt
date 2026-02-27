@@ -5,27 +5,27 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
 
 var (
 	headerStyle = lipgloss.NewStyle().
-			Foreground(constants.Blue).
+			Foreground(theme.Blue).
 			Bold(true)
 
 	userStyle = lipgloss.NewStyle().
-			Foreground(constants.Green)
+			Foreground(theme.Green)
 
 	platformStyle = lipgloss.NewStyle().
-			Foreground(constants.Cyan)
+			Foreground(theme.Cyan)
 
 	emailStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 
 	activeStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
+			Foreground(theme.Yellow).
 			Bold(true)
 )
 

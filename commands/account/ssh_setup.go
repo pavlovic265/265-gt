@@ -10,6 +10,7 @@ import (
 	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
@@ -112,10 +113,10 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m sshSetupModel) View() string {
 	var b strings.Builder
 
-	titleStyle := constants.GetWarningAnsiStyle().Bold(true)
-	dimStyle := constants.GetAnsiStyle(constants.BrightBlack)
-	highlightStyle := constants.GetWarningAnsiStyle()
-	errStyle := constants.GetErrorAnsiStyle()
+	titleStyle := theme.GetWarningAnsiStyle().Bold(true)
+	dimStyle := theme.GetAnsiStyle(theme.BrightBlack)
+	highlightStyle := theme.GetWarningAnsiStyle()
+	errStyle := theme.GetErrorAnsiStyle()
 
 	b.WriteString(titleStyle.Render(fmt.Sprintf("SSH Setup for %s", m.account.User)))
 	b.WriteString("\n\n")

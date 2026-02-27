@@ -3,9 +3,9 @@ package branch
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/components"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/components"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )

@@ -6,9 +6,9 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 )
 
@@ -93,22 +93,22 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *gpgSetupModel) updateFocus() {
 	if m.focusIndex == 0 {
 		m.gpgInput.Focus()
-		m.gpgInput.PromptStyle = constants.GetSuccessAnsiStyle()
-		m.gpgInput.TextStyle = constants.GetAnsiStyle(constants.White)
+		m.gpgInput.PromptStyle = theme.GetSuccessAnsiStyle()
+		m.gpgInput.TextStyle = theme.GetAnsiStyle(theme.White)
 	} else {
 		m.gpgInput.Blur()
-		m.gpgInput.PromptStyle = constants.GetAnsiStyle(constants.BrightBlack)
-		m.gpgInput.TextStyle = constants.GetAnsiStyle(constants.BrightBlack)
+		m.gpgInput.PromptStyle = theme.GetAnsiStyle(theme.BrightBlack)
+		m.gpgInput.TextStyle = theme.GetAnsiStyle(theme.BrightBlack)
 	}
 }
 
 func (m gpgSetupModel) View() string {
 	var b strings.Builder
 
-	titleStyle := constants.GetWarningAnsiStyle().Bold(true)
-	dimStyle := constants.GetAnsiStyle(constants.BrightBlack)
-	highlightStyle := constants.GetWarningAnsiStyle()
-	infoStyle := constants.GetAnsiStyle(constants.Cyan)
+	titleStyle := theme.GetWarningAnsiStyle().Bold(true)
+	dimStyle := theme.GetAnsiStyle(theme.BrightBlack)
+	highlightStyle := theme.GetWarningAnsiStyle()
+	infoStyle := theme.GetAnsiStyle(theme.Cyan)
 
 	b.WriteString(titleStyle.Render(fmt.Sprintf("GPG Signing Key for %s (%s)", m.account.User, m.account.Platform)))
 	b.WriteString("\n\n")

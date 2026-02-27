@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/timeutils"
 )
 
@@ -123,7 +123,7 @@ func showVersionNotification(current, latest, url string) {
 		"🔄",
 		"A new release of gt is available:",
 		currentDisplay,
-		constants.ArrowRightIcon,
+		theme.ArrowRightIcon,
 		latestDisplay)
 
 	fmt.Printf("To upgrade, run: %s\n", "gt upgrade")

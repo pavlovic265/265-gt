@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/spf13/cobra"
 )
 
@@ -57,41 +57,41 @@ func (svc statusCommand) styleGitStatus(output string) string {
 	var styledLines []string
 
 	branchStyle := lipgloss.NewStyle().
-		Foreground(constants.Blue).
+		Foreground(theme.Blue).
 		Bold(true)
 
 	headerStyle := lipgloss.NewStyle().
-		Foreground(constants.Magenta).
+		Foreground(theme.Magenta).
 		Bold(true)
 
 	stagedHeaderStyle := lipgloss.NewStyle().
-		Foreground(constants.Green).
+		Foreground(theme.Green).
 		Bold(true)
 
 	untrackedHeaderStyle := lipgloss.NewStyle().
-		Foreground(constants.Red).
+		Foreground(theme.Red).
 		Bold(true)
 
 	modifiedStyle := lipgloss.NewStyle().
-		Foreground(constants.Yellow)
+		Foreground(theme.Yellow)
 
 	newFileStyle := lipgloss.NewStyle().
-		Foreground(constants.Green)
+		Foreground(theme.Green)
 
 	deletedStyle := lipgloss.NewStyle().
-		Foreground(constants.Red)
+		Foreground(theme.Red)
 
 	untrackedStyle := lipgloss.NewStyle().
-		Foreground(constants.Red)
+		Foreground(theme.Red)
 
 	renamedStyle := lipgloss.NewStyle().
-		Foreground(constants.Yellow)
+		Foreground(theme.Yellow)
 
 	helpStyle := lipgloss.NewStyle().
-		Foreground(constants.BrightBlack)
+		Foreground(theme.BrightBlack)
 
 	cleanStyle := lipgloss.NewStyle().
-		Foreground(constants.Green)
+		Foreground(theme.Green)
 
 	for _, line := range lines {
 		styledLine := line

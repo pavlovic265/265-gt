@@ -3,7 +3,7 @@ package components
 import (
 	"fmt"
 
-	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/theme"
 )
 
 type ButtonType int
@@ -57,29 +57,29 @@ func (b Button) Render() string {
 	// Apply style based on button type when focused
 	switch b.ButtonType {
 	case ButtonSuccess:
-		return constants.GetSuccessAnsiStyle().Render(text)
+		return theme.GetSuccessAnsiStyle().Render(text)
 	case ButtonInfo:
-		return constants.GetInfoAnsiStyle().Render(text)
+		return theme.GetInfoAnsiStyle().Render(text)
 	case ButtonWarning:
-		return constants.GetWarningAnsiStyle().Render(text)
+		return theme.GetWarningAnsiStyle().Render(text)
 	case ButtonDanger:
-		return constants.GetErrorAnsiStyle().Render(text)
+		return theme.GetErrorAnsiStyle().Render(text)
 	case ButtonPrimary:
 		fallthrough
 	default:
-		return constants.GetAnsiStyle(constants.Blue).Bold(true).Render(text)
+		return theme.GetAnsiStyle(theme.Blue).Bold(true).Render(text)
 	}
 }
 
 func NewDoneButton(focused bool) Button {
 	return NewButton("Done", ButtonSuccess).
-		WithIcon(constants.CheckIcon).
+		WithIcon(theme.CheckIcon).
 		WithFocus(focused)
 }
 
 func NewAddButton(focused bool) Button {
 	return NewButton("Add", ButtonInfo).
-		WithIcon(constants.PlusIcon).
+		WithIcon(theme.PlusIcon).
 		WithFocus(focused)
 }
 

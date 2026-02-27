@@ -7,10 +7,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/components"
-	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
@@ -22,17 +22,17 @@ type cleanCommand struct {
 
 var (
 	headerStyle = lipgloss.NewStyle().
-			Foreground(constants.Blue).
+			Foreground(theme.Blue).
 			Bold(true)
 
 	infoStyle = lipgloss.NewStyle().
-			Foreground(constants.Cyan)
+			Foreground(theme.Cyan)
 
 	branchStyle = lipgloss.NewStyle().
-			Foreground(constants.Magenta)
+			Foreground(theme.Magenta)
 
 	parentStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 )
 
 func NewCleanCommand(

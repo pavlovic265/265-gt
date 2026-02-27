@@ -7,23 +7,24 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/constants"
+	"github.com/pavlovic265/265-gt/ui/components"
+	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/pavlovic265/265-gt/utils/validate"
 )
 
 var (
 	optionsStyle = lipgloss.NewStyle().
-			Foreground(constants.BrightBlack)
+			Foreground(theme.BrightBlack)
 	quitKeyStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow).
+			Foreground(theme.Yellow).
 			Bold(true)
 	cursorStyle = lipgloss.NewStyle().
-			Foreground(constants.Yellow)
+			Foreground(theme.Yellow)
 	selectedDotStyle = lipgloss.NewStyle().
-				Foreground(constants.Yellow)
+				Foreground(theme.Yellow)
 )
 
 type accountsModel struct {
@@ -191,7 +192,7 @@ func (am accountsModel) View() string {
 	}
 
 	if am.err != "" {
-		errorStyle := lipgloss.NewStyle().Foreground(constants.Red)
+		errorStyle := lipgloss.NewStyle().Foreground(theme.Red)
 		b.WriteString(errorStyle.Render("Error: "+am.err) + "\n\n")
 	}
 
@@ -278,8 +279,8 @@ func (am accountsModel) updateFocus() {
 	for i := range am.inputs {
 		if i == am.focusIndex {
 			am.inputs[i].Focus()
-			am.inputs[i].PromptStyle = constants.GetSuccessAnsiStyle()
-			am.inputs[i].TextStyle = constants.GetAnsiStyle(constants.White)
+			am.inputs[i].PromptStyle = theme.GetSuccessAnsiStyle()
+			am.inputs[i].TextStyle = theme.GetAnsiStyle(theme.White)
 		} else {
 			am.inputs[i].Blur()
 			am.inputs[i].PromptStyle = lipgloss.NewStyle()

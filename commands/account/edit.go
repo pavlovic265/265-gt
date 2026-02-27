@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pavlovic265/265-gt/components"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/runner"
+	"github.com/pavlovic265/265-gt/ui/components"
 	"github.com/pavlovic265/265-gt/utils/log"
 	"github.com/spf13/cobra"
 )
