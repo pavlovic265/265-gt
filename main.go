@@ -19,6 +19,7 @@ import (
 	"github.com/pavlovic265/265-gt/commands/stack"
 	"github.com/pavlovic265/265-gt/commands/utility"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/version"
@@ -48,12 +49,16 @@ func NewApp() (*App, error) {
 	run := runner.NewRunner()
 	configManager := config.NewDefaultConfigManager(run)
 	gitHelper := helpers.NewGitHelper(run)
-	globalCfg, err := configManager.LoadGlobalConfig()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load global conflig: %w", err)
+
+	platform := constants.GitHubPlatform
+	if globalCfg, err := configManager.LoadGlobalConfig(); err == nil &&
+		globalCfg != nil &&
+		globalCfg.ActiveAccount != nil &&
+		globalCfg.ActiveAccount.Platform != "" {
+		platform = globalCfg.ActiveAccount.Platform
 	}
 
-	cliClient, err := client.NewRestCliClient(globalCfg.ActiveAccount.Platform, gitHelper)
+	cliClient, err := client.NewRestCliClient(platform, gitHelper)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cli client: %w", err)
 	}
