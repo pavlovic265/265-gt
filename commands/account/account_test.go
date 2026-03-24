@@ -6,6 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pavlovic265/265-gt/commands/account"
 	"github.com/pavlovic265/265-gt/mocks"
+	clientmocks "github.com/pavlovic265/265-gt/mocks/client"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,8 +16,9 @@ func TestAccountCommand_Command(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager)
+	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := accountCmd.Command()
 
 	assert.Equal(t, "account", cmd.Use)
@@ -30,8 +32,9 @@ func TestNewAccountCommand(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager)
+	accountCmd := account.NewAccountCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := accountCmd.Command()
 
 	assert.NotNil(t, cmd)

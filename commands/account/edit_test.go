@@ -7,6 +7,7 @@ import (
 	"github.com/pavlovic265/265-gt/commands/account"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/mocks"
+	clientmocks "github.com/pavlovic265/265-gt/mocks/client"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,8 +17,9 @@ func TestEditCommand_Command(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	assert.Equal(t, "edit", cmd.Use)
@@ -31,8 +33,9 @@ func TestEditCommand_NoContext(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	err := cmd.RunE(cmd, []string{})
@@ -46,8 +49,9 @@ func TestEditCommand_NoAccounts(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	setAccountCommandContext(cmd, []config.Account{}, nil)
@@ -62,8 +66,9 @@ func TestNewEditCommand(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	assert.NotNil(t, cmd)
@@ -76,8 +81,9 @@ func TestEditCommand_TokenFlagIsString(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	f := cmd.Flags().Lookup("token")
@@ -92,11 +98,40 @@ func TestEditCommand_GPGFlagIsString(t *testing.T) {
 
 	mockRunner := mocks.NewMockRunner(ctrl)
 	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
 
-	editCmd := account.NewEditCommand(mockRunner, mockConfigManager)
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
 	cmd := editCmd.Command()
 
 	f := cmd.Flags().Lookup("gpg")
 	assert.NotNil(t, f)
 	assert.Equal(t, "string", f.Value.Type())
+}
+
+func TestEditCommand_TokenFlagRelogsUserAfterTokenUpdate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRunner := mocks.NewMockRunner(ctrl)
+	mockConfigManager := mocks.NewMockConfigManager(ctrl)
+	mockCliClient := clientmocks.NewMockCliClient(ctrl)
+
+	editCmd := account.NewEditCommand(mockRunner, mockConfigManager, mockCliClient)
+	cmd := editCmd.Command()
+	setAccountCommandContext(cmd, []config.Account{
+		{
+			User:     "alice",
+			Token:    "old-token",
+			Platform: "github",
+		},
+	}, nil)
+
+	if err := cmd.Flags().Set("token", "new-token"); err != nil {
+		t.Fatalf("failed to set token flag: %v", err)
+	}
+
+	mockCliClient.EXPECT().AuthLogin(gomock.Any(), "alice").Return(nil)
+
+	err := cmd.RunE(cmd, []string{})
+	assert.NoError(t, err)
 }

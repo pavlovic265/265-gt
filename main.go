@@ -123,7 +123,7 @@ func NewApp() (*App, error) {
 	commit.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
 	pr.RegisterCommands(app.rootCmd, app.run, app.configManager, app.gitHelper, app.cliClient)
 	auth.RegisterCommands(app.rootCmd, app.configManager, app.cliClient)
-	account.RegisterCommands(app.rootCmd, app.run, app.configManager)
+	account.RegisterCommands(app.rootCmd, app.run, app.configManager, app.cliClient)
 	createconfig.RegisterCommands(app.rootCmd, app.run, app.configManager)
 
 	return app, nil

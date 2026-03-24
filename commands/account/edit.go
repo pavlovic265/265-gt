@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/pavlovic265/265-gt/client"
 	"github.com/pavlovic265/265-gt/config"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/ui/components"
@@ -15,15 +16,18 @@ import (
 type editCommand struct {
 	runner        runner.Runner
 	configManager config.ConfigManager
+	cliClient     client.CliClient
 }
 
 func NewEditCommand(
 	runner runner.Runner,
 	configManager config.ConfigManager,
+	cliClient client.CliClient,
 ) editCommand {
 	return editCommand{
 		runner:        runner,
 		configManager: configManager,
+		cliClient:     cliClient,
 	}
 }
 
@@ -61,6 +65,7 @@ func (ec editCommand) Command() *cobra.Command {
 			}
 
 			selectedAccount := &cfg.Global.Accounts[selectedIndex]
+			originalToken := selectedAccount.Token
 
 			// Handle quick update flags
 			if cmd.Flags().Changed("token") {
@@ -69,6 +74,11 @@ func (ec editCommand) Command() *cobra.Command {
 				} else {
 					if err := HandleTokenSetup(selectedAccount); err != nil {
 						return log.Error("failed to update token", err)
+					}
+				}
+				if selectedAccount.Token != originalToken {
+					if err := ec.cliClient.AuthLogin(cmd.Context(), selectedAccount.User); err != nil {
+						return log.Error("failed to re-login user after token update", err)
 					}
 				}
 				cfg.MarkDirty()
@@ -108,6 +118,11 @@ func (ec editCommand) Command() *cobra.Command {
 					log.Warningf("Token setup failed: %v", err)
 				}
 			}
+			if editedAccount.Token != originalToken {
+				if err := ec.cliClient.AuthLogin(cmd.Context(), editedAccount.User); err != nil {
+					return log.Error("failed to re-login user after token update", err)
+				}
+			}
 
 			// Update the account in context - will be saved by PersistentPostRunE
 			cfg.Global.Accounts[selectedIndex] = *editedAccount
@@ -132,6 +147,10 @@ func (ec editCommand) Command() *cobra.Command {
 }
 
 func selectAccount(accounts []config.Account) (int, error) {
+	if len(accounts) == 1 {
+		return 0, nil
+	}
+
 	var choices []string
 	for _, account := range accounts {
 		platform := account.Platform.String()
