@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -307,6 +308,80 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 	return prs, nil
 }
 
+func (c *gitHubClient) HasOpenPullRequestForBranch(
+	ctx context.Context, branch string,
+) (bool, error) {
+	repoInfo, account, err := c.getRepoInfo(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	query := url.Values{}
+	query.Set("state", "open")
+	query.Set("head", fmt.Sprintf("%s:%s", repoInfo.Owner, branch))
+
+	apiURL := fmt.Sprintf("%s/repos/%s/%s/pulls?%s",
+		githubAPIBase, repoInfo.Owner, repoInfo.Repo, query.Encode())
+
+	resp, err := c.doRequest(ctx, "GET", apiURL, nil, account.Token)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return false, fmt.Errorf("failed to list PRs: %s", resp.Status)
+	}
+
+	var ghPRs []json.RawMessage
+
+	if err := json.NewDecoder(resp.Body).Decode(&ghPRs); err != nil {
+		return false, err
+	}
+
+	return len(ghPRs) > 0, nil
+}
+
+func (c *gitHubClient) getPullRequestNumberForBranch(
+	ctx context.Context, branch string,
+) (int, error) {
+	repoInfo, account, err := c.getRepoInfo(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	query := url.Values{}
+	query.Set("state", "open")
+	query.Set("head", fmt.Sprintf("%s:%s", repoInfo.Owner, branch))
+
+	apiURL := fmt.Sprintf("%s/repos/%s/%s/pulls?%s",
+		githubAPIBase, repoInfo.Owner, repoInfo.Repo, query.Encode())
+
+	resp, err := c.doRequest(ctx, "GET", apiURL, nil, account.Token)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return 0, fmt.Errorf("failed to list PRs: %s", resp.Status)
+	}
+
+	var ghPRs []struct {
+		Number int `json:"number"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&ghPRs); err != nil {
+		return 0, err
+	}
+
+	if len(ghPRs) == 0 {
+		return 0, nil
+	}
+
+	return ghPRs[0].Number, nil
+}
+
 func (c *gitHubClient) MergePullRequest(ctx context.Context, prNumber int) error {
 	repoInfo, account, err := c.getRepoInfo(ctx)
 	if err != nil {
@@ -331,25 +406,38 @@ func (c *gitHubClient) MergePullRequest(ctx context.Context, prNumber int) error
 	return nil
 }
 
-func (c *gitHubClient) UpdatePullRequestBranch(ctx context.Context, prNumber int) error {
+func (c *gitHubClient) UpdatePullRequestBaseBranch(ctx context.Context, branch string) error {
 	repoInfo, account, err := c.getRepoInfo(ctx)
 	if err != nil {
 		return err
 	}
 
-	payload := map[string]string{
-		"body": "@dependabot rebase",
+	parent, err := c.gitHelper.GetParent(branch)
+	if err != nil {
+		return err
 	}
 
-	url := fmt.Sprintf("%s/repos/%s/%s/issues/%d/comments", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
-	resp, err := c.doRequest(ctx, "POST", url, payload, account.Token)
+	prNumber, err := c.getPullRequestNumberForBranch(ctx, branch)
+	if err != nil {
+		return err
+	}
+	if prNumber == 0 {
+		return nil
+	}
+
+	payload := map[string]string{
+		"base": parent,
+	}
+
+	apiURL := fmt.Sprintf("%s/repos/%s/%s/pulls/%d", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
+	resp, err := c.doRequest(ctx, "PATCH", apiURL, payload, account.Token)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 201 {
-		return fmt.Errorf("failed to add comment: status %d", resp.StatusCode)
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("failed to update PR base branch: status %d", resp.StatusCode)
 	}
 
 	return nil

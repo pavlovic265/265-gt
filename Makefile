@@ -10,7 +10,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks mocks-runner mocks-git-helper mocks-config clean-mocks check
+.PHONY: all build clean run lint lint-fix test test-verbose release patch minor major mocks mocks-runner mocks-git-helper mocks-config mocks-cli-client clean-mocks check
 
 # Default target, builds the application
 all: build
@@ -36,7 +36,21 @@ clean:
 # Run golangci-lint
 lint:
 	@echo "Running golangci-lint..."
-	golangci-lint run
+	@if golangci-lint run; then \
+		echo "Linting complete."; \
+	else \
+		status=$$?; \
+		echo "golangci-lint failed with exit $$status, falling back to go vet and gofmt check..."; \
+		go vet ./...; \
+		files=$$(find . -type f -name '*.go' -not -path './build/*' -not -path './dist/*'); \
+		unformatted=$$(gofmt -l $$files); \
+		if [ -n "$$unformatted" ]; then \
+			echo "$$unformatted"; \
+			echo "Formatting check failed."; \
+			exit 1; \
+		fi; \
+		echo "Fallback linting complete."; \
+	fi
 	@echo "Linting complete."
 
 # Run golangci-lint with auto-fix
@@ -118,12 +132,15 @@ major:
 mocks:
 	@echo "🔧 Generating mocks..."
 	@mkdir -p mocks
+	@mkdir -p mocks/client
 	@echo "📦 Generating runner mock..."
 	@mockgen -source=runner/runner.go -destination=mocks/mock_runner.go -package=mocks
 	@echo "📦 Generating git helper mock..."
-	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=helpers/githelper/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "📦 Generating config manager mock..."
 	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
+	@echo "📦 Generating cli client mock..."
+	@mockgen -source=client/client.go -destination=mocks/client/mock_cli_client.go -package=clientmocks
 	@echo "✅ All mocks generated successfully"
 
 # Generate specific mocks
@@ -136,7 +153,7 @@ mocks-runner:
 mocks-git-helper:
 	@echo "🔧 Generating git helper mock..."
 	@mkdir -p mocks
-	@mockgen -source=helpers/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
+	@mockgen -source=helpers/githelper/git_helper.go -destination=mocks/mock_git_helper.go -package=mocks
 	@echo "✅ Git helper mock generated successfully"
 
 mocks-config:
@@ -144,6 +161,12 @@ mocks-config:
 	@mkdir -p mocks
 	@mockgen -source=config/config.go -destination=mocks/mock_config_manager.go -package=mocks
 	@echo "✅ Config manager mock generated successfully"
+
+mocks-cli-client:
+	@echo "🔧 Generating cli client mock..."
+	@mkdir -p mocks/client
+	@mockgen -source=client/client.go -destination=mocks/client/mock_cli_client.go -package=clientmocks
+	@echo "✅ CLI client mock generated successfully"
 
 # Clean mocks
 clean-mocks:

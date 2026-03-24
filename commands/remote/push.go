@@ -1,6 +1,7 @@
 package remote
 
 import (
+	"github.com/pavlovic265/265-gt/client"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/runner"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -10,15 +11,18 @@ import (
 type pushCommand struct {
 	runner    runner.Runner
 	gitHelper helpers.GitHelper
+	cliClient client.CliClient
 }
 
 func NewPushCommand(
 	runner runner.Runner,
 	gitHelper helpers.GitHelper,
+	cliClient client.CliClient,
 ) pushCommand {
 	return pushCommand{
 		runner:    runner,
 		gitHelper: gitHelper,
+		cliClient: cliClient,
 	}
 }
 
@@ -41,6 +45,16 @@ func (svc pushCommand) Command() *cobra.Command {
 
 			if err := svc.runner.Git("push", "--force", "origin", currentBranchName); err != nil {
 				return log.Error("failed to push branch to remote", err)
+			}
+
+			hasOpenPR, err := svc.cliClient.HasOpenPullRequestForBranch(cmd.Context(), currentBranchName)
+			if err != nil {
+				return log.Error("failed to check for open pull request", err)
+			}
+			if hasOpenPR {
+				if err := svc.cliClient.UpdatePullRequestBaseBranch(cmd.Context(), currentBranchName); err != nil {
+					return log.Error("failed to update pull request base branch", err)
+				}
 			}
 
 			log.Successf("Branch '%s' pushed successfully", currentBranchName)

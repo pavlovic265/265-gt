@@ -119,6 +119,11 @@ func (svc submitCommand) Command() *cobra.Command {
 					created++
 					log.Successf("Created PR for %s", branch)
 				} else {
+					if err := svc.cliClient.UpdatePullRequestBaseBranch(cmd.Context(), branch); err != nil {
+						return log.Error(
+							fmt.Sprintf("failed to update pull request base branch for %s", branch), err,
+						)
+					}
 					log.Infof("PR already exists for %s", branch)
 				}
 

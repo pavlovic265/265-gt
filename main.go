@@ -117,7 +117,7 @@ func NewApp() (*App, error) {
 
 	basic.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
 	branch.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
-	remote.RegisterCommands(app.rootCmd, app.run, app.gitHelper)
+	remote.RegisterCommands(app.rootCmd, app.run, app.gitHelper, app.cliClient)
 	utility.RegisterCommands(app.rootCmd, app.run, app.configManager)
 	stack.RegisterCommands(app.rootCmd, app.run, app.gitHelper, app.cliClient)
 	commit.RegisterCommands(app.rootCmd, app.run, app.gitHelper)

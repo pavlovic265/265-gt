@@ -255,6 +255,80 @@ func (c *gitLabClient) ListPullRequests(ctx context.Context, args []string) ([]P
 	return prs, nil
 }
 
+func (c *gitLabClient) HasOpenPullRequestForBranch(
+	ctx context.Context, branch string,
+) (bool, error) {
+	projectPath, account, err := c.getProjectInfo(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	query := url.Values{}
+	query.Set("state", "opened")
+	query.Set("source_branch", branch)
+
+	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests?%s",
+		gitlabAPIBase, projectPath, query.Encode())
+
+	resp, err := c.doRequest(ctx, "GET", apiURL, nil, account.Token)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return false, fmt.Errorf("failed to list MRs: %s", resp.Status)
+	}
+
+	var glMRs []json.RawMessage
+
+	if err := json.NewDecoder(resp.Body).Decode(&glMRs); err != nil {
+		return false, err
+	}
+
+	return len(glMRs) > 0, nil
+}
+
+func (c *gitLabClient) getMergeRequestIIDForBranch(
+	ctx context.Context, branch string,
+) (int, error) {
+	projectPath, account, err := c.getProjectInfo(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	query := url.Values{}
+	query.Set("state", "opened")
+	query.Set("source_branch", branch)
+
+	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests?%s",
+		gitlabAPIBase, projectPath, query.Encode())
+
+	resp, err := c.doRequest(ctx, "GET", apiURL, nil, account.Token)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return 0, fmt.Errorf("failed to list MRs: %s", resp.Status)
+	}
+
+	var glMRs []struct {
+		IID int `json:"iid"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&glMRs); err != nil {
+		return 0, err
+	}
+
+	if len(glMRs) == 0 {
+		return 0, nil
+	}
+
+	return glMRs[0].IID, nil
+}
+
 func (c *gitLabClient) getReviewState(ctx context.Context, projectPath, token string, mrIID int) ReviewStateType {
 	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests/%d/approvals", gitlabAPIBase, projectPath, mrIID)
 
@@ -311,21 +385,38 @@ func (c *gitLabClient) MergePullRequest(ctx context.Context, prNumber int) error
 	return nil
 }
 
-func (c *gitLabClient) UpdatePullRequestBranch(ctx context.Context, prNumber int) error {
+func (c *gitLabClient) UpdatePullRequestBaseBranch(ctx context.Context, branch string) error {
 	projectPath, account, err := c.getProjectInfo(ctx)
 	if err != nil {
 		return err
 	}
 
-	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests/%d/rebase", gitlabAPIBase, projectPath, prNumber)
+	parent, err := c.gitHelper.GetParent(branch)
+	if err != nil {
+		return err
+	}
+
+	prNumber, err := c.getMergeRequestIIDForBranch(ctx, branch)
+	if err != nil {
+		return err
+	}
+	if prNumber == 0 {
+		return nil
+	}
+
+	query := url.Values{}
+	query.Set("target_branch", parent)
+
+	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests/%d?%s",
+		gitlabAPIBase, projectPath, prNumber, query.Encode())
 	resp, err := c.doRequest(ctx, "PUT", apiURL, nil, account.Token)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 202 {
-		return fmt.Errorf("failed to rebase MR: status %d", resp.StatusCode)
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("failed to update MR base branch: status %d", resp.StatusCode)
 	}
 
 	return nil
