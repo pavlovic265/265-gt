@@ -8,6 +8,7 @@ import (
 
 func RegisterCommands(root *cobra.Command, r runner.Runner, gh helpers.GitHelper) {
 	root.AddCommand(NewAddCommand(r, gh).Command())
+	root.AddCommand(NewCherryPickCommand(r, gh).Command())
 	root.AddCommand(NewStatusCommand(r, gh).Command())
 	root.AddCommand(NewUnstageCommand(r, gh).Command())
 }

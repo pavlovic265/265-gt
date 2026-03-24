@@ -26,6 +26,7 @@
 | Command | Alias | Description | Example |
 |---------|-------|-------------|---------|
 | `add` | - | Stage changes | `gt add` |
+| `cherry-pick` | `cp` | Cherry-pick commits | `gt cp <commit>` |
 | `unstage` | `us` | Unstage changes | `gt unstage` |
 | `commit` | `cm` | Create commit with message | `gt commit "Add new feature"` |
 | `commit -e` | `cm -e` | Create empty commit | `gt commit -e "WIP"` |
