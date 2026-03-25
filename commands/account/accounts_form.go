@@ -120,8 +120,7 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return am.handleCycle(key)
 
 		case tea.KeyUp.String(), tea.KeyDown.String(),
-			tea.KeyLeft.String(), tea.KeyRight.String(),
-			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
+			tea.KeyLeft.String(), tea.KeyRight.String():
 			key := msg.String()
 
 			if am.insertMode {
@@ -323,7 +322,7 @@ func (am accountsModel) updateFocus() {
 }
 
 func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() || key == "k" {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == "k" {
 		am.focusIndex--
 	} else {
 		am.focusIndex++

@@ -41,13 +41,13 @@ func (sm selectPlatformModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			sm.choice = sm.choices[sm.cursor]
 			return sm, tea.Quit
 
-		case tea.KeyDown.String(), tea.KeyCtrlJ.String(), tea.KeyTab.String(), "j":
+		case tea.KeyDown.String(), tea.KeyTab.String(), "j":
 			sm.cursor++
 			if sm.cursor >= len(sm.choices) {
 				sm.cursor = 0
 			}
 
-		case tea.KeyUp.String(), tea.KeyCtrlK.String(), tea.KeyShiftTab.String(), "k":
+		case tea.KeyUp.String(), tea.KeyShiftTab.String(), "k":
 			sm.cursor--
 			if sm.cursor < 0 {
 				sm.cursor = len(sm.choices) - 1

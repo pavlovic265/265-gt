@@ -140,6 +140,19 @@ This means you can use gt as a drop-in replacement for git while getting the ben
 | [Usage Examples](docs/examples.md) | Workflows, branch stacking, multi-account, shell completion |
 | [Integrations](docs/integrations.md) | Powerlevel10k prompt setup |
 
+## ⌨️ Interactive Keys
+
+Interactive screens use modal navigation:
+
+- `q` quits from normal mode
+- `/` enters search mode in searchable lists
+- `i` enters insert mode in text-input forms
+- `Esc` exits search or insert mode
+- `j` / `k` move down and up
+- `h` / `l` move left and right where horizontal selection is available
+- Arrow keys and `Tab` / `Shift+Tab` continue to work
+- `Ctrl+C` remains available as an emergency quit
+
 ## 🧱 Code Structure
 
 ```text

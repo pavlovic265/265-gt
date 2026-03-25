@@ -111,7 +111,7 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.SearchMode {
 				m.SearchMode = false
 			}
-		case tea.KeyShiftTab.String(), tea.KeyUp.String(), tea.KeyCtrlK.String():
+		case tea.KeyShiftTab.String(), tea.KeyUp.String():
 			if len(m.Choices) > 0 {
 				if m.Cursor > 0 {
 					m.Cursor--
@@ -119,7 +119,7 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.Cursor = len(m.Choices) - 1
 				}
 			}
-		case tea.KeyTab.String(), tea.KeyDown.String(), tea.KeyCtrlJ.String():
+		case tea.KeyTab.String(), tea.KeyDown.String():
 			if len(m.Choices) > 0 {
 				if m.Cursor < len(m.Choices)-1 {
 					m.Cursor++

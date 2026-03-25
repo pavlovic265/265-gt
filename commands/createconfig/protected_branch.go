@@ -92,8 +92,7 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 		case tea.KeyTab.String(), tea.KeyShiftTab.String(),
-			tea.KeyUp.String(), tea.KeyDown.String(),
-			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
+			tea.KeyUp.String(), tea.KeyDown.String():
 			key := msg.String()
 			if m.insertMode && m.focusIndex == 0 {
 				m.insertMode = false
@@ -144,7 +143,7 @@ func (m protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
 }
 
 func (m protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() || key == "k" {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == "k" {
 		m.focusIndex--
 	} else {
 		m.focusIndex++
