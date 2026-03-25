@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
@@ -16,7 +15,10 @@ import (
 	"github.com/pavlovic265/265-gt/utils/pointer"
 )
 
-const githubAPIBase = "https://api.github.com"
+const (
+	githubAPIBase        = "https://api.github.com"
+	githubGraphQLAPIBase = "https://api.github.com/graphql"
+)
 
 var githubHTTPClient = &http.Client{Timeout: 30 * time.Second}
 
@@ -240,72 +242,144 @@ func (c *gitHubClient) ListPullRequests(ctx context.Context, args []string) ([]P
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/repos/%s/%s/pulls?state=open", githubAPIBase, repoInfo.Owner, repoInfo.Repo)
-	resp, err := c.doRequest(ctx, "GET", url, nil, account.Token)
+	payload := map[string]any{
+		"query": githubListOpenPullRequestsQuery,
+		"variables": map[string]any{
+			"owner": repoInfo.Owner,
+			"repo":  repoInfo.Repo,
+		},
+	}
+
+	jsonBody, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(
+		ctx, http.MethodPost, githubGraphQLAPIBase, bytes.NewBuffer(jsonBody),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+account.Token)
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+
+	resp, err := githubHTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to list PRs: %s", resp.Status)
 	}
 
-	var ghPRs []struct {
-		Number  int    `json:"number"`
-		Title   string `json:"title"`
-		HTMLURL string `json:"html_url"`
-		User    struct {
-			Login string `json:"login"`
-		} `json:"user"`
-		Head struct {
-			Ref string `json:"ref"`
-			SHA string `json:"sha"`
-		} `json:"head"`
-		Mergeable      *bool            `json:"mergeable"`
-		MergeableState string           `json:"mergeable_state"`
-		AutoMerge      *json.RawMessage `json:"auto_merge"`
+	var result struct {
+		Data struct {
+			Repository struct {
+				PullRequests struct {
+					Nodes []struct {
+						Number         int    `json:"number"`
+						Title          string `json:"title"`
+						URL            string `json:"url"`
+						Mergeable      string `json:"mergeable"`
+						ReviewDecision string `json:"reviewDecision"`
+						IsInMergeQueue bool   `json:"isInMergeQueue"`
+						Author         *struct {
+							Login string `json:"login"`
+						} `json:"author"`
+						HeadRefName string `json:"headRefName"`
+						Commits     struct {
+							Nodes []struct {
+								Commit struct {
+									StatusCheckRollup *struct {
+										State string `json:"state"`
+									} `json:"statusCheckRollup"`
+								} `json:"commit"`
+							} `json:"nodes"`
+						} `json:"commits"`
+					} `json:"nodes"`
+				} `json:"pullRequests"`
+			} `json:"repository"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&ghPRs); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
 
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("failed to list PRs: %s", result.Errors[0].Message)
+	}
+
 	var prs []PullRequest
-	for _, pr := range ghPRs {
-		if pr.User.Login != account.User {
+	for _, pr := range result.Data.Repository.PullRequests.Nodes {
+		if pr.Author == nil || pr.Author.Login != account.User {
 			continue
 		}
-
-		mergeable := "UNKNOWN"
-		if pr.Mergeable != nil {
-			if *pr.Mergeable {
-				mergeable = "MERGEABLE"
-			} else {
-				mergeable = "CONFLICTING"
-			}
-		}
-
-		statusState := c.getCheckRunStatus(ctx, repoInfo, account.Token, pr.Head.SHA)
-		reviewState := c.getReviewState(ctx, repoInfo, account.Token, pr.Number)
-
-		mergeQueued := strings.EqualFold(pr.MergeableState, "queued") ||
-			(pr.AutoMerge != nil && string(*pr.AutoMerge) != "null")
 
 		prs = append(prs, PullRequest{
 			Number:      pr.Number,
 			Title:       pr.Title,
-			URL:         pr.HTMLURL,
-			Author:      pr.User.Login,
-			Branch:      pr.Head.Ref,
-			Mergeable:   mergeable,
-			StatusState: statusState,
-			ReviewState: reviewState,
-			MergeQueued: mergeQueued,
+			URL:         pr.URL,
+			Author:      pr.Author.Login,
+			Branch:      pr.HeadRefName,
+			Mergeable:   pr.Mergeable,
+			StatusState: mapGraphQLStatusState(pr.Commits),
+			ReviewState: mapGraphQLReviewDecision(pr.ReviewDecision),
+			MergeQueued: pr.IsInMergeQueue,
 		})
 	}
 
 	return prs, nil
+}
+
+func mapGraphQLStatusState(commits struct {
+	Nodes []struct {
+		Commit struct {
+			StatusCheckRollup *struct {
+				State string `json:"state"`
+			} `json:"statusCheckRollup"`
+		} `json:"commit"`
+	} `json:"nodes"`
+},
+) StatusStateType {
+	if len(commits.Nodes) == 0 {
+		return ""
+	}
+
+	rollup := commits.Nodes[0].Commit.StatusCheckRollup
+	if rollup == nil {
+		return ""
+	}
+
+	switch rollup.State {
+	case "SUCCESS":
+		return StatusStateTypeSuccess
+	case "FAILURE", "ERROR":
+		return StatusStateTypeFailure
+	case "EXPECTED", "PENDING":
+		return StatusStateTypePending
+	default:
+		return ""
+	}
+}
+
+func mapGraphQLReviewDecision(reviewDecision string) ReviewStateType {
+	switch reviewDecision {
+	case "APPROVED":
+		return ReviewStateApproved
+	case "CHANGES_REQUESTED":
+		return ReviewStateChangesRequested
+	default:
+		return ""
+	}
 }
 
 func (c *gitHubClient) HasOpenPullRequestForBranch(
@@ -441,113 +515,6 @@ func (c *gitHubClient) UpdatePullRequestBaseBranch(ctx context.Context, branch s
 	}
 
 	return nil
-}
-
-func (c *gitHubClient) getCheckRunStatus(ctx context.Context, repoInfo *RepoInfo, token, sha string) StatusStateType {
-	url := fmt.Sprintf("%s/repos/%s/%s/commits/%s/check-runs", githubAPIBase, repoInfo.Owner, repoInfo.Repo, sha)
-
-	resp, err := c.doRequest(ctx, "GET", url, nil, token)
-	if err != nil {
-		return ""
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return ""
-	}
-
-	var result struct {
-		CheckRuns []struct {
-			Status     string  `json:"status"`
-			Conclusion *string `json:"conclusion"`
-		} `json:"check_runs"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return ""
-	}
-
-	hasFailure := false
-	hasPending := false
-	hasSuccess := false
-
-	for _, check := range result.CheckRuns {
-		if check.Status != "completed" {
-			hasPending = true
-			continue
-		}
-		if check.Conclusion != nil {
-			switch *check.Conclusion {
-			case "success", "skipped":
-				hasSuccess = true
-			case "failure", "timed_out", "cancelled":
-				hasFailure = true
-			}
-		}
-	}
-
-	if hasFailure {
-		return StatusStateTypeFailure
-	} else if hasPending {
-		return StatusStateTypePending
-	} else if hasSuccess {
-		return StatusStateTypeSuccess
-	}
-	return ""
-}
-
-func (c *gitHubClient) getReviewState(
-	ctx context.Context, repoInfo *RepoInfo, token string, prNumber int,
-) ReviewStateType {
-	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%d/reviews", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
-
-	resp, err := c.doRequest(ctx, "GET", url, nil, token)
-	if err != nil {
-		return ""
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return ""
-	}
-
-	var reviews []struct {
-		User struct {
-			Login string `json:"login"`
-		} `json:"user"`
-		State string `json:"state"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&reviews); err != nil {
-		return ""
-	}
-
-	// Track the latest review per user
-	latestByUser := make(map[string]string)
-	for _, r := range reviews {
-		if r.State == "APPROVED" || r.State == "CHANGES_REQUESTED" {
-			latestByUser[r.User.Login] = r.State
-		}
-	}
-
-	hasChangesRequested := false
-	hasApproved := false
-	for _, state := range latestByUser {
-		switch state {
-		case "CHANGES_REQUESTED":
-			hasChangesRequested = true
-		case "APPROVED":
-			hasApproved = true
-		}
-	}
-
-	if hasChangesRequested {
-		return ReviewStateChangesRequested
-	}
-	if hasApproved {
-		return ReviewStateApproved
-	}
-	return ""
 }
 
 type PullRequest struct {
