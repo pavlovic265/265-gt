@@ -14,6 +14,7 @@ type ListModel[T any] struct {
 	Choices       []T
 	Cursor        int
 	Query         string
+	SearchMode    bool
 	Selected      T
 	YankAction    bool
 	MergeAction   bool
@@ -104,8 +105,12 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
+		case tea.KeyCtrlC.String():
 			return m, tea.Quit
+		case tea.KeyEsc.String():
+			if m.SearchMode {
+				m.SearchMode = false
+			}
 		case tea.KeyShiftTab.String(), tea.KeyUp.String(), tea.KeyCtrlK.String():
 			if len(m.Choices) > 0 {
 				if m.Cursor > 0 {
@@ -127,30 +132,37 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Selected = m.Choices[m.Cursor]
 			}
 			return m, tea.Quit
-		case tea.KeyCtrlY.String():
-			if len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
-				m.Selected = m.Choices[m.Cursor]
-			}
-			m.YankAction = true
-			return m, tea.Quit
-		case tea.KeyCtrlR.String():
-			if m.EnableRefresh && !m.Refreshing && m.RefreshFunc != nil {
-				m.Refreshing = true
-				return m, m.RefreshFunc
-			}
-		case tea.KeyCtrlO.String():
-			if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
-				m.Selected = m.Choices[m.Cursor]
-				m.MergeAction = true
-				return m, tea.Quit
-			}
 		case tea.KeyBackspace.String():
-			if len(m.Query) > 0 {
+			if m.SearchMode && len(m.Query) > 0 {
 				m.Query = m.Query[:len(m.Query)-1]
 			}
 		default:
 			if msg.Type == tea.KeyRunes {
-				m.Query += msg.String()
+				switch {
+				case m.SearchMode:
+					m.Query += msg.String()
+				case msg.String() == "/":
+					m.SearchMode = true
+				case msg.String() == "q":
+					return m, tea.Quit
+				case msg.String() == "y":
+					if m.EnableYank && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+						m.Selected = m.Choices[m.Cursor]
+						m.YankAction = true
+						return m, tea.Quit
+					}
+				case msg.String() == "r":
+					if m.EnableRefresh && !m.Refreshing && m.RefreshFunc != nil {
+						m.Refreshing = true
+						return m, m.RefreshFunc
+					}
+				case msg.String() == "m":
+					if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
+						m.Selected = m.Choices[m.Cursor]
+						m.MergeAction = true
+						return m, tea.Quit
+					}
+				}
 			}
 		}
 		m.filterChoices()
@@ -165,7 +177,11 @@ func (m ListModel[T]) View() string {
 
 	// Search input
 	searchLabel := searchLabelStyle.Render("Search:")
-	content.WriteString(fmt.Sprintf("%s %s\n\n", searchLabel, m.Query))
+	searchValue := m.Query
+	if !m.SearchMode && m.Query == "" {
+		searchValue = "(/ to search)"
+	}
+	content.WriteString(fmt.Sprintf("%s %s\n\n", searchLabel, searchValue))
 
 	// List items
 	if len(m.Choices) == 0 {
@@ -212,29 +228,34 @@ func (m ListModel[T]) View() string {
 		content.WriteString("\n\n")
 	}
 
-	content.WriteString(footerStyle.Render("Press "))
-	content.WriteString(keyStyle.Render("CTRL+Q"))
-	content.WriteString(footerStyle.Render(" to quit"))
+	if m.SearchMode {
+		content.WriteString(footerStyle.Render("Press "))
+		content.WriteString(keyStyle.Render("ESC"))
+		content.WriteString(footerStyle.Render(" to exit search mode"))
+	} else {
+		content.WriteString(footerStyle.Render("Press "))
+		content.WriteString(keyStyle.Render("/"))
+		content.WriteString(footerStyle.Render(" to search, "))
+		content.WriteString(keyStyle.Render("q"))
+		content.WriteString(footerStyle.Render(" to quit"))
 
-	// Only show refresh option if enabled
-	if m.EnableRefresh && len(m.Choices) > 0 {
-		content.WriteString(footerStyle.Render(", "))
-		content.WriteString(keyStyle.Render("CTRL+R"))
-		content.WriteString(footerStyle.Render(" to refresh"))
-	}
+		if m.EnableRefresh && len(m.Choices) > 0 {
+			content.WriteString(footerStyle.Render(", "))
+			content.WriteString(keyStyle.Render("r"))
+			content.WriteString(footerStyle.Render(" to refresh"))
+		}
 
-	// Only show yank option if enabled
-	if m.EnableYank && len(m.Choices) > 0 {
-		content.WriteString(footerStyle.Render(", "))
-		content.WriteString(keyStyle.Render("CTRL+Y"))
-		content.WriteString(footerStyle.Render(" to yank URL"))
-	}
+		if m.EnableYank && len(m.Choices) > 0 {
+			content.WriteString(footerStyle.Render(", "))
+			content.WriteString(keyStyle.Render("y"))
+			content.WriteString(footerStyle.Render(" to yank URL"))
+		}
 
-	// Show merge option if enabled
-	if m.EnableMerge && len(m.Choices) > 0 {
-		content.WriteString(footerStyle.Render(", "))
-		content.WriteString(keyStyle.Render("CTRL+O"))
-		content.WriteString(footerStyle.Render(" to merge"))
+		if m.EnableMerge && len(m.Choices) > 0 {
+			content.WriteString(footerStyle.Render(", "))
+			content.WriteString(keyStyle.Render("m"))
+			content.WriteString(footerStyle.Render(" to merge"))
+		}
 	}
 
 	return content.String()
