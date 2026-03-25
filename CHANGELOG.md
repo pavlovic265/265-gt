@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.71.0](https://github.com/pavlovic265/265-gt/compare/v0.70.0...v0.71.0) (2026-03-25)
+
+
+### Features
+
+* accept token and GPG key as direct CLI arguments in account edit ([27d681c](https://github.com/pavlovic265/265-gt/commit/27d681c333e672bb387bb66d35ff6d6d03df2c9c))
+* add cherry-pick command and relog after token updates ([ac4470a](https://github.com/pavlovic265/265-gt/commit/ac4470aa842b33185a16b7035a14557f58e5e827))
+* add modal tui keybindings and vim navigation ([925bd83](https://github.com/pavlovic265/265-gt/commit/925bd834f74402d96e4e1414842d18e084a71172))
+* add modal tui navigation and vim-style keybindings ([5fd027b](https://github.com/pavlovic265/265-gt/commit/5fd027b7092c4faa14823f6a57da69187ea46a59))
+* add mode-based key handling for list UIs ([35e886e](https://github.com/pavlovic265/265-gt/commit/35e886e5f719ced0a5ea64f769a93d3d51fc4e68))
+* add submit-stack (ss) command to push and create PRs for entire stack ([beac83b](https://github.com/pavlovic265/265-gt/commit/beac83b67a604d8f74c89543ec64cc3d25e1388f))
+* add viewport scrolling to list component to prevent terminal overflow ([e168eb6](https://github.com/pavlovic265/265-gt/commit/e168eb6164525463eca6067c8cd222bda6a37f98))
+* show merge-queued status in PR list ([ddb5fab](https://github.com/pavlovic265/265-gt/commit/ddb5fabad7cb0c20a834209cfcaa25d313bbaeb9))
+* update PR base on push and relog after token edit ([bd76269](https://github.com/pavlovic265/265-gt/commit/bd7626904c0404dc555677b72e9af263bf5fea71))
+
+
+### Bug Fixes
+
+* add trailing newline to status output to prevent zsh % indicator ([716f541](https://github.com/pavlovic265/265-gt/commit/716f541016298214f9db112f3469c5a8a27f3ea2))
+* **pr:** show merge-queued indicator for GitHub PRs ([b101202](https://github.com/pavlovic265/265-gt/commit/b101202ef9b014fae8ff4822c7515be57583966c))
+* trigger release-please ([1d75fde](https://github.com/pavlovic265/265-gt/commit/1d75fde33da1c10dced480400396f164d4885ca7))
+
 ## [0.70.0](https://github.com/pavlovic265/265-gt/compare/v0.69.0...v0.70.0) (2026-02-10)
 
 
