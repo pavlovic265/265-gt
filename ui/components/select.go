@@ -143,6 +143,22 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.Query += msg.String()
 				case msg.String() == "/":
 					m.SearchMode = true
+				case msg.String() == "k":
+					if len(m.Choices) > 0 {
+						if m.Cursor > 0 {
+							m.Cursor--
+						} else {
+							m.Cursor = len(m.Choices) - 1
+						}
+					}
+				case msg.String() == "j":
+					if len(m.Choices) > 0 {
+						if m.Cursor < len(m.Choices)-1 {
+							m.Cursor++
+						} else {
+							m.Cursor = 0
+						}
+					}
 				case msg.String() == "q":
 					return m, tea.Quit
 				case msg.String() == "y":

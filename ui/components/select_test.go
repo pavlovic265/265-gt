@@ -157,3 +157,35 @@ func TestListModel_ActionsDoNotTriggerInSearchMode(t *testing.T) {
 		t.Fatal("did not expect merge action in search mode")
 	}
 }
+
+func TestListModel_JKMovesCursorInNormalMode(t *testing.T) {
+	model := newTestListModel()
+
+	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
+	next := updated.(ListModel[string])
+	if next.Cursor != 1 {
+		t.Fatalf("expected cursor to move down to 1, got %d", next.Cursor)
+	}
+
+	updated, _ = next.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'k'}})
+	next = updated.(ListModel[string])
+	if next.Cursor != 0 {
+		t.Fatalf("expected cursor to move up to 0, got %d", next.Cursor)
+	}
+}
+
+func TestListModel_JKTypesInSearchMode(t *testing.T) {
+	model := newTestListModel()
+
+	updated, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'/'}})
+	model = updated.(ListModel[string])
+
+	updated, _ = model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}})
+	next := updated.(ListModel[string])
+	if next.Query != "j" {
+		t.Fatalf("expected query to be %q, got %q", "j", next.Query)
+	}
+	if next.Cursor != 0 {
+		t.Fatalf("expected cursor to stay at 0 in search mode, got %d", next.Cursor)
+	}
+}
