@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/ui/components"
 	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -53,12 +54,12 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.updateFocus()
 				return m, nil
 			}
-		case "q":
+		case constants.KeyQ:
 			if !m.insertMode {
 				m.skipped = true
 				return m, tea.Quit
 			}
-		case "i":
+		case constants.KeyI:
 			if !m.insertMode && m.focusIndex == 0 {
 				m.insertMode = true
 				m.updateFocus()
@@ -83,7 +84,7 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.updateFocus()
 			return m, nil
 
-		case tea.KeyUp.String(), tea.KeyLeft.String(), "k":
+		case tea.KeyUp.String(), tea.KeyLeft.String(), constants.KeyK:
 			if !m.insertMode {
 				m.focusIndex--
 				if m.focusIndex < 0 {
@@ -93,7 +94,7 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-		case tea.KeyDown.String(), tea.KeyRight.String(), "j":
+		case tea.KeyDown.String(), tea.KeyRight.String(), constants.KeyJ:
 			if !m.insertMode {
 				m.focusIndex++
 				if m.focusIndex > 2 {
@@ -177,9 +178,9 @@ func (m gpgSetupModel) View() string {
 
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render("Press "))
-	b.WriteString(highlightStyle.Render("q"))
+	b.WriteString(highlightStyle.Render(constants.KeyQ))
 	b.WriteString(dimStyle.Render(" to quit, "))
-	b.WriteString(highlightStyle.Render("i"))
+	b.WriteString(highlightStyle.Render(constants.KeyI))
 	b.WriteString(dimStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()

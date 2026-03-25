@@ -69,12 +69,12 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.keyPath.Blur()
 				return m, nil
 			}
-		case "q":
+		case constants.KeyQ:
 			if !(m.step == stepEnterKeyPath && m.insertMode) {
 				m.quitting = true
 				return m, tea.Quit
 			}
-		case "i":
+		case constants.KeyI:
 			if m.step == stepEnterKeyPath && !m.insertMode {
 				m.insertMode = true
 				m.keyPath.Focus()
@@ -99,7 +99,7 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
-		case tea.KeyUp.String(), tea.KeyDown.String(), "j", "k":
+		case tea.KeyUp.String(), tea.KeyDown.String(), constants.KeyJ, constants.KeyK:
 			if m.step == stepSelectKeyType {
 				m.keyTypeIdx = (m.keyTypeIdx + 1) % len(keyTypeOptions)
 				m.keyType = keyTypeOptions[m.keyTypeIdx]
@@ -185,7 +185,7 @@ func (m sshSetupModel) View() string {
 		b.WriteString("\n\n")
 		b.WriteString(dimStyle.Render("Press Enter to confirm"))
 		b.WriteString("\n")
-		b.WriteString(dimStyle.Render("Press i to edit, Esc to leave insert mode"))
+		b.WriteString(dimStyle.Render("Press " + constants.KeyI + " to edit, Esc to leave insert mode"))
 	}
 
 	if m.err != "" {
@@ -195,7 +195,7 @@ func (m sshSetupModel) View() string {
 
 	b.WriteString("\n\n")
 	b.WriteString(dimStyle.Render("Press "))
-	b.WriteString(highlightStyle.Render("q"))
+	b.WriteString(highlightStyle.Render(constants.KeyQ))
 	b.WriteString(dimStyle.Render(" to quit"))
 
 	return b.String()

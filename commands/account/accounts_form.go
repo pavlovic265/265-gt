@@ -99,11 +99,11 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				am.updateFocus()
 				return am, nil
 			}
-		case "q":
+		case constants.KeyQ:
 			if !am.insertMode {
 				return am, tea.Quit
 			}
-		case "i":
+		case constants.KeyI:
 			if !am.insertMode && am.focusIndex < len(am.inputs) {
 				am.insertMode = true
 				am.updateFocus()
@@ -136,13 +136,13 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return am.handleCycle(key)
 
-		case "j", "k":
+		case constants.KeyJ, constants.KeyK:
 			if am.insertMode {
 				break
 			}
 			return am.handleCycle(msg.String())
 
-		case "h", "l":
+		case constants.KeyH, constants.KeyL:
 			if am.insertMode {
 				break
 			}
@@ -231,9 +231,9 @@ func (am accountsModel) View() string {
 
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))
-	b.WriteString(quitKeyStyle.Render("q"))
+	b.WriteString(quitKeyStyle.Render(constants.KeyQ))
 	b.WriteString(optionsStyle.Render(" to quit, "))
-	b.WriteString(quitKeyStyle.Render("i"))
+	b.WriteString(quitKeyStyle.Render(constants.KeyI))
 	b.WriteString(optionsStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()
@@ -292,7 +292,7 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 }
 
 func (am accountsModel) handlePlatformSelection(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyLeft.String() || key == "h" {
+	if key == tea.KeyLeft.String() || key == constants.KeyH {
 		am.platformIndex--
 		if am.platformIndex < 0 {
 			am.platformIndex = len(platformOptions) - 1
@@ -322,7 +322,7 @@ func (am accountsModel) updateFocus() {
 }
 
 func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == "k" {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == constants.KeyK {
 		am.focusIndex--
 	} else {
 		am.focusIndex++

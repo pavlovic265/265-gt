@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/ui/theme"
 )
 
@@ -65,16 +66,16 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "y", "Y":
+		case constants.KeyY, "Y":
 			m.answer = "Yes"
 			return m, tea.Quit
-		case "n", "N":
+		case constants.KeyN, "N":
 			m.answer = "No"
 			return m, tea.Quit
 		case tea.KeyEnter.String():
 			m.answer = "Yes"
 			return m, tea.Quit
-		case tea.KeyCtrlC.String(), "q":
+		case tea.KeyCtrlC.String(), constants.KeyQ:
 			m.Quitting = true
 			return m, tea.Quit
 		}
@@ -97,13 +98,13 @@ func (m YesNoPrompt) View() string {
 
 	// Options with styled keys
 	content.WriteString(optionsStyle.Render("Press "))
-	content.WriteString(yesKeyStyle.Render("Yes (Y)"))
+	content.WriteString(yesKeyStyle.Render("Yes (" + constants.KeyY + ")"))
 	content.WriteString(optionsStyle.Render(", "))
-	content.WriteString(noKeyStyle.Render("No (N)"))
+	content.WriteString(noKeyStyle.Render("No (" + constants.KeyN + ")"))
 	content.WriteString(optionsStyle.Render(", "))
 	content.WriteString(enterKeyStyle.Render("ENTER (Yes)"))
 	content.WriteString(optionsStyle.Render(", or "))
-	content.WriteString(quitKeyStyle.Render("q"))
+	content.WriteString(quitKeyStyle.Render(constants.KeyQ))
 	content.WriteString(optionsStyle.Render(" to quit"))
 
 	return content.String()

@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/ui/components"
 	"github.com/pavlovic265/265-gt/ui/theme"
 	"github.com/pavlovic265/265-gt/utils/log"
@@ -80,12 +81,12 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.insertMode = false
 				return m, nil
 			}
-		case "q":
+		case constants.KeyQ:
 			if !m.insertMode {
 				m.quitting = true
 				return m, tea.Quit
 			}
-		case "i":
+		case constants.KeyI:
 			if !m.insertMode && m.focusIndex == 0 {
 				m.insertMode = true
 				m.branch.Focus()
@@ -99,7 +100,7 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			// Cycle indexes
 			return m.handleCycle(key)
-		case "j", "k":
+		case constants.KeyJ, constants.KeyK:
 			if m.insertMode {
 				break
 			}
@@ -143,7 +144,7 @@ func (m protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
 }
 
 func (m protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == "k" {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == constants.KeyK {
 		m.focusIndex--
 	} else {
 		m.focusIndex++
@@ -172,9 +173,9 @@ func (m protectedBranchModele) View() string {
 
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))
-	b.WriteString(quitKeyStyle.Render("q"))
+	b.WriteString(quitKeyStyle.Render(constants.KeyQ))
 	b.WriteString(optionsStyle.Render(" to quit, "))
-	b.WriteString(quitKeyStyle.Render("i"))
+	b.WriteString(quitKeyStyle.Render(constants.KeyI))
 	b.WriteString(optionsStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()

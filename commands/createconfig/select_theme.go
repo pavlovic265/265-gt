@@ -34,20 +34,20 @@ func (sm selectThemeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), "q":
+		case tea.KeyCtrlC.String(), constants.KeyQ:
 			return sm, tea.Quit
 
 		case tea.KeyEnter.String():
 			sm.choice = sm.choices[sm.cursor]
 			return sm, tea.Quit
 
-		case tea.KeyDown.String(), tea.KeyTab.String(), "j":
+		case tea.KeyDown.String(), tea.KeyTab.String(), constants.KeyJ:
 			sm.cursor++
 			if sm.cursor >= len(sm.choices) {
 				sm.cursor = 0
 			}
 
-		case tea.KeyUp.String(), tea.KeyShiftTab.String(), "k":
+		case tea.KeyUp.String(), tea.KeyShiftTab.String(), constants.KeyK:
 			sm.cursor--
 			if sm.cursor < 0 {
 				sm.cursor = len(sm.choices) - 1
@@ -71,7 +71,7 @@ func (sm selectThemeModel) View() string {
 		s.WriteString(sm.choices[i].String())
 		s.WriteString("\n")
 	}
-	s.WriteString("\n(press q to quit)\n")
+	s.WriteString("\n(press " + constants.KeyQ + " to quit)\n")
 
 	return s.String()
 }

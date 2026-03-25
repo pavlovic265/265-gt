@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pavlovic265/265-gt/constants"
 	"github.com/pavlovic265/265-gt/ui/theme"
 )
 
@@ -141,9 +142,9 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				switch {
 				case m.SearchMode:
 					m.Query += msg.String()
-				case msg.String() == "/":
+				case msg.String() == constants.KeySlash:
 					m.SearchMode = true
-				case msg.String() == "k":
+				case msg.String() == constants.KeyK:
 					if len(m.Choices) > 0 {
 						if m.Cursor > 0 {
 							m.Cursor--
@@ -151,7 +152,7 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.Cursor = len(m.Choices) - 1
 						}
 					}
-				case msg.String() == "j":
+				case msg.String() == constants.KeyJ:
 					if len(m.Choices) > 0 {
 						if m.Cursor < len(m.Choices)-1 {
 							m.Cursor++
@@ -159,20 +160,20 @@ func (m ListModel[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.Cursor = 0
 						}
 					}
-				case msg.String() == "q":
+				case msg.String() == constants.KeyQ:
 					return m, tea.Quit
-				case msg.String() == "y":
+				case msg.String() == constants.KeyY:
 					if m.EnableYank && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
 						m.Selected = m.Choices[m.Cursor]
 						m.YankAction = true
 						return m, tea.Quit
 					}
-				case msg.String() == "r":
+				case msg.String() == constants.KeyR:
 					if m.EnableRefresh && !m.Refreshing && m.RefreshFunc != nil {
 						m.Refreshing = true
 						return m, m.RefreshFunc
 					}
-				case msg.String() == "m":
+				case msg.String() == constants.KeyM:
 					if m.EnableMerge && len(m.Choices) > 0 && m.Cursor >= 0 && m.Cursor < len(m.Choices) {
 						m.Selected = m.Choices[m.Cursor]
 						m.MergeAction = true
@@ -195,7 +196,7 @@ func (m ListModel[T]) View() string {
 	searchLabel := searchLabelStyle.Render("Search:")
 	searchValue := m.Query
 	if !m.SearchMode && m.Query == "" {
-		searchValue = "(/ to search)"
+		searchValue = "(" + constants.KeySlash + " to search)"
 	}
 	content.WriteString(fmt.Sprintf("%s %s\n\n", searchLabel, searchValue))
 
@@ -250,26 +251,26 @@ func (m ListModel[T]) View() string {
 		content.WriteString(footerStyle.Render(" to exit search mode"))
 	} else {
 		content.WriteString(footerStyle.Render("Press "))
-		content.WriteString(keyStyle.Render("/"))
+		content.WriteString(keyStyle.Render(constants.KeySlash))
 		content.WriteString(footerStyle.Render(" to search, "))
-		content.WriteString(keyStyle.Render("q"))
+		content.WriteString(keyStyle.Render(constants.KeyQ))
 		content.WriteString(footerStyle.Render(" to quit"))
 
 		if m.EnableRefresh && len(m.Choices) > 0 {
 			content.WriteString(footerStyle.Render(", "))
-			content.WriteString(keyStyle.Render("r"))
+			content.WriteString(keyStyle.Render(constants.KeyR))
 			content.WriteString(footerStyle.Render(" to refresh"))
 		}
 
 		if m.EnableYank && len(m.Choices) > 0 {
 			content.WriteString(footerStyle.Render(", "))
-			content.WriteString(keyStyle.Render("y"))
+			content.WriteString(keyStyle.Render(constants.KeyY))
 			content.WriteString(footerStyle.Render(" to yank URL"))
 		}
 
 		if m.EnableMerge && len(m.Choices) > 0 {
 			content.WriteString(footerStyle.Render(", "))
-			content.WriteString(keyStyle.Render("m"))
+			content.WriteString(keyStyle.Render(constants.KeyM))
 			content.WriteString(footerStyle.Render(" to merge"))
 		}
 	}
