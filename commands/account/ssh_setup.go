@@ -70,7 +70,7 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 		case constants.KeyQ:
-			if !(m.step == stepEnterKeyPath && m.insertMode) {
+			if m.step != stepEnterKeyPath || !m.insertMode {
 				m.quitting = true
 				return m, tea.Quit
 			}
