@@ -33,6 +33,7 @@
 ## 🛠️ Installation
 
 ### npm (Recommended for cross-platform)
+
 ```bash
 npm install -g @pavlovic265/gt
 ```
@@ -40,12 +41,14 @@ npm install -g @pavlovic265/gt
 Supports Linux (x64, ARM64), macOS (Intel, Apple Silicon), and Windows (x64, ARM64).
 
 ### Homebrew (macOS)
+
 ```bash
 brew tap pavlovic265/265-gt
 brew install 265-gt
 ```
 
 ### Ubuntu/Debian (.deb package)
+
 ```bash
 # Download and install the latest .deb package
 wget https://github.com/pavlovic265/265-gt/releases/download/v0.3.0/gt_0.3.0_linux_amd64.deb
@@ -53,20 +56,21 @@ sudo apt install ./gt_0.3.0_linux_amd64.deb
 ```
 
 ### Fedora / RHEL / CentOS (.rpm package)
+
 ```bash
 # Download and install the latest .rpm package
 wget https://github.com/pavlovic265/265-gt/releases/download/v0.3.0/gt_0.3.0_linux_amd64.rpm
 sudo rpm -i gt_0.3.0_linux_amd64.rpm
 ```
 
-
-
 ### Quick Install Script
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/pavlovic265/265-gt/main/scripts/install.sh | bash
 ```
 
 ### Build from Source (For Developers)
+
 ```bash
 # Clone the repository
 git clone https://github.com/pavlovic265/265-gt.git
@@ -88,21 +92,25 @@ sudo mv gt /usr/local/bin/
 ## 🎯 Quick Start
 
 1. **Initialize Configuration**
+
    ```bash
    gt config global
    ```
 
 2. **Add your first account**
+
    ```bash
    gt account add
    ```
 
 3. **Authenticate with your Git platform**
+
    ```bash
    gt auth login
    ```
 
 4. **Start using gt commands**
+
    ```bash
    gt create feature-branch    # Create and switch to a new branch
    gt up                       # Move up in branch stack
@@ -124,6 +132,7 @@ gt commit -m "My commit"
 ```
 
 When an unknown command is used, gt will show:
+
 ```
 Unknown command, passing to git: git [command]
 [git output]
@@ -178,17 +187,14 @@ Interactive screens use modal navigation:
 - [ ] **Branch Syncing** — Seamlessly synchronize local and remote branches with intelligent conflict handling.
 - [ ] **Change Submission** — Streamlined `submit` command for creating pull requests or submitting changes for review.
 - [ ] **Advanced Branch Visualization** — Enhanced visualization of branch structures and relationships for easier navigation.
-- [x] **Multi-Platform Git Integration** — Full support for GitHub and GitLab with direct API calls (no external CLI dependencies).
 - [ ] **Theme Customization** — Flexible theme settings to personalize the CLI experience.
-- [x] **Automated GitHub Setup** — One-command configuration for GitHub authentication, commit signing, tokens, and SSH keys.
-- [x] **User-Aware Repository Checkout** — Automatically clone and manage repositories based on the active user profile.
-
 
 ## 🤝 Contributing
 
 We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ### Development Setup
+
 ```bash
 git clone https://github.com/pavlovic265/265-gt.git
 cd 265-gt
