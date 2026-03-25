@@ -43,6 +43,7 @@ type protectedBranchModele struct {
 	focusIndex int
 	branch     textinput.Model
 	branches   []string
+	insertMode bool
 	quitting   bool
 }
 
@@ -50,6 +51,7 @@ func newProtectedBranchModel() protectedBranchModele {
 	return protectedBranchModele{
 		branch:     components.NewBranchInput(),
 		focusIndex: 0,
+		insertMode: false,
 		quitting:   false,
 	}
 }
@@ -61,8 +63,7 @@ func (m protectedBranchModele) Init() tea.Cmd {
 func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// Handle focus based on focusIndex
-	if m.focusIndex == 0 {
+	if m.focusIndex == 0 && m.insertMode {
 		m.branch.Focus()
 	} else {
 		m.branch.Blur()
@@ -71,15 +72,39 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyEsc.String(), tea.KeyCtrlQ.String():
+		case tea.KeyCtrlC.String():
 			m.quitting = true
 			return m, tea.Quit
+		case tea.KeyEsc.String():
+			if m.insertMode {
+				m.insertMode = false
+				return m, nil
+			}
+		case "q":
+			if !m.insertMode {
+				m.quitting = true
+				return m, tea.Quit
+			}
+		case "i":
+			if !m.insertMode && m.focusIndex == 0 {
+				m.insertMode = true
+				m.branch.Focus()
+				return m, nil
+			}
 		case tea.KeyTab.String(), tea.KeyShiftTab.String(),
 			tea.KeyUp.String(), tea.KeyDown.String(),
 			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
 			key := msg.String()
+			if m.insertMode && m.focusIndex == 0 {
+				m.insertMode = false
+			}
 			// Cycle indexes
 			return m.handleCycle(key)
+		case "j", "k":
+			if m.insertMode {
+				break
+			}
+			return m.handleCycle(msg.String())
 		case tea.KeyEnter.String():
 			// Handle Enter key for buttons only
 			switch m.focusIndex {
@@ -95,7 +120,7 @@ func (m protectedBranchModele) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Only update the text input if focus is on it (index 0)
-	if m.focusIndex == 0 {
+	if m.focusIndex == 0 && m.insertMode {
 		m.branch, cmd = m.branch.Update(msg)
 	}
 	return m, cmd
@@ -113,12 +138,13 @@ func (m protectedBranchModele) handleAdd() (tea.Model, tea.Cmd) {
 
 	m.branch = components.NewBranchInput()
 	m.focusIndex = 0
+	m.insertMode = false
 
 	return m, nil
 }
 
 func (m protectedBranchModele) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() || key == "k" {
 		m.focusIndex--
 	} else {
 		m.focusIndex++
@@ -147,8 +173,10 @@ func (m protectedBranchModele) View() string {
 
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))
-	b.WriteString(quitKeyStyle.Render("Ctrl+Q"))
-	b.WriteString(optionsStyle.Render(" to quit"))
+	b.WriteString(quitKeyStyle.Render("q"))
+	b.WriteString(optionsStyle.Render(" to quit, "))
+	b.WriteString(quitKeyStyle.Render("i"))
+	b.WriteString(optionsStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()
 }

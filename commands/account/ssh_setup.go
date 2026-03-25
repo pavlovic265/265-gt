@@ -27,6 +27,7 @@ type sshSetupModel struct {
 	keyType    helpers.SSHKeyType
 	keyTypeIdx int
 	keyPath    textinput.Model
+	insertMode bool
 	quitting   bool
 	sshHelper  helpers.SSHHelper
 	err        string
@@ -40,14 +41,13 @@ var keyTypeOptions = []helpers.SSHKeyType{
 func newSSHSetupModel(account *config.Account, sshHelper helpers.SSHHelper) sshSetupModel {
 	keyPathInput := textinput.New()
 	keyPathInput.Placeholder = helpers.DefaultSSHKeyPath(strings.ToLower(string(account.Platform)), account.User)
-	keyPathInput.Focus()
-
 	return sshSetupModel{
 		account:    account,
 		step:       stepChooseOption,
 		keyType:    helpers.SSHKeyTypeEd25519,
 		keyTypeIdx: 0,
 		keyPath:    keyPathInput,
+		insertMode: false,
 		sshHelper:  sshHelper,
 	}
 }
@@ -60,9 +60,26 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyCtrlQ.String(), tea.KeyEsc.String():
+		case tea.KeyCtrlC.String():
 			m.quitting = true
 			return m, tea.Quit
+		case tea.KeyEsc.String():
+			if m.step == stepEnterKeyPath && m.insertMode {
+				m.insertMode = false
+				m.keyPath.Blur()
+				return m, nil
+			}
+		case "q":
+			if !(m.step == stepEnterKeyPath && m.insertMode) {
+				m.quitting = true
+				return m, tea.Quit
+			}
+		case "i":
+			if m.step == stepEnterKeyPath && !m.insertMode {
+				m.insertMode = true
+				m.keyPath.Focus()
+				return m, textinput.Blink
+			}
 
 		case "1":
 			if m.step == stepChooseOption {
@@ -89,11 +106,23 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
+		case tea.KeyTab.String(), tea.KeyShiftTab.String():
+			if m.step == stepEnterKeyPath {
+				m.insertMode = !m.insertMode
+				if m.insertMode {
+					m.keyPath.Focus()
+					return m, textinput.Blink
+				}
+				m.keyPath.Blur()
+				return m, nil
+			}
+
 		case tea.KeyEnter.String():
 			if m.step == stepSelectKeyType {
 				m.step = stepEnterKeyPath
-				m.keyPath.Focus()
-				return m, textinput.Blink
+				m.insertMode = false
+				m.keyPath.Blur()
+				return m, nil
 			}
 			if m.step == stepEnterKeyPath {
 				return m, tea.Quit
@@ -101,7 +130,7 @@ func (m sshSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if m.step == stepEnterKeyPath {
+	if m.step == stepEnterKeyPath && m.insertMode {
 		var cmd tea.Cmd
 		m.keyPath, cmd = m.keyPath.Update(msg)
 		return m, cmd
@@ -132,13 +161,13 @@ func (m sshSetupModel) View() string {
 		b.WriteString("Select key type:\n\n")
 		for i, kt := range keyTypeOptions {
 			if i == m.keyTypeIdx {
-				b.WriteString(highlightStyle.Render("  (•) "))
+				b.WriteString(highlightStyle.Render("  [x] "))
 				b.WriteString(string(kt))
 				if kt == helpers.SSHKeyTypeEd25519 {
 					b.WriteString(dimStyle.Render(" (recommended)"))
 				}
 			} else {
-				b.WriteString(dimStyle.Render("  ( ) " + string(kt)))
+				b.WriteString(dimStyle.Render("  [ ] " + string(kt)))
 			}
 			b.WriteString("\n")
 		}
@@ -155,6 +184,8 @@ func (m sshSetupModel) View() string {
 		b.WriteString(m.keyPath.View())
 		b.WriteString("\n\n")
 		b.WriteString(dimStyle.Render("Press Enter to confirm"))
+		b.WriteString("\n")
+		b.WriteString(dimStyle.Render("Press i to edit, Esc to leave insert mode"))
 	}
 
 	if m.err != "" {
@@ -164,7 +195,7 @@ func (m sshSetupModel) View() string {
 
 	b.WriteString("\n\n")
 	b.WriteString(dimStyle.Render("Press "))
-	b.WriteString(highlightStyle.Render("Ctrl+Q"))
+	b.WriteString(highlightStyle.Render("q"))
 	b.WriteString(dimStyle.Render(" to quit"))
 
 	return b.String()

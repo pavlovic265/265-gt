@@ -74,7 +74,7 @@ func (m YesNoPrompt) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEnter.String():
 			m.answer = "Yes"
 			return m, tea.Quit
-		case tea.KeyEsc.String(), tea.KeyCtrlC.String(), tea.KeyCtrlQ.String():
+		case tea.KeyCtrlC.String(), "q":
 			m.Quitting = true
 			return m, tea.Quit
 		}
@@ -103,7 +103,7 @@ func (m YesNoPrompt) View() string {
 	content.WriteString(optionsStyle.Render(", "))
 	content.WriteString(enterKeyStyle.Render("ENTER (Yes)"))
 	content.WriteString(optionsStyle.Render(", or "))
-	content.WriteString(quitKeyStyle.Render("Ctrl+Q"))
+	content.WriteString(quitKeyStyle.Render("q"))
 	content.WriteString(optionsStyle.Render(" to quit"))
 
 	return content.String()

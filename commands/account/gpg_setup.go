@@ -16,14 +16,13 @@ type gpgSetupModel struct {
 	account    *config.Account
 	gpgInput   textinput.Model
 	focusIndex int // 0 = input, 1 = skip button, 2 = save button
+	insertMode bool
 	skipped    bool
 	saved      bool
 }
 
 func newGPGSetupModel(account *config.Account) gpgSetupModel {
 	gpgInput := components.NewSigningKeyInput()
-	gpgInput.Focus()
-
 	// Prefill if account already has a signing key
 	if account.SigningKey != "" {
 		gpgInput.SetValue(account.SigningKey)
@@ -33,6 +32,7 @@ func newGPGSetupModel(account *config.Account) gpgSetupModel {
 		account:    account,
 		gpgInput:   gpgInput,
 		focusIndex: 0,
+		insertMode: false,
 	}
 }
 
@@ -44,11 +44,31 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyCtrlQ.String(), tea.KeyEsc.String():
+		case tea.KeyCtrlC.String():
 			m.skipped = true
 			return m, tea.Quit
+		case tea.KeyEsc.String():
+			if m.insertMode {
+				m.insertMode = false
+				m.updateFocus()
+				return m, nil
+			}
+		case "q":
+			if !m.insertMode {
+				m.skipped = true
+				return m, tea.Quit
+			}
+		case "i":
+			if !m.insertMode && m.focusIndex == 0 {
+				m.insertMode = true
+				m.updateFocus()
+				return m, nil
+			}
 
 		case tea.KeyTab.String(), tea.KeyShiftTab.String():
+			if m.insertMode && m.focusIndex == 0 {
+				m.insertMode = false
+			}
 			if msg.String() == tea.KeyShiftTab.String() {
 				m.focusIndex--
 				if m.focusIndex < 0 {
@@ -62,6 +82,26 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.updateFocus()
 			return m, nil
+
+		case tea.KeyUp.String(), tea.KeyLeft.String(), "k":
+			if !m.insertMode {
+				m.focusIndex--
+				if m.focusIndex < 0 {
+					m.focusIndex = 2
+				}
+				m.updateFocus()
+				return m, nil
+			}
+
+		case tea.KeyDown.String(), tea.KeyRight.String(), "j":
+			if !m.insertMode {
+				m.focusIndex++
+				if m.focusIndex > 2 {
+					m.focusIndex = 0
+				}
+				m.updateFocus()
+				return m, nil
+			}
 
 		case tea.KeyEnter.String():
 			if m.focusIndex == 1 {
@@ -81,7 +121,7 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if m.focusIndex == 0 {
+	if m.focusIndex == 0 && m.insertMode {
 		var cmd tea.Cmd
 		m.gpgInput, cmd = m.gpgInput.Update(msg)
 		return m, cmd
@@ -91,7 +131,7 @@ func (m gpgSetupModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *gpgSetupModel) updateFocus() {
-	if m.focusIndex == 0 {
+	if m.focusIndex == 0 && m.insertMode {
 		m.gpgInput.Focus()
 		m.gpgInput.PromptStyle = theme.GetSuccessAnsiStyle()
 		m.gpgInput.TextStyle = theme.GetAnsiStyle(theme.White)
@@ -137,8 +177,10 @@ func (m gpgSetupModel) View() string {
 
 	b.WriteString("\n")
 	b.WriteString(dimStyle.Render("Press "))
-	b.WriteString(highlightStyle.Render("Ctrl+Q"))
-	b.WriteString(dimStyle.Render(" to quit"))
+	b.WriteString(highlightStyle.Render("q"))
+	b.WriteString(dimStyle.Render(" to quit, "))
+	b.WriteString(highlightStyle.Render("i"))
+	b.WriteString(dimStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()
 }

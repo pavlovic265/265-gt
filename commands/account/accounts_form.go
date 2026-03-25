@@ -33,6 +33,7 @@ type accountsModel struct {
 	accounts      []config.Account
 	platform      constants.Platform
 	platformIndex int
+	insertMode    bool
 	editMode      bool
 	err           string
 }
@@ -51,6 +52,7 @@ func newAccountsModelWithData(account *config.Account) accountsModel {
 	accountsModel.inputs[1] = components.NewEmailInput()
 	accountsModel.inputs[2] = components.NewNameInput()
 	accountsModel.focusIndex = 0
+	accountsModel.insertMode = false
 	accountsModel.platform = constants.GitHubPlatform // Default to GitHub
 	accountsModel.platformIndex = 0                   // Default to first platform (GitHub)
 
@@ -89,33 +91,65 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyEsc.String(), tea.KeyCtrlQ.String():
+		case tea.KeyCtrlC.String():
 			return am, tea.Quit
+		case tea.KeyEsc.String():
+			if am.insertMode {
+				am.insertMode = false
+				am.updateFocus()
+				return am, nil
+			}
+		case "q":
+			if !am.insertMode {
+				return am, tea.Quit
+			}
+		case "i":
+			if !am.insertMode && am.focusIndex < len(am.inputs) {
+				am.insertMode = true
+				am.updateFocus()
+				return am, nil
+			}
 
 		case tea.KeyTab.String(), tea.KeyShiftTab.String():
 			key := msg.String()
 
 			// Tab always cycles through fields
+			if am.insertMode && am.focusIndex < len(am.inputs) {
+				am.insertMode = false
+			}
 			return am.handleCycle(key)
 
 		case tea.KeyUp.String(), tea.KeyDown.String(),
+			tea.KeyLeft.String(), tea.KeyRight.String(),
 			tea.KeyCtrlJ.String(), tea.KeyCtrlK.String():
 			key := msg.String()
 
-			// When on platform, arrow keys toggle between GitHub/GitLab
-			if am.focusIndex == len(am.inputs) {
-				return am.handlePlatformSelection(key)
+			if am.insertMode {
+				break
 			}
 
-			// Otherwise cycle through fields
+			if am.focusIndex == len(am.inputs) {
+				if key == tea.KeyLeft.String() || key == tea.KeyRight.String() {
+					return am.handlePlatformSelection(key)
+				}
+				return am.handleCycle(key)
+			}
+
 			return am.handleCycle(key)
 
 		case "j", "k":
-			// Only handle j/k when on platform field (not in text inputs)
+			if am.insertMode {
+				break
+			}
+			return am.handleCycle(msg.String())
+
+		case "h", "l":
+			if am.insertMode {
+				break
+			}
 			if am.focusIndex == len(am.inputs) {
 				return am.handlePlatformSelection(msg.String())
 			}
-			// Otherwise let it pass through to text input
 
 		case tea.KeyEnter.String():
 			// Handle Enter key for buttons
@@ -136,7 +170,7 @@ func (am accountsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Only update the text input if focus is on it
-	if am.focusIndex < len(am.inputs) {
+	if am.insertMode && am.focusIndex < len(am.inputs) {
 		am.inputs[am.focusIndex], cmd = am.inputs[am.focusIndex].Update(msg)
 	}
 
@@ -170,9 +204,9 @@ func (am accountsModel) View() string {
 	for i, platform := range platformOptions {
 		platformStr := platform.String()
 		if i == am.platformIndex {
-			b.WriteString(selectedDotStyle.Render("(•)") + " " + platformStr)
+			b.WriteString(selectedDotStyle.Render("[x]") + " " + platformStr)
 		} else {
-			b.WriteString("( ) " + platformStr)
+			b.WriteString("[ ] " + platformStr)
 		}
 		if i < len(platformOptions)-1 {
 			b.WriteString("  ")
@@ -198,8 +232,10 @@ func (am accountsModel) View() string {
 
 	// Add quit instruction
 	b.WriteString(optionsStyle.Render("Press "))
-	b.WriteString(quitKeyStyle.Render("Ctrl+Q"))
-	b.WriteString(optionsStyle.Render(" to quit"))
+	b.WriteString(quitKeyStyle.Render("q"))
+	b.WriteString(optionsStyle.Render(" to quit, "))
+	b.WriteString(quitKeyStyle.Render("i"))
+	b.WriteString(optionsStyle.Render(" to edit, Esc to leave insert mode"))
 
 	return b.String()
 }
@@ -249,6 +285,7 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 	am.inputs[1] = components.NewEmailInput()
 	am.inputs[2] = components.NewNameInput()
 	am.focusIndex = 0
+	am.insertMode = false
 	am.err = ""
 
 	cmds := make([]tea.Cmd, len(am.inputs))
@@ -256,15 +293,12 @@ func (am accountsModel) handleAdd() (tea.Model, tea.Cmd) {
 }
 
 func (am accountsModel) handlePlatformSelection(key string) (tea.Model, tea.Cmd) {
-	// Cycle through platform options
-	if key == tea.KeyUp.String() || key == tea.KeyCtrlK.String() || key == "k" {
-		// Move backward (Up, k)
+	if key == tea.KeyLeft.String() || key == "h" {
 		am.platformIndex--
 		if am.platformIndex < 0 {
 			am.platformIndex = len(platformOptions) - 1
 		}
 	} else {
-		// Move forward (Down, j)
 		am.platformIndex++
 		if am.platformIndex >= len(platformOptions) {
 			am.platformIndex = 0
@@ -275,9 +309,8 @@ func (am accountsModel) handlePlatformSelection(key string) (tea.Model, tea.Cmd)
 }
 
 func (am accountsModel) updateFocus() {
-	// Handle focus based on focusIndex - only focus the active input
 	for i := range am.inputs {
-		if i == am.focusIndex {
+		if i == am.focusIndex && am.insertMode {
 			am.inputs[i].Focus()
 			am.inputs[i].PromptStyle = theme.GetSuccessAnsiStyle()
 			am.inputs[i].TextStyle = theme.GetAnsiStyle(theme.White)
@@ -290,7 +323,7 @@ func (am accountsModel) updateFocus() {
 }
 
 func (am accountsModel) handleCycle(key string) (tea.Model, tea.Cmd) {
-	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() {
+	if key == tea.KeyUp.String() || key == tea.KeyShiftTab.String() || key == tea.KeyCtrlK.String() || key == "k" {
 		am.focusIndex--
 	} else {
 		am.focusIndex++

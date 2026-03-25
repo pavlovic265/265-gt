@@ -34,20 +34,20 @@ func (sm selectThemeModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case tea.KeyCtrlC.String(), tea.KeyCtrlQ.String(), tea.KeyEsc.String():
+		case tea.KeyCtrlC.String(), "q":
 			return sm, tea.Quit
 
 		case tea.KeyEnter.String():
 			sm.choice = sm.choices[sm.cursor]
 			return sm, tea.Quit
 
-		case tea.KeyDown.String(), tea.KeyCtrlJ.String(), tea.KeyTab.String():
+		case tea.KeyDown.String(), tea.KeyCtrlJ.String(), tea.KeyTab.String(), "j":
 			sm.cursor++
 			if sm.cursor >= len(sm.choices) {
 				sm.cursor = 0
 			}
 
-		case tea.KeyUp.String(), tea.KeyCtrlK.String(), tea.KeyShiftTab.String():
+		case tea.KeyUp.String(), tea.KeyCtrlK.String(), tea.KeyShiftTab.String(), "k":
 			sm.cursor--
 			if sm.cursor < 0 {
 				sm.cursor = len(sm.choices) - 1
@@ -64,14 +64,14 @@ func (sm selectThemeModel) View() string {
 
 	for i := 0; i < len(sm.choices); i++ {
 		if sm.cursor == i {
-			s.WriteString("(•) ")
+			s.WriteString("[x] ")
 		} else {
-			s.WriteString("( ) ")
+			s.WriteString("[ ] ")
 		}
 		s.WriteString(sm.choices[i].String())
 		s.WriteString("\n")
 	}
-	s.WriteString("\n(press ctrl+q to quit)\n")
+	s.WriteString("\n(press q to quit)\n")
 
 	return s.String()
 }
