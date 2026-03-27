@@ -45,7 +45,8 @@ type PublicConfigStruct struct {
 
 // LocalConfigStruct represents repository-local configuration (.gtconfig.yaml).
 type LocalConfigStruct struct {
-	Protected []string `yaml:"protected,omitempty"`
+	Protected   []string              `yaml:"protected,omitempty"`
+	MergeMethod constants.MergeMethod `yaml:"merge_method,omitempty"`
 }
 
 // DefaultConfigManager implements ConfigManager interface.

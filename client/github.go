@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 )
@@ -51,6 +52,18 @@ func (c *gitHubClient) getRepoInfo(ctx context.Context) (*RepoInfo, *config.Acco
 	}
 
 	return repoInfo, cfg.Global.ActiveAccount, nil
+}
+
+func getConfiguredMergeMethod(ctx context.Context) (constants.MergeMethod, error) {
+	cfg, ok := config.GetConfig(ctx)
+	if !ok {
+		return "", ErrConfigNotLoaded
+	}
+	if cfg.Local == nil || cfg.Local.MergeMethod == "" {
+		return "", fmt.Errorf("no merge method configured for this repository; run 'gt config local'")
+	}
+
+	return cfg.Local.MergeMethod, nil
 }
 
 func (c *gitHubClient) doRequest(
@@ -462,8 +475,15 @@ func (c *gitHubClient) MergePullRequest(ctx context.Context, prNumber int) error
 		return err
 	}
 
+	mergeMethod, err := getConfiguredMergeMethod(ctx)
+	if err != nil {
+		return err
+	}
+
 	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%d/merge", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
-	resp, err := c.doRequest(ctx, "PUT", url, map[string]string{}, account.Token)
+	resp, err := c.doRequest(ctx, "PUT", url, map[string]string{
+		"merge_method": mergeMethod.String(),
+	}, account.Token)
 	if err != nil {
 		return err
 	}

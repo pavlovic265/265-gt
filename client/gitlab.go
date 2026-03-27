@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pavlovic265/265-gt/config"
+	"github.com/pavlovic265/265-gt/constants"
 	helpers "github.com/pavlovic265/265-gt/helpers"
 	"github.com/pavlovic265/265-gt/utils/pointer"
 )
@@ -367,8 +368,25 @@ func (c *gitLabClient) MergePullRequest(ctx context.Context, prNumber int) error
 		return err
 	}
 
+	mergeMethod, err := getConfiguredMergeMethod(ctx)
+	if err != nil {
+		return err
+	}
+
+	var payload map[string]any
+	switch mergeMethod {
+	case constants.MergeMethodMerge:
+		payload = nil
+	case constants.MergeMethodSquash:
+		payload = map[string]any{"squash": true}
+	case constants.MergeMethodRebase:
+		return fmt.Errorf("merge method %q is not supported for GitLab; use 'merge' or 'squash'", mergeMethod)
+	default:
+		return fmt.Errorf("unsupported merge method %q", mergeMethod)
+	}
+
 	apiURL := fmt.Sprintf("%s/projects/%s/merge_requests/%d/merge", gitlabAPIBase, projectPath, prNumber)
-	resp, err := c.doRequest(ctx, "PUT", apiURL, nil, account.Token)
+	resp, err := c.doRequest(ctx, "PUT", apiURL, payload, account.Token)
 	if err != nil {
 		return err
 	}

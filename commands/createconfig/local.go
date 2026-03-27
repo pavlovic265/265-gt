@@ -43,6 +43,15 @@ func (svc localCommand) Command() *cobra.Command {
 				cfg.Local = &config.LocalConfigStruct{}
 			}
 			cfg.Local.Protected = append(cfg.Local.Protected, branches...)
+
+			mergeMethod, err := HandleSelectMergeMethod()
+			if err != nil {
+				return err
+			}
+			if mergeMethod != "" {
+				cfg.Local.MergeMethod = mergeMethod
+			}
+
 			cfg.MarkLocalDirty()
 
 			log.Info("Note: 'main' and 'master' are protected by default")
