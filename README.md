@@ -162,6 +162,26 @@ Interactive screens use modal navigation:
 - Arrow keys and `Tab` / `Shift+Tab` continue to work
 - `Ctrl+C` remains available as an emergency quit
 
+## 🗂️ Local Config
+
+Repository-local settings live in `.gtconfig.yaml`.
+
+Example:
+
+```yaml
+protected:
+  - main
+  - develop
+merge_method: queue
+```
+
+Supported `merge_method` values:
+
+- `merge`
+- `squash`
+- `rebase`
+- `queue` for GitHub merge queue
+
 ## 🧱 Code Structure
 
 ```text
