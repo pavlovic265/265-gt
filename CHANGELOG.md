@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.73.0](https://github.com/pavlovic265/265-gt/compare/v0.72.0...v0.73.0) (2026-03-27)
+
+
+### Features
+
+* add repo-local merge method config for PR merges ([67bd4fa](https://github.com/pavlovic265/265-gt/commit/67bd4fa3ede06961fd4ced19bafc57ad8f3cba9b))
+
 ## [0.72.0](https://github.com/pavlovic265/265-gt/compare/v0.71.0...v0.72.0) (2026-03-25)
 
 
