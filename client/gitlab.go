@@ -381,6 +381,8 @@ func (c *gitLabClient) MergePullRequest(ctx context.Context, prNumber int) error
 		payload = map[string]any{"squash": true}
 	case constants.MergeMethodRebase:
 		return fmt.Errorf("merge method %q is not supported for GitLab; use 'merge' or 'squash'", mergeMethod)
+	case constants.MergeMethodQueue:
+		return fmt.Errorf("merge method %q is not supported for GitLab", mergeMethod)
 	default:
 		return fmt.Errorf("unsupported merge method %q", mergeMethod)
 	}

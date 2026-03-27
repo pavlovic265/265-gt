@@ -28,3 +28,21 @@ query ListOpenPullRequests($owner: String!, $repo: String!) {
     }
   }
 }`
+
+const githubPullRequestNodeIDQuery = `
+query PullRequestNodeID($owner: String!, $repo: String!, $number: Int!) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      id
+    }
+  }
+}`
+
+const githubEnqueuePullRequestMutation = `
+mutation EnqueuePullRequest($pullRequestId: ID!) {
+  enqueuePullRequest(input: { pullRequestId: $pullRequestId }) {
+    mergeQueueEntry {
+      id
+    }
+  }
+}`

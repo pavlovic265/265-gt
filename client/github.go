@@ -66,6 +66,44 @@ func getConfiguredMergeMethod(ctx context.Context) (constants.MergeMethod, error
 	return cfg.Local.MergeMethod, nil
 }
 
+func (c *gitHubClient) doGraphQLRequest(
+	ctx context.Context, token, query string, variables map[string]any, out any,
+) error {
+	payload := map[string]any{
+		"query":     query,
+		"variables": variables,
+	}
+
+	jsonBody, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(
+		ctx, http.MethodPost, githubGraphQLAPIBase, bytes.NewBuffer(jsonBody),
+	)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+
+	resp, err := githubHTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("graphql request failed: %s", resp.Status)
+	}
+
+	return json.NewDecoder(resp.Body).Decode(out)
+}
+
 func (c *gitHubClient) doRequest(
 	ctx context.Context, method, url string, body any, token string,
 ) (*http.Response, error) {
@@ -480,6 +518,10 @@ func (c *gitHubClient) MergePullRequest(ctx context.Context, prNumber int) error
 		return err
 	}
 
+	if mergeMethod == constants.MergeMethodQueue {
+		return c.enqueuePullRequest(ctx, repoInfo, account.Token, prNumber)
+	}
+
 	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%d/merge", githubAPIBase, repoInfo.Owner, repoInfo.Repo, prNumber)
 	resp, err := c.doRequest(ctx, "PUT", url, map[string]string{
 		"merge_method": mergeMethod.String(),
@@ -495,6 +537,66 @@ func (c *gitHubClient) MergePullRequest(ctx context.Context, prNumber int) error
 		}
 		_ = json.NewDecoder(resp.Body).Decode(&errResp)
 		return fmt.Errorf("failed to merge PR: %s", errResp.Message)
+	}
+
+	return nil
+}
+
+func (c *gitHubClient) enqueuePullRequest(
+	ctx context.Context, repoInfo *RepoInfo, token string, prNumber int,
+) error {
+	var queryResult struct {
+		Data struct {
+			Repository struct {
+				PullRequest *struct {
+					ID string `json:"id"`
+				} `json:"pullRequest"`
+			} `json:"repository"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	err := c.doGraphQLRequest(ctx, token, githubPullRequestNodeIDQuery, map[string]any{
+		"owner":  repoInfo.Owner,
+		"repo":   repoInfo.Repo,
+		"number": prNumber,
+	}, &queryResult)
+	if err != nil {
+		return err
+	}
+	if len(queryResult.Errors) > 0 {
+		return fmt.Errorf("failed to enqueue PR: %s", queryResult.Errors[0].Message)
+	}
+	if queryResult.Data.Repository.PullRequest == nil || queryResult.Data.Repository.PullRequest.ID == "" {
+		return fmt.Errorf("failed to enqueue PR: pull request not found")
+	}
+
+	var mutationResult struct {
+		Data struct {
+			EnqueuePullRequest struct {
+				MergeQueueEntry *struct {
+					ID string `json:"id"`
+				} `json:"mergeQueueEntry"`
+			} `json:"enqueuePullRequest"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	err = c.doGraphQLRequest(ctx, token, githubEnqueuePullRequestMutation, map[string]any{
+		"pullRequestId": queryResult.Data.Repository.PullRequest.ID,
+	}, &mutationResult)
+	if err != nil {
+		return err
+	}
+	if len(mutationResult.Errors) > 0 {
+		return fmt.Errorf("failed to enqueue PR: %s", mutationResult.Errors[0].Message)
+	}
+	if mutationResult.Data.EnqueuePullRequest.MergeQueueEntry == nil {
+		return fmt.Errorf("failed to enqueue PR: merge queue entry not created")
 	}
 
 	return nil

@@ -6,6 +6,7 @@ var (
 	MergeMethodMerge  MergeMethod = "merge"
 	MergeMethodSquash MergeMethod = "squash"
 	MergeMethodRebase MergeMethod = "rebase"
+	MergeMethodQueue  MergeMethod = "queue"
 )
 
 func (m MergeMethod) String() string {
@@ -16,6 +17,8 @@ func (m MergeMethod) String() string {
 		return "squash"
 	case MergeMethodRebase:
 		return "rebase"
+	case MergeMethodQueue:
+		return "queue"
 	default:
 		return ""
 	}

@@ -6,6 +6,7 @@ import (
 )
 
 var mergeMethodChoices = []string{
+	constants.MergeMethodQueue.String(),
 	constants.MergeMethodSquash.String(),
 	constants.MergeMethodRebase.String(),
 	constants.MergeMethodMerge.String(),
