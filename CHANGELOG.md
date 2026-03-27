@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.75.0](https://github.com/pavlovic265/265-gt/compare/v0.74.0...v0.75.0) (2026-03-27)
+
+
+### Features
+
+* support GitHub merge queue via repo-local merge method ([677cfbd](https://github.com/pavlovic265/265-gt/commit/677cfbde023e2070d198398dac4c665e56fb8593))
+
 ## [0.74.0](https://github.com/pavlovic265/265-gt/compare/v0.73.0...v0.74.0) (2026-03-27)
 
 
